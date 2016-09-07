@@ -1,0 +1,13 @@
+---
+# Defaults for samples
+disabled: false                  # Default disabled for all samples
+generator: sample                # Default generator for events
+outputter: stdout                # Default outputter for events      
+rater: config                    # Default rater for events
+interval: 60                     # Default interval for events
+delay: 0                         # Delay before starting generation of events
+count: 0                         # Default count of events, 0 generates the whole sample on each interval
+earliest: now                    # Default timestamp for earliest, as expressed in Splunk's relative time syntax
+latest: now                      # Default timestamp for latest, as expressed in Splunk's relative time syntax
+randomizeCount: 0.2              # Floating point representing +/- what percentage events should randomize
+randomizeEvents: true            # Randomly pick from events in the sample rather than sequentually picking from them
