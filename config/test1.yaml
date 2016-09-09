@@ -1,7 +1,6 @@
-name: test1
 interval: 1
 count: 3
 earliest: -3s
 latest: now
 tokens:
-  - name: ts-ymdhms
+	name: ts-ymdhms
