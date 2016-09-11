@@ -4,4 +4,43 @@ count: 3
 earliest: -3s
 latest: now
 tokens:
-  - name: ts-ymdhms
+  - name: ts-ymdhmsms-regex  # References existing default token
+  - name: transtype          # An inline token defined in this YAML
+    token: transType=(\w+)
+    type: percChoice
+    percChoice: 
+      - New: .333
+        Change: .5
+        Delete: .1666
+  - name: integerid-template # References existing default token
+  - name: guid-template      # References existing default token
+  - name: usernames-template # References existing default token
+  - name: markets-city 
+    format: template
+    token: city
+    type: fieldChoice
+    sample: markets.csv
+    field: city
+  - name: markets-state 
+    format: template
+    token: city
+    type: fieldChoice
+    sample: markets.csv
+    field: state
+  - name: markets-city 
+    format: template
+    token: city
+    type: fieldChoice
+    sample: markets.csv
+    field: zip
+  - name: value
+    format: regex
+    token: value=(\d+)
+    type: random
+    replacement: float
+    precision: 3
+    lower: 0
+    upper: 10
+
+lines:
+  - 2012-09-14 16:30:20,072 transType=ReplaceMe transID=000000 transGUID=0A0B0C userName=bob city="City" state=State zip=00000 value=0

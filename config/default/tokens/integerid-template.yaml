@@ -1,0 +1,5 @@
+name: integerid-template
+format: template
+token: integerid
+type: integerid
+replacement: 100000

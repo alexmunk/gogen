@@ -2,14 +2,17 @@ package config
 
 import (
 	"encoding/json"
-	"github.com/coccyx/gogen/timeparser"
-	"github.com/ghodss/yaml"
-	"github.com/op/go-logging"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sync"
 	"time"
+
+	"github.com/coccyx/timeparser"
+	"github.com/ghodss/yaml"
+	_ "github.com/hhkbp2/go-strftime"
+	"github.com/op/go-logging"
+	_ "github.com/pbnjay/strptime"
 )
 
 // Config is a struct representing a Singleton which contains a copy of the running config
@@ -25,6 +28,7 @@ type Config struct {
 	Timezone *time.Location  `json:"-"`
 }
 
+// Global represents global configuration options which apply to all of gogen
 type Global struct {
 	Debug            bool `json:"debug"`
 	Verbose          bool `json:"verbose"`
@@ -43,6 +47,7 @@ func getConfig() *Config {
 	return instance
 }
 
+// NewConfig is a singleton constructor which will return a pointer to a global instance of Config
 func NewConfig() *Config {
 	c := getConfig()
 	backend := logging.NewLogBackend(os.Stdout, "", 0)
@@ -94,20 +99,42 @@ func NewConfig() *Config {
 				return nil
 			}
 
-			if s.End == "now" || s.End == "" {
+			// Setup Begin & End
+			// If End is not set, then we're intended to always run in realtime
+			if s.End == "" {
 				s.realtime = true
 			}
 			if len(s.Begin) > 0 {
-				if s.beginParsed, err = timeparser.TimeParser(s.Begin, time.Now); err != nil {
+				if s.beginParsed, err = timeparser.TimeParserNow(s.Begin, time.Now); err != nil {
 					c.Log.Errorf("Error parsing Begin for sample %s: %v", s.Name, err)
-					return nil
 				}
 			}
 			if len(s.End) > 0 {
-				if s.endParsed, err = timeparser.TimeParser(s.End, time.Now); err != nil {
-					c.Log.Errorf("Error parsing Begin for sample %s: %v", s.Name, err)
-					return nil
+				if s.endParsed, err = timeparser.TimeParserNow(s.End, time.Now); err != nil {
+					c.Log.Errorf("Error parsing End for sample %s: %v", s.Name, err)
 				}
+			}
+
+			// Parse earliest and latest as relative times
+
+			// Cache a time so we can get a delta for parsed earliest and latest
+			n := time.Now()
+			now := func() time.Time {
+				return n
+			}
+
+			var p time.Time
+			if p, err = timeparser.TimeParserNow(s.Earliest, now); err != nil {
+				c.Log.Errorf("Error parsing earliest time '%s' for sample '%s', using Now", s.Earliest, s.Name)
+				s.earliestParsed = time.Duration(0)
+			} else {
+				s.earliestParsed = n.Sub(p)
+			}
+			if p, err = timeparser.TimeParserNow(s.Latest, now); err != nil {
+				c.Log.Errorf("Error parsing latest time '%s' for sample '%s', using Now", s.Latest, s.Name)
+				s.latestParsed = time.Duration(0)
+			} else {
+				s.latestParsed = n.Sub(p)
 			}
 
 			c.Samples = append(c.Samples, s)

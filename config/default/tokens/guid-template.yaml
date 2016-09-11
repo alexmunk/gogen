@@ -1,0 +1,5 @@
+name: guid-template
+format: template
+token: guid
+type: random
+replacement: guid
