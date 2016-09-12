@@ -1,36 +1,18 @@
 package generator
 
-import (
-	"time"
+import "github.com/coccyx/gogen/config"
 
-	"github.com/coccyx/gogen/config"
-)
-
-// GenQueueItem represents one generation job
-type GenQueueItem struct {
-	S        *config.Sample
-	Count    int
-	Earliest time.Time
-	Latest   time.Time
-	OQ       chan []string
-}
-
-// Generator will generate count events from earliest to latest time and put them
-// in the output queue
-type Generator interface {
-	Gen(item *GenQueueItem) error
-}
-
-func Start(gq chan *GenQueueItem) {
+func Start(gq chan *config.GenQueueItem) {
 	for {
 		item := <-gq
-		if item.S.Generator == "sample" {
-			sampleGen(item)
+		// Check to see if our generator is not set
+		if item.S.Gen == nil {
+			item.S.Log.Infof("Setting sample '%s' to generator '%s'", item.S.Name, item.S.Generator)
+			if item.S.Generator == "sample" {
+				s := new(sample)
+				item.S.Gen = s
+			}
 		}
+		item.S.Gen.Gen(item)
 	}
-}
-
-func sampleGen(item *GenQueueItem) {
-	c := config.NewConfig()
-	c.Log.Debugf("Gen Queue Item %#v", item)
 }

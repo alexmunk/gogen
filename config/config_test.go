@@ -16,6 +16,6 @@ func TestNewConfig(t *testing.T) {
 
 	global := Global{Debug: false, Verbose: false, UseOutputQueue: true, GeneratorWorkers: 1, OutputWorkers: 1}
 	assert.Equal(t, c.Global, global)
-	defaultSample := Sample{Disabled: false, Generator: "sample", Outputter: "stdout", Rater: "config", Interval: 60, Delay: 0, Count: 0, Earliest: "now", Latest: "now", RandomizeCount: 0.20000000298023224, RandomizeEvents: true}
-	assert.Equal(t, c.defaultSample, defaultSample)
+	defaultSample := Sample{Name: "", Disabled: false, Generator: "sample", Outputter: "stdout", Rater: "config", Interval: 60, Delay: 0, Count: 0, Earliest: "now", Latest: "now", Begin: "", End: "", RandomizeCount: 0.2, RandomizeEvents: true}
+	assert.Equal(t, c.DefaultSample, defaultSample)
 }

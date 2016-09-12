@@ -24,8 +24,7 @@ type Config struct {
 	Global        Global    `json:"global"`
 	Samples       []*Sample `json:"samples"`
 	DefaultTokens []*Token  `json:"defaultTokens"`
-
-	defaultSample Sample
+	DefaultSample Sample    `json:"defaultSample"`
 	initialized   bool
 
 	// Exported but internal use variables
@@ -77,7 +76,7 @@ func NewConfig() *Config {
 	if err := c.parseFileConfig(&c.Global, home, "config/default/global.yml"); err != nil {
 		c.Log.Panic(err)
 	}
-	if err := c.parseFileConfig(&c.defaultSample, home, "config/default/sample.yml"); err != nil {
+	if err := c.parseFileConfig(&c.DefaultSample, home, "config/default/sample.yml"); err != nil {
 		c.Log.Panic(err)
 	}
 
@@ -171,7 +170,7 @@ func NewConfig() *Config {
 	fullPath = filepath.Join(home, "config", "samples")
 	acceptableExtensions = map[string]bool{".yml": true, ".yaml": true, ".json": true}
 	c.walkPath(fullPath, acceptableExtensions, func(innerPath string) error {
-		s := c.defaultSample
+		s := c.DefaultSample
 		if err := c.parseFileConfig(&s, innerPath); err != nil {
 			c.Log.Errorf("Error parsing config %s: %s", innerPath, err)
 			return nil
@@ -286,6 +285,9 @@ func NewConfig() *Config {
 
 		}
 
+		// Give us a logger we can use elsewhere
+		s.Log = c.Log
+
 		c.Samples = append(c.Samples, &s)
 		return nil
 	})
@@ -357,5 +359,15 @@ func (c *Config) parseFileConfig(out interface{}, path ...string) error {
 		}
 	}
 	// c.Log.Debugf("Out: %#v\n", out)
+	return nil
+}
+
+// FindSampleByName finds and returns a pointer to a sample referenced by the passed name
+func (c Config) FindSampleByName(name string) *Sample {
+	for i := 0; i < len(c.Samples); i++ {
+		if c.Samples[i].Name == name {
+			return c.Samples[i]
+		}
+	}
 	return nil
 }

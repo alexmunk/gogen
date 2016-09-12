@@ -1,9 +1,20 @@
 package generator
 
-import "github.com/coccyx/gogen/config"
+import (
+	"fmt"
 
-func SampleGen(item *GenQueueItem) {
-	c := config.NewConfig()
+	"github.com/coccyx/gogen/config"
+)
 
-	c.Log.Debugf("Gen Queue Item %#v", item)
+type sample struct{}
+
+func (foo sample) Gen(item *config.GenQueueItem) error {
+	item.S.Log.Debugf("Gen Queue Item %#v", item)
+	outstr := []map[string]string{{"_raw": fmt.Sprintf("%#v", item)}}
+	outitem := &config.OutQueueItem{S: item.S, Events: outstr}
+	select {
+	case item.OQ <- outitem:
+	default:
+	}
+	return nil
 }
