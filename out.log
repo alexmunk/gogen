@@ -1,44 +1,44 @@
-[36;1m2016-09-11T17:37:03.82-07:00 NewConfig [36m[0m GOGEN_HOME not set, setting to '.'
-[36;1m2016-09-11T17:37:03.82-07:00 NewConfig [36m[0m Home: .
-[36;1m2016-09-11T17:37:03.82-07:00 parseFileConfig [36m[0m Config Path: config/default/global.yml
-[36;1m2016-09-11T17:37:03.82-07:00 parseFileConfig [36m[0m Config Path: config/default/sample.yml
-[36;1m2016-09-11T17:37:03.821-07:00 func1 [36m[0m Walking, at config/default/tokens
-[36;1m2016-09-11T17:37:03.821-07:00 func1 [36m[0m Walking, at config/default/tokens/guid-template.yml
-[36;1m2016-09-11T17:37:03.821-07:00 parseFileConfig [36m[0m Config Path: config/default/tokens/guid-template.yml
-[36;1m2016-09-11T17:37:03.821-07:00 func1 [36m[0m Walking, at config/default/tokens/integerid-template.yml
-[36;1m2016-09-11T17:37:03.821-07:00 parseFileConfig [36m[0m Config Path: config/default/tokens/integerid-template.yml
-[36;1m2016-09-11T17:37:03.821-07:00 func1 [36m[0m Walking, at config/default/tokens/ts-ymdhmsms-regex.yml
-[36;1m2016-09-11T17:37:03.821-07:00 parseFileConfig [36m[0m Config Path: config/default/tokens/ts-ymdhmsms-regex.yml
-[36;1m2016-09-11T17:37:03.821-07:00 func1 [36m[0m Walking, at config/default/tokens/usernames-template.yml
-[36;1m2016-09-11T17:37:03.821-07:00 parseFileConfig [36m[0m Config Path: config/default/tokens/usernames-template.yml
-[36;1m2016-09-11T17:37:03.822-07:00 func1 [36m[0m Walking, at config/samples
-[36;1m2016-09-11T17:37:03.822-07:00 func1 [36m[0m Walking, at config/samples/markets.csv
-[36;1m2016-09-11T17:37:03.822-07:00 func1 [36m[0m Walking, at config/samples/markets.csv.bak
-[36;1m2016-09-11T17:37:03.822-07:00 func1 [36m[0m Walking, at config/samples/test1.yml
-[36;1m2016-09-11T17:37:03.822-07:00 func1 [36m[0m Walking, at config/samples/usernames.sample
-[36;1m2016-09-11T17:37:03.822-07:00 func1 [36m[0m Walking, at config/samples/usernames.sample.bak
-[36;1m2016-09-11T17:37:03.822-07:00 func1 [36m[0m Walking, at config/samples
-[36;1m2016-09-11T17:37:03.822-07:00 func1 [36m[0m Walking, at config/samples/markets.csv
-[36;1m2016-09-11T17:37:03.822-07:00 func1 [36m[0m Walking, at config/samples/markets.csv.bak
-[36;1m2016-09-11T17:37:03.822-07:00 func1 [36m[0m Walking, at config/samples/test1.yml
-[36;1m2016-09-11T17:37:03.822-07:00 func1 [36m[0m Walking, at config/samples/usernames.sample
-[36;1m2016-09-11T17:37:03.822-07:00 func1 [36m[0m Walking, at config/samples/usernames.sample.bak
-[36;1m2016-09-11T17:37:03.822-07:00 func1 [36m[0m Walking, at config/samples
-[36;1m2016-09-11T17:37:03.822-07:00 func1 [36m[0m Walking, at config/samples/markets.csv
-[36;1m2016-09-11T17:37:03.822-07:00 func1 [36m[0m Walking, at config/samples/markets.csv.bak
-[36;1m2016-09-11T17:37:03.822-07:00 func1 [36m[0m Walking, at config/samples/test1.yml
-[36;1m2016-09-11T17:37:03.822-07:00 parseFileConfig [36m[0m Config Path: config/samples/test1.yml
-[36;1m2016-09-11T17:37:03.822-07:00 func1 [36m[0m Walking, at config/samples/usernames.sample
-[36;1m2016-09-11T17:37:03.822-07:00 func1 [36m[0m Walking, at config/samples/usernames.sample.bak
-[36;1m2016-09-11T17:37:03.822-07:00 resolve [36m[0m Resolving sample 'markets.csv' to token 'markets.csv'
-[36;1m2016-09-11T17:37:03.822-07:00 resolve [36m[0m Resolving sample 'markets.csv' to token 'markets.csv'
-[36;1m2016-09-11T17:37:03.822-07:00 resolve [36m[0m Resolving sample 'markets.csv' to token 'markets.csv'
-[36;1m2016-09-11T17:37:03.822-07:00 main [36m[0m Pretty Values &config.Config{
+[36;1m2016-09-11T23:16:07.591-07:00 NewConfig [36m[0m GOGEN_HOME not set, setting to '.'
+[36;1m2016-09-11T23:16:07.591-07:00 NewConfig [36m[0m Home: .
+[36;1m2016-09-11T23:16:07.591-07:00 parseFileConfig [36m[0m Config Path: config/default/global.yml
+[36;1m2016-09-11T23:16:07.592-07:00 parseFileConfig [36m[0m Config Path: config/default/sample.yml
+[36;1m2016-09-11T23:16:07.592-07:00 func1 [36m[0m Walking, at config/default/tokens
+[36;1m2016-09-11T23:16:07.592-07:00 func1 [36m[0m Walking, at config/default/tokens/guid-template.yml
+[36;1m2016-09-11T23:16:07.592-07:00 parseFileConfig [36m[0m Config Path: config/default/tokens/guid-template.yml
+[36;1m2016-09-11T23:16:07.593-07:00 func1 [36m[0m Walking, at config/default/tokens/integerid-template.yml
+[36;1m2016-09-11T23:16:07.593-07:00 parseFileConfig [36m[0m Config Path: config/default/tokens/integerid-template.yml
+[36;1m2016-09-11T23:16:07.593-07:00 func1 [36m[0m Walking, at config/default/tokens/ts-ymdhmsms-regex.yml
+[36;1m2016-09-11T23:16:07.593-07:00 parseFileConfig [36m[0m Config Path: config/default/tokens/ts-ymdhmsms-regex.yml
+[36;1m2016-09-11T23:16:07.593-07:00 func1 [36m[0m Walking, at config/default/tokens/usernames-template.yml
+[36;1m2016-09-11T23:16:07.593-07:00 parseFileConfig [36m[0m Config Path: config/default/tokens/usernames-template.yml
+[36;1m2016-09-11T23:16:07.594-07:00 func1 [36m[0m Walking, at config/samples
+[36;1m2016-09-11T23:16:07.594-07:00 func1 [36m[0m Walking, at config/samples/markets.csv
+[36;1m2016-09-11T23:16:07.594-07:00 func1 [36m[0m Walking, at config/samples/markets.csv.bak
+[36;1m2016-09-11T23:16:07.594-07:00 func1 [36m[0m Walking, at config/samples/test1.yml
+[36;1m2016-09-11T23:16:07.594-07:00 func1 [36m[0m Walking, at config/samples/usernames.sample
+[36;1m2016-09-11T23:16:07.594-07:00 func1 [36m[0m Walking, at config/samples/usernames.sample.bak
+[36;1m2016-09-11T23:16:07.594-07:00 func1 [36m[0m Walking, at config/samples
+[36;1m2016-09-11T23:16:07.594-07:00 func1 [36m[0m Walking, at config/samples/markets.csv
+[36;1m2016-09-11T23:16:07.594-07:00 func1 [36m[0m Walking, at config/samples/markets.csv.bak
+[36;1m2016-09-11T23:16:07.594-07:00 func1 [36m[0m Walking, at config/samples/test1.yml
+[36;1m2016-09-11T23:16:07.594-07:00 func1 [36m[0m Walking, at config/samples/usernames.sample
+[36;1m2016-09-11T23:16:07.594-07:00 func1 [36m[0m Walking, at config/samples/usernames.sample.bak
+[36;1m2016-09-11T23:16:07.594-07:00 func1 [36m[0m Walking, at config/samples
+[36;1m2016-09-11T23:16:07.595-07:00 func1 [36m[0m Walking, at config/samples/markets.csv
+[36;1m2016-09-11T23:16:07.595-07:00 func1 [36m[0m Walking, at config/samples/markets.csv.bak
+[36;1m2016-09-11T23:16:07.595-07:00 func1 [36m[0m Walking, at config/samples/test1.yml
+[36;1m2016-09-11T23:16:07.595-07:00 parseFileConfig [36m[0m Config Path: config/samples/test1.yml
+[36;1m2016-09-11T23:16:07.595-07:00 func1 [36m[0m Walking, at config/samples/usernames.sample
+[36;1m2016-09-11T23:16:07.595-07:00 func1 [36m[0m Walking, at config/samples/usernames.sample.bak
+[36;1m2016-09-11T23:16:07.595-07:00 resolve [36m[0m Resolving sample 'markets.csv' to token 'markets.csv'
+[36;1m2016-09-11T23:16:07.595-07:00 resolve [36m[0m Resolving sample 'markets.csv' to token 'markets.csv'
+[36;1m2016-09-11T23:16:07.595-07:00 resolve [36m[0m Resolving sample 'markets.csv' to token 'markets.csv'
+[36;1m2016-09-11T23:16:07.595-07:00 main [36m[0m Pretty Values &config.Config{
     Global:  config.Global{Debug:false, Verbose:false, UseOutputQueue:true, GeneratorWorkers:1, OutputWorkers:1},
     Samples: {
         &config.Sample{
             Name:            "usernames.sample",
-            Disabled:        false,
+            Disabled:        true,
             Generator:       "",
             Outputter:       "",
             Rater:           "",
@@ -54,16 +54,16 @@
             Tokens:          nil,
             Lines:           {"birodivulga162", "nildajcbonanno", "ivettaadelima", "pckomono", "Looreeto", "JooPedro1591", "claaarecurlingg", "acciokcavote", "JungD", "InaraAllves", "Haroldmcaol", "xNessaa", "stylesdofunk", "meltemmeltemm", "emapujig", "cellphones4deal", "amisisuvi", "MegSeecharran95", "MargueritaYociu", "MarcioBFasano"},
             LinesMap:        nil,
-            earliestParsed:  0,
-            latestParsed:    0,
-            beginParsed:     time.Time{},
-            endParsed:       time.Time{},
-            current:         time.Time{},
-            realtime:        false,
+            EarliestParsed:  0,
+            LatestParsed:    0,
+            BeginParsed:     time.Time{},
+            EndParsed:       time.Time{},
+            Current:         time.Time{},
+            Realtime:        false,
         },
         &config.Sample{
             Name:            "markets.csv",
-            Disabled:        false,
+            Disabled:        true,
             Generator:       "",
             Outputter:       "",
             Rater:           "",
@@ -79,32 +79,32 @@
             Tokens:          nil,
             Lines:           nil,
             LinesMap:        {
-                {"state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1101", "city":"SPRINGFIELD"},
-                {"long":"-72.5977", "county":"HAMPDEN", "zip":"1102", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106"},
+                {"lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1101", "city":"SPRINGFIELD", "state":"MA"},
+                {"lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1102", "city":"SPRINGFIELD", "state":"MA"},
                 {"zip":"1103", "city":"SPRINGFIELD", "state":"MA", "lat":"42.1029", "long":"-72.588735", "county":"HAMPDEN"},
-                {"zip":"1104", "city":"SPRINGFIELD", "state":"MA", "lat":"42.128848", "long":"-72.577769", "county":"HAMPDEN"},
-                {"lat":"42.099931", "long":"-72.578312", "county":"HAMPDEN", "zip":"1105", "city":"SPRINGFIELD", "state":"MA"},
-                {"city":"SPRINGFIELD", "state":"MA", "lat":"42.117907", "long":"-72.606544", "county":"HAMPDEN", "zip":"1107"},
-                {"state":"MA", "lat":"42.085314", "long":"-72.558432", "county":"HAMPDEN", "zip":"1108", "city":"SPRINGFIELD"},
+                {"long":"-72.577769", "county":"HAMPDEN", "zip":"1104", "city":"SPRINGFIELD", "state":"MA", "lat":"42.128848"},
+                {"zip":"1105", "city":"SPRINGFIELD", "state":"MA", "lat":"42.099931", "long":"-72.578312", "county":"HAMPDEN"},
+                {"zip":"1107", "city":"SPRINGFIELD", "state":"MA", "lat":"42.117907", "long":"-72.606544", "county":"HAMPDEN"},
+                {"zip":"1108", "city":"SPRINGFIELD", "state":"MA", "lat":"42.085314", "long":"-72.558432", "county":"HAMPDEN"},
                 {"lat":"42.114455", "long":"-72.554349", "county":"HAMPDEN", "zip":"1109", "city":"SPRINGFIELD", "state":"MA"},
                 {"zip":"1111", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
-                {"long":"-72.5977", "county":"HAMPDEN", "zip":"1115", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106"},
+                {"lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1115", "city":"SPRINGFIELD", "state":"MA"},
                 {"zip":"1118", "city":"SPRINGFIELD", "state":"MA", "lat":"42.092937", "long":"-72.527445", "county":"HAMPDEN"},
-                {"zip":"1119", "city":"SPRINGFIELD", "state":"MA", "lat":"42.12473", "long":"-72.51211", "county":"HAMPDEN"},
-                {"zip":"1128", "city":"SPRINGFIELD", "state":"MA", "lat":"42.094397", "long":"-72.488903", "county":"HAMPDEN"},
-                {"long":"-72.487622", "county":"HAMPDEN", "zip":"1129", "city":"SPRINGFIELD", "state":"MA", "lat":"42.122263"},
-                {"zip":"1133", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
-                {"city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1138"},
-                {"state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1139", "city":"SPRINGFIELD"},
-                {"long":"-72.5977", "county":"HAMPDEN", "zip":"1144", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106"},
-                {"zip":"1151", "city":"SPRINGFIELD", "state":"MA", "lat":"42.153225", "long":"-72.505048", "county":"HAMPDEN"},
+                {"lat":"42.12473", "long":"-72.51211", "county":"HAMPDEN", "zip":"1119", "city":"SPRINGFIELD", "state":"MA"},
+                {"city":"SPRINGFIELD", "state":"MA", "lat":"42.094397", "long":"-72.488903", "county":"HAMPDEN", "zip":"1128"},
+                {"state":"MA", "lat":"42.122263", "long":"-72.487622", "county":"HAMPDEN", "zip":"1129", "city":"SPRINGFIELD"},
+                {"long":"-72.5977", "county":"HAMPDEN", "zip":"1133", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106"},
+                {"zip":"1138", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
+                {"zip":"1139", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
+                {"zip":"1144", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
+                {"long":"-72.505048", "county":"HAMPDEN", "zip":"1151", "city":"SPRINGFIELD", "state":"MA", "lat":"42.153225"},
             },
-            earliestParsed: 0,
-            latestParsed:   0,
-            beginParsed:    time.Time{},
-            endParsed:      time.Time{},
-            current:        time.Time{},
-            realtime:       false,
+            EarliestParsed: 0,
+            LatestParsed:   0,
+            BeginParsed:    time.Time{},
+            EndParsed:      time.Time{},
+            Current:        time.Time{},
+            Realtime:       false,
         },
         &config.Sample{
             Name:            "test1",
@@ -213,46 +213,46 @@
                     Lower:       0,
                     Upper:       0,
                     PercChoice:  {
-                        {"state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1101", "city":"SPRINGFIELD"},
+                        {"zip":"1101", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
                         {"long":"-72.5977", "county":"HAMPDEN", "zip":"1102", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106"},
                         {"zip":"1103", "city":"SPRINGFIELD", "state":"MA", "lat":"42.1029", "long":"-72.588735", "county":"HAMPDEN"},
-                        {"zip":"1104", "city":"SPRINGFIELD", "state":"MA", "lat":"42.128848", "long":"-72.577769", "county":"HAMPDEN"},
-                        {"zip":"1105", "city":"SPRINGFIELD", "state":"MA", "lat":"42.099931", "long":"-72.578312", "county":"HAMPDEN"},
-                        {"zip":"1107", "city":"SPRINGFIELD", "state":"MA", "lat":"42.117907", "long":"-72.606544", "county":"HAMPDEN"},
+                        {"city":"SPRINGFIELD", "state":"MA", "lat":"42.128848", "long":"-72.577769", "county":"HAMPDEN", "zip":"1104"},
+                        {"state":"MA", "lat":"42.099931", "long":"-72.578312", "county":"HAMPDEN", "zip":"1105", "city":"SPRINGFIELD"},
+                        {"long":"-72.606544", "county":"HAMPDEN", "zip":"1107", "city":"SPRINGFIELD", "state":"MA", "lat":"42.117907"},
                         {"zip":"1108", "city":"SPRINGFIELD", "state":"MA", "lat":"42.085314", "long":"-72.558432", "county":"HAMPDEN"},
                         {"zip":"1109", "city":"SPRINGFIELD", "state":"MA", "lat":"42.114455", "long":"-72.554349", "county":"HAMPDEN"},
-                        {"lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1111", "city":"SPRINGFIELD", "state":"MA"},
-                        {"zip":"1115", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
-                        {"long":"-72.527445", "county":"HAMPDEN", "zip":"1118", "city":"SPRINGFIELD", "state":"MA", "lat":"42.092937"},
+                        {"zip":"1111", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
+                        {"long":"-72.5977", "county":"HAMPDEN", "zip":"1115", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106"},
+                        {"zip":"1118", "city":"SPRINGFIELD", "state":"MA", "lat":"42.092937", "long":"-72.527445", "county":"HAMPDEN"},
                         {"zip":"1119", "city":"SPRINGFIELD", "state":"MA", "lat":"42.12473", "long":"-72.51211", "county":"HAMPDEN"},
                         {"zip":"1128", "city":"SPRINGFIELD", "state":"MA", "lat":"42.094397", "long":"-72.488903", "county":"HAMPDEN"},
-                        {"zip":"1129", "city":"SPRINGFIELD", "state":"MA", "lat":"42.122263", "long":"-72.487622", "county":"HAMPDEN"},
-                        {"city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1133"},
-                        {"state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1138", "city":"SPRINGFIELD"},
-                        {"lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1139", "city":"SPRINGFIELD", "state":"MA"},
-                        {"city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1144"},
-                        {"county":"HAMPDEN", "zip":"1151", "city":"SPRINGFIELD", "state":"MA", "lat":"42.153225", "long":"-72.505048"},
-                    },
-                    FieldChoice: {
-                        {"county":"HAMPDEN", "zip":"1101", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977"},
-                        {"state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1102", "city":"SPRINGFIELD"},
-                        {"long":"-72.588735", "county":"HAMPDEN", "zip":"1103", "city":"SPRINGFIELD", "state":"MA", "lat":"42.1029"},
-                        {"zip":"1104", "city":"SPRINGFIELD", "state":"MA", "lat":"42.128848", "long":"-72.577769", "county":"HAMPDEN"},
-                        {"zip":"1105", "city":"SPRINGFIELD", "state":"MA", "lat":"42.099931", "long":"-72.578312", "county":"HAMPDEN"},
-                        {"lat":"42.117907", "long":"-72.606544", "county":"HAMPDEN", "zip":"1107", "city":"SPRINGFIELD", "state":"MA"},
-                        {"zip":"1108", "city":"SPRINGFIELD", "state":"MA", "lat":"42.085314", "long":"-72.558432", "county":"HAMPDEN"},
-                        {"long":"-72.554349", "county":"HAMPDEN", "zip":"1109", "city":"SPRINGFIELD", "state":"MA", "lat":"42.114455"},
-                        {"zip":"1111", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
-                        {"city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1115"},
-                        {"county":"HAMPDEN", "zip":"1118", "city":"SPRINGFIELD", "state":"MA", "lat":"42.092937", "long":"-72.527445"},
-                        {"state":"MA", "lat":"42.12473", "long":"-72.51211", "county":"HAMPDEN", "zip":"1119", "city":"SPRINGFIELD"},
-                        {"lat":"42.094397", "long":"-72.488903", "county":"HAMPDEN", "zip":"1128", "city":"SPRINGFIELD", "state":"MA"},
                         {"city":"SPRINGFIELD", "state":"MA", "lat":"42.122263", "long":"-72.487622", "county":"HAMPDEN", "zip":"1129"},
                         {"state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1133", "city":"SPRINGFIELD"},
                         {"long":"-72.5977", "county":"HAMPDEN", "zip":"1138", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106"},
                         {"zip":"1139", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
                         {"zip":"1144", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
-                        {"zip":"1151", "city":"SPRINGFIELD", "state":"MA", "lat":"42.153225", "long":"-72.505048", "county":"HAMPDEN"},
+                        {"long":"-72.505048", "county":"HAMPDEN", "zip":"1151", "city":"SPRINGFIELD", "state":"MA", "lat":"42.153225"},
+                    },
+                    FieldChoice: {
+                        {"zip":"1101", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
+                        {"zip":"1102", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
+                        {"long":"-72.588735", "county":"HAMPDEN", "zip":"1103", "city":"SPRINGFIELD", "state":"MA", "lat":"42.1029"},
+                        {"zip":"1104", "city":"SPRINGFIELD", "state":"MA", "lat":"42.128848", "long":"-72.577769", "county":"HAMPDEN"},
+                        {"city":"SPRINGFIELD", "state":"MA", "lat":"42.099931", "long":"-72.578312", "county":"HAMPDEN", "zip":"1105"},
+                        {"state":"MA", "lat":"42.117907", "long":"-72.606544", "county":"HAMPDEN", "zip":"1107", "city":"SPRINGFIELD"},
+                        {"lat":"42.085314", "long":"-72.558432", "county":"HAMPDEN", "zip":"1108", "city":"SPRINGFIELD", "state":"MA"},
+                        {"city":"SPRINGFIELD", "state":"MA", "lat":"42.114455", "long":"-72.554349", "county":"HAMPDEN", "zip":"1109"},
+                        {"county":"HAMPDEN", "zip":"1111", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977"},
+                        {"county":"HAMPDEN", "zip":"1115", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977"},
+                        {"county":"HAMPDEN", "zip":"1118", "city":"SPRINGFIELD", "state":"MA", "lat":"42.092937", "long":"-72.527445"},
+                        {"state":"MA", "lat":"42.12473", "long":"-72.51211", "county":"HAMPDEN", "zip":"1119", "city":"SPRINGFIELD"},
+                        {"long":"-72.488903", "county":"HAMPDEN", "zip":"1128", "city":"SPRINGFIELD", "state":"MA", "lat":"42.094397"},
+                        {"zip":"1129", "city":"SPRINGFIELD", "state":"MA", "lat":"42.122263", "long":"-72.487622", "county":"HAMPDEN"},
+                        {"zip":"1133", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
+                        {"city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1138"},
+                        {"county":"HAMPDEN", "zip":"1139", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977"},
+                        {"state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1144", "city":"SPRINGFIELD"},
+                        {"lat":"42.153225", "long":"-72.505048", "county":"HAMPDEN", "zip":"1151", "city":"SPRINGFIELD", "state":"MA"},
                     },
                     Choice: nil,
                 },
@@ -268,46 +268,46 @@
                     Lower:       0,
                     Upper:       0,
                     PercChoice:  {
-                        {"lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1101", "city":"SPRINGFIELD", "state":"MA"},
-                        {"zip":"1102", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
-                        {"long":"-72.588735", "county":"HAMPDEN", "zip":"1103", "city":"SPRINGFIELD", "state":"MA", "lat":"42.1029"},
-                        {"zip":"1104", "city":"SPRINGFIELD", "state":"MA", "lat":"42.128848", "long":"-72.577769", "county":"HAMPDEN"},
-                        {"city":"SPRINGFIELD", "state":"MA", "lat":"42.099931", "long":"-72.578312", "county":"HAMPDEN", "zip":"1105"},
-                        {"state":"MA", "lat":"42.117907", "long":"-72.606544", "county":"HAMPDEN", "zip":"1107", "city":"SPRINGFIELD"},
+                        {"city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1101"},
+                        {"county":"HAMPDEN", "zip":"1102", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977"},
+                        {"state":"MA", "lat":"42.1029", "long":"-72.588735", "county":"HAMPDEN", "zip":"1103", "city":"SPRINGFIELD"},
+                        {"long":"-72.577769", "county":"HAMPDEN", "zip":"1104", "city":"SPRINGFIELD", "state":"MA", "lat":"42.128848"},
+                        {"zip":"1105", "city":"SPRINGFIELD", "state":"MA", "lat":"42.099931", "long":"-72.578312", "county":"HAMPDEN"},
+                        {"zip":"1107", "city":"SPRINGFIELD", "state":"MA", "lat":"42.117907", "long":"-72.606544", "county":"HAMPDEN"},
                         {"long":"-72.558432", "county":"HAMPDEN", "zip":"1108", "city":"SPRINGFIELD", "state":"MA", "lat":"42.085314"},
                         {"zip":"1109", "city":"SPRINGFIELD", "state":"MA", "lat":"42.114455", "long":"-72.554349", "county":"HAMPDEN"},
                         {"city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1111"},
                         {"county":"HAMPDEN", "zip":"1115", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977"},
-                        {"county":"HAMPDEN", "zip":"1118", "city":"SPRINGFIELD", "state":"MA", "lat":"42.092937", "long":"-72.527445"},
-                        {"state":"MA", "lat":"42.12473", "long":"-72.51211", "county":"HAMPDEN", "zip":"1119", "city":"SPRINGFIELD"},
-                        {"long":"-72.488903", "county":"HAMPDEN", "zip":"1128", "city":"SPRINGFIELD", "state":"MA", "lat":"42.094397"},
-                        {"zip":"1129", "city":"SPRINGFIELD", "state":"MA", "lat":"42.122263", "long":"-72.487622", "county":"HAMPDEN"},
-                        {"zip":"1133", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
-                        {"lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1138", "city":"SPRINGFIELD", "state":"MA"},
-                        {"city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1139"},
-                        {"state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1144", "city":"SPRINGFIELD"},
-                        {"long":"-72.505048", "county":"HAMPDEN", "zip":"1151", "city":"SPRINGFIELD", "state":"MA", "lat":"42.153225"},
+                        {"state":"MA", "lat":"42.092937", "long":"-72.527445", "county":"HAMPDEN", "zip":"1118", "city":"SPRINGFIELD"},
+                        {"lat":"42.12473", "long":"-72.51211", "county":"HAMPDEN", "zip":"1119", "city":"SPRINGFIELD", "state":"MA"},
+                        {"zip":"1128", "city":"SPRINGFIELD", "state":"MA", "lat":"42.094397", "long":"-72.488903", "county":"HAMPDEN"},
+                        {"lat":"42.122263", "long":"-72.487622", "county":"HAMPDEN", "zip":"1129", "city":"SPRINGFIELD", "state":"MA"},
+                        {"city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1133"},
+                        {"state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1138", "city":"SPRINGFIELD"},
+                        {"long":"-72.5977", "county":"HAMPDEN", "zip":"1139", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106"},
+                        {"zip":"1144", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
+                        {"zip":"1151", "city":"SPRINGFIELD", "state":"MA", "lat":"42.153225", "long":"-72.505048", "county":"HAMPDEN"},
                     },
                     FieldChoice: {
                         {"city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1101"},
-                        {"state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1102", "city":"SPRINGFIELD"},
-                        {"long":"-72.588735", "county":"HAMPDEN", "zip":"1103", "city":"SPRINGFIELD", "state":"MA", "lat":"42.1029"},
-                        {"zip":"1104", "city":"SPRINGFIELD", "state":"MA", "lat":"42.128848", "long":"-72.577769", "county":"HAMPDEN"},
+                        {"county":"HAMPDEN", "zip":"1102", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977"},
+                        {"state":"MA", "lat":"42.1029", "long":"-72.588735", "county":"HAMPDEN", "zip":"1103", "city":"SPRINGFIELD"},
+                        {"lat":"42.128848", "long":"-72.577769", "county":"HAMPDEN", "zip":"1104", "city":"SPRINGFIELD", "state":"MA"},
                         {"city":"SPRINGFIELD", "state":"MA", "lat":"42.099931", "long":"-72.578312", "county":"HAMPDEN", "zip":"1105"},
-                        {"state":"MA", "lat":"42.117907", "long":"-72.606544", "county":"HAMPDEN", "zip":"1107", "city":"SPRINGFIELD"},
-                        {"long":"-72.558432", "county":"HAMPDEN", "zip":"1108", "city":"SPRINGFIELD", "state":"MA", "lat":"42.085314"},
-                        {"zip":"1109", "city":"SPRINGFIELD", "state":"MA", "lat":"42.114455", "long":"-72.554349", "county":"HAMPDEN"},
-                        {"zip":"1111", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
-                        {"zip":"1115", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
-                        {"lat":"42.092937", "long":"-72.527445", "county":"HAMPDEN", "zip":"1118", "city":"SPRINGFIELD", "state":"MA"},
+                        {"county":"HAMPDEN", "zip":"1107", "city":"SPRINGFIELD", "state":"MA", "lat":"42.117907", "long":"-72.606544"},
+                        {"county":"HAMPDEN", "zip":"1108", "city":"SPRINGFIELD", "state":"MA", "lat":"42.085314", "long":"-72.558432"},
+                        {"county":"HAMPDEN", "zip":"1109", "city":"SPRINGFIELD", "state":"MA", "lat":"42.114455", "long":"-72.554349"},
+                        {"state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1111", "city":"SPRINGFIELD"},
+                        {"long":"-72.5977", "county":"HAMPDEN", "zip":"1115", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106"},
+                        {"zip":"1118", "city":"SPRINGFIELD", "state":"MA", "lat":"42.092937", "long":"-72.527445", "county":"HAMPDEN"},
                         {"zip":"1119", "city":"SPRINGFIELD", "state":"MA", "lat":"42.12473", "long":"-72.51211", "county":"HAMPDEN"},
                         {"lat":"42.094397", "long":"-72.488903", "county":"HAMPDEN", "zip":"1128", "city":"SPRINGFIELD", "state":"MA"},
-                        {"zip":"1129", "city":"SPRINGFIELD", "state":"MA", "lat":"42.122263", "long":"-72.487622", "county":"HAMPDEN"},
-                        {"lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1133", "city":"SPRINGFIELD", "state":"MA"},
-                        {"zip":"1138", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
-                        {"lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1139", "city":"SPRINGFIELD", "state":"MA"},
-                        {"zip":"1144", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
-                        {"long":"-72.505048", "county":"HAMPDEN", "zip":"1151", "city":"SPRINGFIELD", "state":"MA", "lat":"42.153225"},
+                        {"city":"SPRINGFIELD", "state":"MA", "lat":"42.122263", "long":"-72.487622", "county":"HAMPDEN", "zip":"1129"},
+                        {"state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1133", "city":"SPRINGFIELD"},
+                        {"long":"-72.5977", "county":"HAMPDEN", "zip":"1138", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106"},
+                        {"zip":"1139", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
+                        {"city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1144"},
+                        {"county":"HAMPDEN", "zip":"1151", "city":"SPRINGFIELD", "state":"MA", "lat":"42.153225", "long":"-72.505048"},
                     },
                     Choice: nil,
                 },
@@ -323,46 +323,46 @@
                     Lower:       0,
                     Upper:       0,
                     PercChoice:  {
-                        {"zip":"1101", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
+                        {"long":"-72.5977", "county":"HAMPDEN", "zip":"1101", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106"},
                         {"zip":"1102", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
-                        {"long":"-72.588735", "county":"HAMPDEN", "zip":"1103", "city":"SPRINGFIELD", "state":"MA", "lat":"42.1029"},
-                        {"zip":"1104", "city":"SPRINGFIELD", "state":"MA", "lat":"42.128848", "long":"-72.577769", "county":"HAMPDEN"},
-                        {"city":"SPRINGFIELD", "state":"MA", "lat":"42.099931", "long":"-72.578312", "county":"HAMPDEN", "zip":"1105"},
-                        {"state":"MA", "lat":"42.117907", "long":"-72.606544", "county":"HAMPDEN", "zip":"1107", "city":"SPRINGFIELD"},
-                        {"long":"-72.558432", "county":"HAMPDEN", "zip":"1108", "city":"SPRINGFIELD", "state":"MA", "lat":"42.085314"},
-                        {"zip":"1109", "city":"SPRINGFIELD", "state":"MA", "lat":"42.114455", "long":"-72.554349", "county":"HAMPDEN"},
-                        {"city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1111"},
-                        {"county":"HAMPDEN", "zip":"1115", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977"},
-                        {"county":"HAMPDEN", "zip":"1118", "city":"SPRINGFIELD", "state":"MA", "lat":"42.092937", "long":"-72.527445"},
-                        {"state":"MA", "lat":"42.12473", "long":"-72.51211", "county":"HAMPDEN", "zip":"1119", "city":"SPRINGFIELD"},
-                        {"long":"-72.488903", "county":"HAMPDEN", "zip":"1128", "city":"SPRINGFIELD", "state":"MA", "lat":"42.094397"},
-                        {"zip":"1129", "city":"SPRINGFIELD", "state":"MA", "lat":"42.122263", "long":"-72.487622", "county":"HAMPDEN"},
-                        {"city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1133"},
-                        {"state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1138", "city":"SPRINGFIELD"},
-                        {"long":"-72.5977", "county":"HAMPDEN", "zip":"1139", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106"},
-                        {"zip":"1144", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
+                        {"city":"SPRINGFIELD", "state":"MA", "lat":"42.1029", "long":"-72.588735", "county":"HAMPDEN", "zip":"1103"},
+                        {"county":"HAMPDEN", "zip":"1104", "city":"SPRINGFIELD", "state":"MA", "lat":"42.128848", "long":"-72.577769"},
+                        {"state":"MA", "lat":"42.099931", "long":"-72.578312", "county":"HAMPDEN", "zip":"1105", "city":"SPRINGFIELD"},
+                        {"lat":"42.117907", "long":"-72.606544", "county":"HAMPDEN", "zip":"1107", "city":"SPRINGFIELD", "state":"MA"},
+                        {"city":"SPRINGFIELD", "state":"MA", "lat":"42.085314", "long":"-72.558432", "county":"HAMPDEN", "zip":"1108"},
+                        {"county":"HAMPDEN", "zip":"1109", "city":"SPRINGFIELD", "state":"MA", "lat":"42.114455", "long":"-72.554349"},
+                        {"state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1111", "city":"SPRINGFIELD"},
+                        {"lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1115", "city":"SPRINGFIELD", "state":"MA"},
+                        {"zip":"1118", "city":"SPRINGFIELD", "state":"MA", "lat":"42.092937", "long":"-72.527445", "county":"HAMPDEN"},
+                        {"lat":"42.12473", "long":"-72.51211", "county":"HAMPDEN", "zip":"1119", "city":"SPRINGFIELD", "state":"MA"},
+                        {"zip":"1128", "city":"SPRINGFIELD", "state":"MA", "lat":"42.094397", "long":"-72.488903", "county":"HAMPDEN"},
+                        {"long":"-72.487622", "county":"HAMPDEN", "zip":"1129", "city":"SPRINGFIELD", "state":"MA", "lat":"42.122263"},
+                        {"zip":"1133", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
+                        {"zip":"1138", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
+                        {"zip":"1139", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
+                        {"lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1144", "city":"SPRINGFIELD", "state":"MA"},
                         {"city":"SPRINGFIELD", "state":"MA", "lat":"42.153225", "long":"-72.505048", "county":"HAMPDEN", "zip":"1151"},
                     },
                     FieldChoice: {
-                        {"county":"HAMPDEN", "zip":"1101", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977"},
-                        {"state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1102", "city":"SPRINGFIELD"},
-                        {"long":"-72.588735", "county":"HAMPDEN", "zip":"1103", "city":"SPRINGFIELD", "state":"MA", "lat":"42.1029"},
-                        {"zip":"1104", "city":"SPRINGFIELD", "state":"MA", "lat":"42.128848", "long":"-72.577769", "county":"HAMPDEN"},
-                        {"zip":"1105", "city":"SPRINGFIELD", "state":"MA", "lat":"42.099931", "long":"-72.578312", "county":"HAMPDEN"},
-                        {"long":"-72.606544", "county":"HAMPDEN", "zip":"1107", "city":"SPRINGFIELD", "state":"MA", "lat":"42.117907"},
+                        {"state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1101", "city":"SPRINGFIELD"},
+                        {"long":"-72.5977", "county":"HAMPDEN", "zip":"1102", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106"},
+                        {"zip":"1103", "city":"SPRINGFIELD", "state":"MA", "lat":"42.1029", "long":"-72.588735", "county":"HAMPDEN"},
+                        {"city":"SPRINGFIELD", "state":"MA", "lat":"42.128848", "long":"-72.577769", "county":"HAMPDEN", "zip":"1104"},
+                        {"state":"MA", "lat":"42.099931", "long":"-72.578312", "county":"HAMPDEN", "zip":"1105", "city":"SPRINGFIELD"},
+                        {"lat":"42.117907", "long":"-72.606544", "county":"HAMPDEN", "zip":"1107", "city":"SPRINGFIELD", "state":"MA"},
                         {"zip":"1108", "city":"SPRINGFIELD", "state":"MA", "lat":"42.085314", "long":"-72.558432", "county":"HAMPDEN"},
-                        {"zip":"1109", "city":"SPRINGFIELD", "state":"MA", "lat":"42.114455", "long":"-72.554349", "county":"HAMPDEN"},
-                        {"zip":"1111", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
-                        {"zip":"1115", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
-                        {"zip":"1118", "city":"SPRINGFIELD", "state":"MA", "lat":"42.092937", "long":"-72.527445", "county":"HAMPDEN"},
-                        {"zip":"1119", "city":"SPRINGFIELD", "state":"MA", "lat":"42.12473", "long":"-72.51211", "county":"HAMPDEN"},
+                        {"lat":"42.114455", "long":"-72.554349", "county":"HAMPDEN", "zip":"1109", "city":"SPRINGFIELD", "state":"MA"},
+                        {"city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1111"},
+                        {"county":"HAMPDEN", "zip":"1115", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977"},
+                        {"state":"MA", "lat":"42.092937", "long":"-72.527445", "county":"HAMPDEN", "zip":"1118", "city":"SPRINGFIELD"},
+                        {"long":"-72.51211", "county":"HAMPDEN", "zip":"1119", "city":"SPRINGFIELD", "state":"MA", "lat":"42.12473"},
                         {"zip":"1128", "city":"SPRINGFIELD", "state":"MA", "lat":"42.094397", "long":"-72.488903", "county":"HAMPDEN"},
                         {"zip":"1129", "city":"SPRINGFIELD", "state":"MA", "lat":"42.122263", "long":"-72.487622", "county":"HAMPDEN"},
-                        {"city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1133"},
-                        {"county":"HAMPDEN", "zip":"1138", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977"},
-                        {"county":"HAMPDEN", "zip":"1139", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977"},
+                        {"zip":"1133", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
+                        {"zip":"1138", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
+                        {"city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1139"},
                         {"county":"HAMPDEN", "zip":"1144", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977"},
-                        {"state":"MA", "lat":"42.153225", "long":"-72.505048", "county":"HAMPDEN", "zip":"1151", "city":"SPRINGFIELD"},
+                        {"county":"HAMPDEN", "zip":"1151", "city":"SPRINGFIELD", "state":"MA", "lat":"42.153225", "long":"-72.505048"},
                     },
                     Choice: nil,
                 },
@@ -384,12 +384,12 @@
             },
             Lines:          {"2012-09-14 16:30:20,072 transType=ReplaceMe transID=000000 transGUID=0A0B0C userName=bob city=\"City\" state=State zip=00000 value=0"},
             LinesMap:       nil,
-            earliestParsed: -3000000000,
-            latestParsed:   0,
-            beginParsed:    time.Time{},
-            endParsed:      time.Time{},
-            current:        time.Time{},
-            realtime:       true,
+            EarliestParsed: -3000000000,
+            LatestParsed:   0,
+            BeginParsed:    time.Time{},
+            EndParsed:      time.Time{},
+            Current:        time.Time{},
+            Realtime:       true,
         },
     },
     DefaultTokens: {
@@ -472,14 +472,15 @@
         Tokens:          nil,
         Lines:           nil,
         LinesMap:        nil,
-        earliestParsed:  0,
-        latestParsed:    0,
-        beginParsed:     time.Time{},
-        endParsed:       time.Time{},
-        current:         time.Time{},
-        realtime:        false,
+        EarliestParsed:  0,
+        LatestParsed:    0,
+        BeginParsed:     time.Time{},
+        EndParsed:       time.Time{},
+        Current:         time.Time{},
+        Realtime:        false,
     },
-    Log: &logging.Logger{
+    initialized: true,
+    Log:         &logging.Logger{
         Module:         "gogen",
         backend:        nil,
         haveBackend:    false,
@@ -685,7 +686,7 @@
         cacheZone:  &time.zone{(CYCLIC REFERENCE)},
     },
 }
-[36;1m2016-09-11T17:37:03.854-07:00 main [36m[0m JSON Config: {
+[36;1m2016-09-11T23:16:07.623-07:00 main [36m[0m JSON Config: {
   "global": {
     "debug": false,
     "verbose": false,
@@ -696,7 +697,7 @@
   "samples": [
     {
       "name": "usernames.sample",
-      "disabled": false,
+      "disabled": true,
       "generator": "",
       "outputter": "",
       "rater": "",
@@ -736,7 +737,7 @@
     },
     {
       "name": "markets.csv",
-      "disabled": false,
+      "disabled": true,
       "generator": "",
       "outputter": "",
       "rater": "",

@@ -26,6 +26,7 @@ type Config struct {
 	DefaultTokens []*Token  `json:"defaultTokens"`
 
 	defaultSample Sample
+	initialized   bool
 
 	// Exported but internal use variables
 	Log      *logging.Logger `json:"-"`
@@ -46,7 +47,7 @@ var once sync.Once
 
 func getConfig() *Config {
 	once.Do(func() {
-		instance = &Config{Log: logging.MustGetLogger("gogen")}
+		instance = &Config{Log: logging.MustGetLogger("gogen"), initialized: false}
 	})
 	return instance
 }
@@ -54,6 +55,9 @@ func getConfig() *Config {
 // NewConfig is a singleton constructor which will return a pointer to a global instance of Config
 func NewConfig() *Config {
 	c := getConfig()
+	if c.initialized {
+		return c
+	}
 	backend := logging.NewLogBackend(os.Stdout, "", 0)
 	format := logging.MustStringFormatter(
 		`%{color:bold}%{time} %{shortfunc} %{color:%{level:.1s}%{color:reset} %{message}`,
@@ -101,6 +105,7 @@ func NewConfig() *Config {
 	c.walkPath(fullPath, acceptableExtensions, func(innerPath string) error {
 		s := new(Sample)
 		s.Name = filepath.Base(innerPath)
+		s.Disabled = true
 
 		file, err := os.Open(innerPath)
 		if err != nil {
@@ -123,6 +128,7 @@ func NewConfig() *Config {
 	c.walkPath(fullPath, acceptableExtensions, func(innerPath string) error {
 		s := new(Sample)
 		s.Name = filepath.Base(innerPath)
+		s.Disabled = true
 
 		var (
 			fields []string
@@ -179,16 +185,16 @@ func NewConfig() *Config {
 		// Setup Begin & End
 		// If End is not set, then we're intended to always run in realtime
 		if s.End == "" {
-			s.realtime = true
+			s.Realtime = true
 		}
 		var err error
 		if len(s.Begin) > 0 {
-			if s.beginParsed, err = timeparser.TimeParserNow(s.Begin, time.Now); err != nil {
+			if s.BeginParsed, err = timeparser.TimeParserNow(s.Begin, time.Now); err != nil {
 				c.Log.Errorf("Error parsing Begin for sample %s: %v", s.Name, err)
 			}
 		}
 		if len(s.End) > 0 {
-			if s.endParsed, err = timeparser.TimeParserNow(s.End, time.Now); err != nil {
+			if s.EndParsed, err = timeparser.TimeParserNow(s.End, time.Now); err != nil {
 				c.Log.Errorf("Error parsing End for sample %s: %v", s.Name, err)
 			}
 		}
@@ -206,15 +212,15 @@ func NewConfig() *Config {
 		var p time.Time
 		if p, err = timeparser.TimeParserNow(s.Earliest, now); err != nil {
 			c.Log.Errorf("Error parsing earliest time '%s' for sample '%s', using Now", s.Earliest, s.Name)
-			s.earliestParsed = time.Duration(0)
+			s.EarliestParsed = time.Duration(0)
 		} else {
-			s.earliestParsed = n.Sub(p) * -1
+			s.EarliestParsed = n.Sub(p) * -1
 		}
 		if p, err = timeparser.TimeParserNow(s.Latest, now); err != nil {
 			c.Log.Errorf("Error parsing latest time '%s' for sample '%s', using Now", s.Latest, s.Name)
-			s.latestParsed = time.Duration(0)
+			s.LatestParsed = time.Duration(0)
 		} else {
-			s.latestParsed = n.Sub(p) * -1
+			s.LatestParsed = n.Sub(p) * -1
 		}
 
 		//
@@ -288,6 +294,8 @@ func NewConfig() *Config {
 	for i := 0; i < len(c.Samples); i++ {
 		c.resolve(c.Samples[i])
 	}
+
+	c.initialized = true
 	return c
 }
 

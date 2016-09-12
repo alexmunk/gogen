@@ -24,12 +24,12 @@ type Sample struct {
 	LinesMap        []map[string]string `json:"linesMap"`
 
 	// Internal use variables
-	earliestParsed time.Duration `json:"-"`
-	latestParsed   time.Duration `json:"-"`
-	beginParsed    time.Time     `json:"-"`
-	endParsed      time.Time     `json:"-"`
-	current        time.Time     `json:"-"` // If we are backfilling or generating for a specified time window, what time is it?
-	realtime       bool          `json:"-"` // Are we done doing batch backfill or specified time window?
+	EarliestParsed time.Duration `json:"-"`
+	LatestParsed   time.Duration `json:"-"`
+	BeginParsed    time.Time     `json:"-"`
+	EndParsed      time.Time     `json:"-"`
+	Current        time.Time     `json:"-"` // If we are backfilling or generating for a specified time window, what time is it?
+	Realtime       bool          `json:"-"` // Are we done doing batch backfill or specified time window?
 }
 
 // Clock allows for implementers to keep track of their own view
@@ -45,13 +45,14 @@ type Clock interface {
 // specified time window or whether we should be generating
 // events in realtime
 func (s *Sample) Now() time.Time {
-	if !s.realtime {
-		return s.current
+	if !s.Realtime {
+		return s.Current
 	} else {
 		return time.Now()
 	}
 }
 
+// Token describes a replacement task to run against a sample
 type Token struct {
 	Name        string              `json:"name"`
 	Format      string              `json:"format"`
