@@ -8,10 +8,10 @@ tokens:
   - name: transtype          # An inline token defined in this YAML
     token: transType=(\w+)
     type: percChoice
-    percChoice: 
+    percChoice:
       - New: .333
-        Change: .5
-        Delete: .1666
+      - Change: .5
+      - Delete: .1666
   - name: integerid-template # References existing default token
   - name: guid-template      # References existing default token
   - name: usernames-template # References existing default token

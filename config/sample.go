@@ -53,17 +53,17 @@ func (s *Sample) Now() time.Time {
 }
 
 type Token struct {
-	Name        string                       `json:"name"`
-	Format      string                       `json:"format"`
-	Token       string                       `json:"token"`
-	Type        string                       `json:"type"`
-	Replacement string                       `json:"replacement"`
-	Sample      string                       `json:"sample"`
-	Field       string                       `json:"field"`
-	Precision   int                          `json:"precision"`
-	Lower       int                          `json:"lower"`
-	Upper       int                          `json:"upper"`
-	PercChoice  map[string]float32           `json:"percEnum"`
-	FieldChoice map[string]map[string]string `json:"fieldNum"`
-	Choice      []string                     `json:"choice"`
+	Name        string              `json:"name"`
+	Format      string              `json:"format"`
+	Token       string              `json:"token"`
+	Type        string              `json:"type"`
+	Replacement string              `json:"replacement"`
+	Sample      string              `json:"sample"`
+	Field       string              `json:"field"`
+	Precision   int                 `json:"precision"`
+	Lower       int                 `json:"lower"`
+	Upper       int                 `json:"upper"`
+	PercChoice  []map[string]string `json:"percChoice"`
+	FieldChoice []map[string]string `json:"fieldChoice"`
+	Choice      []string            `json:"choice"`
 }
