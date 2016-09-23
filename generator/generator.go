@@ -1,6 +1,6 @@
 package generator
 
-import "github.com/coccyx/gogen/config"
+import "github.com/coccyx/gogen/internal"
 
 func Start(gq chan *config.GenQueueItem) {
 	for {

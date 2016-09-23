@@ -1,0 +1,5 @@
+name: validate-badrandom
+tokens:
+  - name: badrandom
+    type: random
+    replacement: bad

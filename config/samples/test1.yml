@@ -1,17 +1,21 @@
 name: test1
-interval: 1
-count: 3
+interval: 3
+count: 5
+randomizeEvents: true
 earliest: -3s
 latest: now
 tokens:
   - name: ts-ymdhmsms-regex  # References existing default token
   - name: transtype          # An inline token defined in this YAML
     token: transType=(\w+)
-    type: percChoice
-    percChoice:
-      - New: .333
-      - Change: .5
-      - Delete: .1666
+    type: weightedChoice
+    weightedChoice:
+    - weight: 3
+      choice: New
+    - weight: 5
+      choice: Change
+    - weight: 1
+      choice: Delete
   - name: integerid-template # References existing default token
   - name: guid-template      # References existing default token
   - name: usernames-template # References existing default token
@@ -20,19 +24,22 @@ tokens:
     token: city
     type: fieldChoice
     sample: markets.csv
-    field: city
+    srcField: city
+    group: 1
   - name: markets-state 
     format: template
     token: city
     type: fieldChoice
     sample: markets.csv
-    field: state
+    srcField: state
+    group: 1
   - name: markets-city 
     format: template
     token: city
     type: fieldChoice
     sample: markets.csv
-    field: zip
+    srcField: zip
+    group: 1
   - name: value
     format: regex
     token: value=(\d+)
@@ -43,4 +50,5 @@ tokens:
     upper: 10
 
 lines:
-  - 2012-09-14 16:30:20,072 transType=ReplaceMe transID=000000 transGUID=0A0B0C userName=bob city="City" state=State zip=00000 value=0
+  - _raw: 2012-09-14 16:30:20,072 transType=ReplaceMe transID=000000 transGUID=0A0B0C userName=bob city="City" state=State zip=00000 value=0
+  - _raw: 2012-09-15 16:30:20,072 transType=ReplaceMe transID=000000 transGUID=0A0B0C userName=bob city="City" state=State zip=00000 value=0

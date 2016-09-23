@@ -1,0 +1,5 @@
+name: validate-weightedchoice-items
+tokens:
+  - name: weightedChoice
+    type: weightedChoice
+    weightedChoice:

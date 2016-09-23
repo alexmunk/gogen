@@ -1,692 +1,48 @@
-[36;1m2016-09-11T23:16:07.591-07:00 NewConfig [36m[0m GOGEN_HOME not set, setting to '.'
-[36;1m2016-09-11T23:16:07.591-07:00 NewConfig [36m[0m Home: .
-[36;1m2016-09-11T23:16:07.591-07:00 parseFileConfig [36m[0m Config Path: config/default/global.yml
-[36;1m2016-09-11T23:16:07.592-07:00 parseFileConfig [36m[0m Config Path: config/default/sample.yml
-[36;1m2016-09-11T23:16:07.592-07:00 func1 [36m[0m Walking, at config/default/tokens
-[36;1m2016-09-11T23:16:07.592-07:00 func1 [36m[0m Walking, at config/default/tokens/guid-template.yml
-[36;1m2016-09-11T23:16:07.592-07:00 parseFileConfig [36m[0m Config Path: config/default/tokens/guid-template.yml
-[36;1m2016-09-11T23:16:07.593-07:00 func1 [36m[0m Walking, at config/default/tokens/integerid-template.yml
-[36;1m2016-09-11T23:16:07.593-07:00 parseFileConfig [36m[0m Config Path: config/default/tokens/integerid-template.yml
-[36;1m2016-09-11T23:16:07.593-07:00 func1 [36m[0m Walking, at config/default/tokens/ts-ymdhmsms-regex.yml
-[36;1m2016-09-11T23:16:07.593-07:00 parseFileConfig [36m[0m Config Path: config/default/tokens/ts-ymdhmsms-regex.yml
-[36;1m2016-09-11T23:16:07.593-07:00 func1 [36m[0m Walking, at config/default/tokens/usernames-template.yml
-[36;1m2016-09-11T23:16:07.593-07:00 parseFileConfig [36m[0m Config Path: config/default/tokens/usernames-template.yml
-[36;1m2016-09-11T23:16:07.594-07:00 func1 [36m[0m Walking, at config/samples
-[36;1m2016-09-11T23:16:07.594-07:00 func1 [36m[0m Walking, at config/samples/markets.csv
-[36;1m2016-09-11T23:16:07.594-07:00 func1 [36m[0m Walking, at config/samples/markets.csv.bak
-[36;1m2016-09-11T23:16:07.594-07:00 func1 [36m[0m Walking, at config/samples/test1.yml
-[36;1m2016-09-11T23:16:07.594-07:00 func1 [36m[0m Walking, at config/samples/usernames.sample
-[36;1m2016-09-11T23:16:07.594-07:00 func1 [36m[0m Walking, at config/samples/usernames.sample.bak
-[36;1m2016-09-11T23:16:07.594-07:00 func1 [36m[0m Walking, at config/samples
-[36;1m2016-09-11T23:16:07.594-07:00 func1 [36m[0m Walking, at config/samples/markets.csv
-[36;1m2016-09-11T23:16:07.594-07:00 func1 [36m[0m Walking, at config/samples/markets.csv.bak
-[36;1m2016-09-11T23:16:07.594-07:00 func1 [36m[0m Walking, at config/samples/test1.yml
-[36;1m2016-09-11T23:16:07.594-07:00 func1 [36m[0m Walking, at config/samples/usernames.sample
-[36;1m2016-09-11T23:16:07.594-07:00 func1 [36m[0m Walking, at config/samples/usernames.sample.bak
-[36;1m2016-09-11T23:16:07.594-07:00 func1 [36m[0m Walking, at config/samples
-[36;1m2016-09-11T23:16:07.595-07:00 func1 [36m[0m Walking, at config/samples/markets.csv
-[36;1m2016-09-11T23:16:07.595-07:00 func1 [36m[0m Walking, at config/samples/markets.csv.bak
-[36;1m2016-09-11T23:16:07.595-07:00 func1 [36m[0m Walking, at config/samples/test1.yml
-[36;1m2016-09-11T23:16:07.595-07:00 parseFileConfig [36m[0m Config Path: config/samples/test1.yml
-[36;1m2016-09-11T23:16:07.595-07:00 func1 [36m[0m Walking, at config/samples/usernames.sample
-[36;1m2016-09-11T23:16:07.595-07:00 func1 [36m[0m Walking, at config/samples/usernames.sample.bak
-[36;1m2016-09-11T23:16:07.595-07:00 resolve [36m[0m Resolving sample 'markets.csv' to token 'markets.csv'
-[36;1m2016-09-11T23:16:07.595-07:00 resolve [36m[0m Resolving sample 'markets.csv' to token 'markets.csv'
-[36;1m2016-09-11T23:16:07.595-07:00 resolve [36m[0m Resolving sample 'markets.csv' to token 'markets.csv'
-[36;1m2016-09-11T23:16:07.595-07:00 main [36m[0m Pretty Values &config.Config{
-    Global:  config.Global{Debug:false, Verbose:false, UseOutputQueue:true, GeneratorWorkers:1, OutputWorkers:1},
-    Samples: {
-        &config.Sample{
-            Name:            "usernames.sample",
-            Disabled:        true,
-            Generator:       "",
-            Outputter:       "",
-            Rater:           "",
-            Interval:        0,
-            Delay:           0,
-            Count:           0,
-            Earliest:        "",
-            Latest:          "",
-            Begin:           "",
-            End:             "",
-            RandomizeCount:  0,
-            RandomizeEvents: false,
-            Tokens:          nil,
-            Lines:           {"birodivulga162", "nildajcbonanno", "ivettaadelima", "pckomono", "Looreeto", "JooPedro1591", "claaarecurlingg", "acciokcavote", "JungD", "InaraAllves", "Haroldmcaol", "xNessaa", "stylesdofunk", "meltemmeltemm", "emapujig", "cellphones4deal", "amisisuvi", "MegSeecharran95", "MargueritaYociu", "MarcioBFasano"},
-            LinesMap:        nil,
-            EarliestParsed:  0,
-            LatestParsed:    0,
-            BeginParsed:     time.Time{},
-            EndParsed:       time.Time{},
-            Current:         time.Time{},
-            Realtime:        false,
-        },
-        &config.Sample{
-            Name:            "markets.csv",
-            Disabled:        true,
-            Generator:       "",
-            Outputter:       "",
-            Rater:           "",
-            Interval:        0,
-            Delay:           0,
-            Count:           0,
-            Earliest:        "",
-            Latest:          "",
-            Begin:           "",
-            End:             "",
-            RandomizeCount:  0,
-            RandomizeEvents: false,
-            Tokens:          nil,
-            Lines:           nil,
-            LinesMap:        {
-                {"lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1101", "city":"SPRINGFIELD", "state":"MA"},
-                {"lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1102", "city":"SPRINGFIELD", "state":"MA"},
-                {"zip":"1103", "city":"SPRINGFIELD", "state":"MA", "lat":"42.1029", "long":"-72.588735", "county":"HAMPDEN"},
-                {"long":"-72.577769", "county":"HAMPDEN", "zip":"1104", "city":"SPRINGFIELD", "state":"MA", "lat":"42.128848"},
-                {"zip":"1105", "city":"SPRINGFIELD", "state":"MA", "lat":"42.099931", "long":"-72.578312", "county":"HAMPDEN"},
-                {"zip":"1107", "city":"SPRINGFIELD", "state":"MA", "lat":"42.117907", "long":"-72.606544", "county":"HAMPDEN"},
-                {"zip":"1108", "city":"SPRINGFIELD", "state":"MA", "lat":"42.085314", "long":"-72.558432", "county":"HAMPDEN"},
-                {"lat":"42.114455", "long":"-72.554349", "county":"HAMPDEN", "zip":"1109", "city":"SPRINGFIELD", "state":"MA"},
-                {"zip":"1111", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
-                {"lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1115", "city":"SPRINGFIELD", "state":"MA"},
-                {"zip":"1118", "city":"SPRINGFIELD", "state":"MA", "lat":"42.092937", "long":"-72.527445", "county":"HAMPDEN"},
-                {"lat":"42.12473", "long":"-72.51211", "county":"HAMPDEN", "zip":"1119", "city":"SPRINGFIELD", "state":"MA"},
-                {"city":"SPRINGFIELD", "state":"MA", "lat":"42.094397", "long":"-72.488903", "county":"HAMPDEN", "zip":"1128"},
-                {"state":"MA", "lat":"42.122263", "long":"-72.487622", "county":"HAMPDEN", "zip":"1129", "city":"SPRINGFIELD"},
-                {"long":"-72.5977", "county":"HAMPDEN", "zip":"1133", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106"},
-                {"zip":"1138", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
-                {"zip":"1139", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
-                {"zip":"1144", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
-                {"long":"-72.505048", "county":"HAMPDEN", "zip":"1151", "city":"SPRINGFIELD", "state":"MA", "lat":"42.153225"},
-            },
-            EarliestParsed: 0,
-            LatestParsed:   0,
-            BeginParsed:    time.Time{},
-            EndParsed:      time.Time{},
-            Current:        time.Time{},
-            Realtime:       false,
-        },
-        &config.Sample{
-            Name:            "test1",
-            Disabled:        false,
-            Generator:       "sample",
-            Outputter:       "stdout",
-            Rater:           "config",
-            Interval:        1,
-            Delay:           0,
-            Count:           3,
-            Earliest:        "-3s",
-            Latest:          "now",
-            Begin:           "",
-            End:             "",
-            RandomizeCount:  0.20000000298023224,
-            RandomizeEvents: true,
-            Tokens:          {
-                {
-                    Name:        "ts-ymdhmsms-regex",
-                    Format:      "regex",
-                    Token:       "",
-                    Type:        "timestamp",
-                    Replacement: "%Y-%m-%d %H:%M:%S,%3n",
-                    Sample:      "",
-                    Field:       "",
-                    Precision:   0,
-                    Lower:       0,
-                    Upper:       0,
-                    PercChoice:  nil,
-                    FieldChoice: nil,
-                    Choice:      nil,
-                },
-                {
-                    Name:        "transtype",
-                    Format:      "",
-                    Token:       "transType=(\\w+)",
-                    Type:        "percChoice",
-                    Replacement: "",
-                    Sample:      "",
-                    Field:       "",
-                    Precision:   0,
-                    Lower:       0,
-                    Upper:       0,
-                    PercChoice:  {
-                        {"New":"0.333"},
-                        {"Change":"0.5"},
-                        {"Delete":"0.1666"},
-                    },
-                    FieldChoice: nil,
-                    Choice:      nil,
-                },
-                {
-                    Name:        "integerid-template",
-                    Format:      "template",
-                    Token:       "integerid",
-                    Type:        "integerid",
-                    Replacement: "100000",
-                    Sample:      "",
-                    Field:       "",
-                    Precision:   0,
-                    Lower:       0,
-                    Upper:       0,
-                    PercChoice:  nil,
-                    FieldChoice: nil,
-                    Choice:      nil,
-                },
-                {
-                    Name:        "guid-template",
-                    Format:      "template",
-                    Token:       "guid",
-                    Type:        "random",
-                    Replacement: "guid",
-                    Sample:      "",
-                    Field:       "",
-                    Precision:   0,
-                    Lower:       0,
-                    Upper:       0,
-                    PercChoice:  nil,
-                    FieldChoice: nil,
-                    Choice:      nil,
-                },
-                {
-                    Name:        "usernames-template",
-                    Format:      "template",
-                    Token:       "username",
-                    Type:        "choice",
-                    Replacement: "",
-                    Sample:      "usernames",
-                    Field:       "",
-                    Precision:   0,
-                    Lower:       0,
-                    Upper:       0,
-                    PercChoice:  nil,
-                    FieldChoice: nil,
-                    Choice:      nil,
-                },
-                {
-                    Name:        "markets-city",
-                    Format:      "template",
-                    Token:       "city",
-                    Type:        "fieldChoice",
-                    Replacement: "",
-                    Sample:      "markets.csv",
-                    Field:       "city",
-                    Precision:   0,
-                    Lower:       0,
-                    Upper:       0,
-                    PercChoice:  {
-                        {"zip":"1101", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
-                        {"long":"-72.5977", "county":"HAMPDEN", "zip":"1102", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106"},
-                        {"zip":"1103", "city":"SPRINGFIELD", "state":"MA", "lat":"42.1029", "long":"-72.588735", "county":"HAMPDEN"},
-                        {"city":"SPRINGFIELD", "state":"MA", "lat":"42.128848", "long":"-72.577769", "county":"HAMPDEN", "zip":"1104"},
-                        {"state":"MA", "lat":"42.099931", "long":"-72.578312", "county":"HAMPDEN", "zip":"1105", "city":"SPRINGFIELD"},
-                        {"long":"-72.606544", "county":"HAMPDEN", "zip":"1107", "city":"SPRINGFIELD", "state":"MA", "lat":"42.117907"},
-                        {"zip":"1108", "city":"SPRINGFIELD", "state":"MA", "lat":"42.085314", "long":"-72.558432", "county":"HAMPDEN"},
-                        {"zip":"1109", "city":"SPRINGFIELD", "state":"MA", "lat":"42.114455", "long":"-72.554349", "county":"HAMPDEN"},
-                        {"zip":"1111", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
-                        {"long":"-72.5977", "county":"HAMPDEN", "zip":"1115", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106"},
-                        {"zip":"1118", "city":"SPRINGFIELD", "state":"MA", "lat":"42.092937", "long":"-72.527445", "county":"HAMPDEN"},
-                        {"zip":"1119", "city":"SPRINGFIELD", "state":"MA", "lat":"42.12473", "long":"-72.51211", "county":"HAMPDEN"},
-                        {"zip":"1128", "city":"SPRINGFIELD", "state":"MA", "lat":"42.094397", "long":"-72.488903", "county":"HAMPDEN"},
-                        {"city":"SPRINGFIELD", "state":"MA", "lat":"42.122263", "long":"-72.487622", "county":"HAMPDEN", "zip":"1129"},
-                        {"state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1133", "city":"SPRINGFIELD"},
-                        {"long":"-72.5977", "county":"HAMPDEN", "zip":"1138", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106"},
-                        {"zip":"1139", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
-                        {"zip":"1144", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
-                        {"long":"-72.505048", "county":"HAMPDEN", "zip":"1151", "city":"SPRINGFIELD", "state":"MA", "lat":"42.153225"},
-                    },
-                    FieldChoice: {
-                        {"zip":"1101", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
-                        {"zip":"1102", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
-                        {"long":"-72.588735", "county":"HAMPDEN", "zip":"1103", "city":"SPRINGFIELD", "state":"MA", "lat":"42.1029"},
-                        {"zip":"1104", "city":"SPRINGFIELD", "state":"MA", "lat":"42.128848", "long":"-72.577769", "county":"HAMPDEN"},
-                        {"city":"SPRINGFIELD", "state":"MA", "lat":"42.099931", "long":"-72.578312", "county":"HAMPDEN", "zip":"1105"},
-                        {"state":"MA", "lat":"42.117907", "long":"-72.606544", "county":"HAMPDEN", "zip":"1107", "city":"SPRINGFIELD"},
-                        {"lat":"42.085314", "long":"-72.558432", "county":"HAMPDEN", "zip":"1108", "city":"SPRINGFIELD", "state":"MA"},
-                        {"city":"SPRINGFIELD", "state":"MA", "lat":"42.114455", "long":"-72.554349", "county":"HAMPDEN", "zip":"1109"},
-                        {"county":"HAMPDEN", "zip":"1111", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977"},
-                        {"county":"HAMPDEN", "zip":"1115", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977"},
-                        {"county":"HAMPDEN", "zip":"1118", "city":"SPRINGFIELD", "state":"MA", "lat":"42.092937", "long":"-72.527445"},
-                        {"state":"MA", "lat":"42.12473", "long":"-72.51211", "county":"HAMPDEN", "zip":"1119", "city":"SPRINGFIELD"},
-                        {"long":"-72.488903", "county":"HAMPDEN", "zip":"1128", "city":"SPRINGFIELD", "state":"MA", "lat":"42.094397"},
-                        {"zip":"1129", "city":"SPRINGFIELD", "state":"MA", "lat":"42.122263", "long":"-72.487622", "county":"HAMPDEN"},
-                        {"zip":"1133", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
-                        {"city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1138"},
-                        {"county":"HAMPDEN", "zip":"1139", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977"},
-                        {"state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1144", "city":"SPRINGFIELD"},
-                        {"lat":"42.153225", "long":"-72.505048", "county":"HAMPDEN", "zip":"1151", "city":"SPRINGFIELD", "state":"MA"},
-                    },
-                    Choice: nil,
-                },
-                {
-                    Name:        "markets-state",
-                    Format:      "template",
-                    Token:       "city",
-                    Type:        "fieldChoice",
-                    Replacement: "",
-                    Sample:      "markets.csv",
-                    Field:       "state",
-                    Precision:   0,
-                    Lower:       0,
-                    Upper:       0,
-                    PercChoice:  {
-                        {"city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1101"},
-                        {"county":"HAMPDEN", "zip":"1102", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977"},
-                        {"state":"MA", "lat":"42.1029", "long":"-72.588735", "county":"HAMPDEN", "zip":"1103", "city":"SPRINGFIELD"},
-                        {"long":"-72.577769", "county":"HAMPDEN", "zip":"1104", "city":"SPRINGFIELD", "state":"MA", "lat":"42.128848"},
-                        {"zip":"1105", "city":"SPRINGFIELD", "state":"MA", "lat":"42.099931", "long":"-72.578312", "county":"HAMPDEN"},
-                        {"zip":"1107", "city":"SPRINGFIELD", "state":"MA", "lat":"42.117907", "long":"-72.606544", "county":"HAMPDEN"},
-                        {"long":"-72.558432", "county":"HAMPDEN", "zip":"1108", "city":"SPRINGFIELD", "state":"MA", "lat":"42.085314"},
-                        {"zip":"1109", "city":"SPRINGFIELD", "state":"MA", "lat":"42.114455", "long":"-72.554349", "county":"HAMPDEN"},
-                        {"city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1111"},
-                        {"county":"HAMPDEN", "zip":"1115", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977"},
-                        {"state":"MA", "lat":"42.092937", "long":"-72.527445", "county":"HAMPDEN", "zip":"1118", "city":"SPRINGFIELD"},
-                        {"lat":"42.12473", "long":"-72.51211", "county":"HAMPDEN", "zip":"1119", "city":"SPRINGFIELD", "state":"MA"},
-                        {"zip":"1128", "city":"SPRINGFIELD", "state":"MA", "lat":"42.094397", "long":"-72.488903", "county":"HAMPDEN"},
-                        {"lat":"42.122263", "long":"-72.487622", "county":"HAMPDEN", "zip":"1129", "city":"SPRINGFIELD", "state":"MA"},
-                        {"city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1133"},
-                        {"state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1138", "city":"SPRINGFIELD"},
-                        {"long":"-72.5977", "county":"HAMPDEN", "zip":"1139", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106"},
-                        {"zip":"1144", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
-                        {"zip":"1151", "city":"SPRINGFIELD", "state":"MA", "lat":"42.153225", "long":"-72.505048", "county":"HAMPDEN"},
-                    },
-                    FieldChoice: {
-                        {"city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1101"},
-                        {"county":"HAMPDEN", "zip":"1102", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977"},
-                        {"state":"MA", "lat":"42.1029", "long":"-72.588735", "county":"HAMPDEN", "zip":"1103", "city":"SPRINGFIELD"},
-                        {"lat":"42.128848", "long":"-72.577769", "county":"HAMPDEN", "zip":"1104", "city":"SPRINGFIELD", "state":"MA"},
-                        {"city":"SPRINGFIELD", "state":"MA", "lat":"42.099931", "long":"-72.578312", "county":"HAMPDEN", "zip":"1105"},
-                        {"county":"HAMPDEN", "zip":"1107", "city":"SPRINGFIELD", "state":"MA", "lat":"42.117907", "long":"-72.606544"},
-                        {"county":"HAMPDEN", "zip":"1108", "city":"SPRINGFIELD", "state":"MA", "lat":"42.085314", "long":"-72.558432"},
-                        {"county":"HAMPDEN", "zip":"1109", "city":"SPRINGFIELD", "state":"MA", "lat":"42.114455", "long":"-72.554349"},
-                        {"state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1111", "city":"SPRINGFIELD"},
-                        {"long":"-72.5977", "county":"HAMPDEN", "zip":"1115", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106"},
-                        {"zip":"1118", "city":"SPRINGFIELD", "state":"MA", "lat":"42.092937", "long":"-72.527445", "county":"HAMPDEN"},
-                        {"zip":"1119", "city":"SPRINGFIELD", "state":"MA", "lat":"42.12473", "long":"-72.51211", "county":"HAMPDEN"},
-                        {"lat":"42.094397", "long":"-72.488903", "county":"HAMPDEN", "zip":"1128", "city":"SPRINGFIELD", "state":"MA"},
-                        {"city":"SPRINGFIELD", "state":"MA", "lat":"42.122263", "long":"-72.487622", "county":"HAMPDEN", "zip":"1129"},
-                        {"state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1133", "city":"SPRINGFIELD"},
-                        {"long":"-72.5977", "county":"HAMPDEN", "zip":"1138", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106"},
-                        {"zip":"1139", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
-                        {"city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1144"},
-                        {"county":"HAMPDEN", "zip":"1151", "city":"SPRINGFIELD", "state":"MA", "lat":"42.153225", "long":"-72.505048"},
-                    },
-                    Choice: nil,
-                },
-                {
-                    Name:        "markets-city",
-                    Format:      "template",
-                    Token:       "city",
-                    Type:        "fieldChoice",
-                    Replacement: "",
-                    Sample:      "markets.csv",
-                    Field:       "zip",
-                    Precision:   0,
-                    Lower:       0,
-                    Upper:       0,
-                    PercChoice:  {
-                        {"long":"-72.5977", "county":"HAMPDEN", "zip":"1101", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106"},
-                        {"zip":"1102", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
-                        {"city":"SPRINGFIELD", "state":"MA", "lat":"42.1029", "long":"-72.588735", "county":"HAMPDEN", "zip":"1103"},
-                        {"county":"HAMPDEN", "zip":"1104", "city":"SPRINGFIELD", "state":"MA", "lat":"42.128848", "long":"-72.577769"},
-                        {"state":"MA", "lat":"42.099931", "long":"-72.578312", "county":"HAMPDEN", "zip":"1105", "city":"SPRINGFIELD"},
-                        {"lat":"42.117907", "long":"-72.606544", "county":"HAMPDEN", "zip":"1107", "city":"SPRINGFIELD", "state":"MA"},
-                        {"city":"SPRINGFIELD", "state":"MA", "lat":"42.085314", "long":"-72.558432", "county":"HAMPDEN", "zip":"1108"},
-                        {"county":"HAMPDEN", "zip":"1109", "city":"SPRINGFIELD", "state":"MA", "lat":"42.114455", "long":"-72.554349"},
-                        {"state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1111", "city":"SPRINGFIELD"},
-                        {"lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1115", "city":"SPRINGFIELD", "state":"MA"},
-                        {"zip":"1118", "city":"SPRINGFIELD", "state":"MA", "lat":"42.092937", "long":"-72.527445", "county":"HAMPDEN"},
-                        {"lat":"42.12473", "long":"-72.51211", "county":"HAMPDEN", "zip":"1119", "city":"SPRINGFIELD", "state":"MA"},
-                        {"zip":"1128", "city":"SPRINGFIELD", "state":"MA", "lat":"42.094397", "long":"-72.488903", "county":"HAMPDEN"},
-                        {"long":"-72.487622", "county":"HAMPDEN", "zip":"1129", "city":"SPRINGFIELD", "state":"MA", "lat":"42.122263"},
-                        {"zip":"1133", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
-                        {"zip":"1138", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
-                        {"zip":"1139", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
-                        {"lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1144", "city":"SPRINGFIELD", "state":"MA"},
-                        {"city":"SPRINGFIELD", "state":"MA", "lat":"42.153225", "long":"-72.505048", "county":"HAMPDEN", "zip":"1151"},
-                    },
-                    FieldChoice: {
-                        {"state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1101", "city":"SPRINGFIELD"},
-                        {"long":"-72.5977", "county":"HAMPDEN", "zip":"1102", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106"},
-                        {"zip":"1103", "city":"SPRINGFIELD", "state":"MA", "lat":"42.1029", "long":"-72.588735", "county":"HAMPDEN"},
-                        {"city":"SPRINGFIELD", "state":"MA", "lat":"42.128848", "long":"-72.577769", "county":"HAMPDEN", "zip":"1104"},
-                        {"state":"MA", "lat":"42.099931", "long":"-72.578312", "county":"HAMPDEN", "zip":"1105", "city":"SPRINGFIELD"},
-                        {"lat":"42.117907", "long":"-72.606544", "county":"HAMPDEN", "zip":"1107", "city":"SPRINGFIELD", "state":"MA"},
-                        {"zip":"1108", "city":"SPRINGFIELD", "state":"MA", "lat":"42.085314", "long":"-72.558432", "county":"HAMPDEN"},
-                        {"lat":"42.114455", "long":"-72.554349", "county":"HAMPDEN", "zip":"1109", "city":"SPRINGFIELD", "state":"MA"},
-                        {"city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1111"},
-                        {"county":"HAMPDEN", "zip":"1115", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977"},
-                        {"state":"MA", "lat":"42.092937", "long":"-72.527445", "county":"HAMPDEN", "zip":"1118", "city":"SPRINGFIELD"},
-                        {"long":"-72.51211", "county":"HAMPDEN", "zip":"1119", "city":"SPRINGFIELD", "state":"MA", "lat":"42.12473"},
-                        {"zip":"1128", "city":"SPRINGFIELD", "state":"MA", "lat":"42.094397", "long":"-72.488903", "county":"HAMPDEN"},
-                        {"zip":"1129", "city":"SPRINGFIELD", "state":"MA", "lat":"42.122263", "long":"-72.487622", "county":"HAMPDEN"},
-                        {"zip":"1133", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
-                        {"zip":"1138", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN"},
-                        {"city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977", "county":"HAMPDEN", "zip":"1139"},
-                        {"county":"HAMPDEN", "zip":"1144", "city":"SPRINGFIELD", "state":"MA", "lat":"42.106", "long":"-72.5977"},
-                        {"county":"HAMPDEN", "zip":"1151", "city":"SPRINGFIELD", "state":"MA", "lat":"42.153225", "long":"-72.505048"},
-                    },
-                    Choice: nil,
-                },
-                {
-                    Name:        "value",
-                    Format:      "regex",
-                    Token:       "value=(\\d+)",
-                    Type:        "random",
-                    Replacement: "float",
-                    Sample:      "",
-                    Field:       "",
-                    Precision:   3,
-                    Lower:       0,
-                    Upper:       10,
-                    PercChoice:  nil,
-                    FieldChoice: nil,
-                    Choice:      nil,
-                },
-            },
-            Lines:          {"2012-09-14 16:30:20,072 transType=ReplaceMe transID=000000 transGUID=0A0B0C userName=bob city=\"City\" state=State zip=00000 value=0"},
-            LinesMap:       nil,
-            EarliestParsed: -3000000000,
-            LatestParsed:   0,
-            BeginParsed:    time.Time{},
-            EndParsed:      time.Time{},
-            Current:        time.Time{},
-            Realtime:       true,
-        },
-    },
-    DefaultTokens: {
-        &config.Token{
-            Name:        "guid-template",
-            Format:      "template",
-            Token:       "guid",
-            Type:        "random",
-            Replacement: "guid",
-            Sample:      "",
-            Field:       "",
-            Precision:   0,
-            Lower:       0,
-            Upper:       0,
-            PercChoice:  nil,
-            FieldChoice: nil,
-            Choice:      nil,
-        },
-        &config.Token{
-            Name:        "integerid-template",
-            Format:      "template",
-            Token:       "integerid",
-            Type:        "integerid",
-            Replacement: "100000",
-            Sample:      "",
-            Field:       "",
-            Precision:   0,
-            Lower:       0,
-            Upper:       0,
-            PercChoice:  nil,
-            FieldChoice: nil,
-            Choice:      nil,
-        },
-        &config.Token{
-            Name:        "ts-ymdhmsms-regex",
-            Format:      "regex",
-            Token:       "",
-            Type:        "timestamp",
-            Replacement: "%Y-%m-%d %H:%M:%S,%3n",
-            Sample:      "",
-            Field:       "",
-            Precision:   0,
-            Lower:       0,
-            Upper:       0,
-            PercChoice:  nil,
-            FieldChoice: nil,
-            Choice:      nil,
-        },
-        &config.Token{
-            Name:        "usernames-template",
-            Format:      "template",
-            Token:       "username",
-            Type:        "choice",
-            Replacement: "",
-            Sample:      "usernames",
-            Field:       "",
-            Precision:   0,
-            Lower:       0,
-            Upper:       0,
-            PercChoice:  nil,
-            FieldChoice: nil,
-            Choice:      nil,
-        },
-    },
-    defaultSample: config.Sample{
-        Name:            "",
-        Disabled:        false,
-        Generator:       "sample",
-        Outputter:       "stdout",
-        Rater:           "config",
-        Interval:        60,
-        Delay:           0,
-        Count:           0,
-        Earliest:        "now",
-        Latest:          "now",
-        Begin:           "",
-        End:             "",
-        RandomizeCount:  0.20000000298023224,
-        RandomizeEvents: true,
-        Tokens:          nil,
-        Lines:           nil,
-        LinesMap:        nil,
-        EarliestParsed:  0,
-        LatestParsed:    0,
-        BeginParsed:     time.Time{},
-        EndParsed:       time.Time{},
-        Current:         time.Time{},
-        Realtime:        false,
-    },
-    initialized: true,
-    Log:         &logging.Logger{
-        Module:         "gogen",
-        backend:        nil,
-        haveBackend:    false,
-        ExtraCalldepth: 0,
-    },
-    Timezone: &time.Location{
-        name: "Local",
-        zone: {
-            {name:"PDT", offset:-25200, isDST:true},
-            {name:"PST", offset:-28800, isDST:false},
-            {name:"PWT", offset:-25200, isDST:true},
-            {name:"PPT", offset:-25200, isDST:true},
-        },
-        tx: {
-            {when:-1633269600, index:0x0, isstd:false, isutc:false},
-            {when:-1615129200, index:0x1, isstd:false, isutc:false},
-            {when:-1601820000, index:0x0, isstd:false, isutc:false},
-            {when:-1583679600, index:0x1, isstd:true, isutc:true},
-            {when:-880207200, index:0x2, isstd:false, isutc:false},
-            {when:-769395600, index:0x3, isstd:false, isutc:false},
-            {when:-765385200, index:0x1, isstd:false, isutc:false},
-            {when:-687967200, index:0x0, isstd:false, isutc:false},
-            {when:-662655600, index:0x1, isstd:false, isutc:false},
-            {when:-620834400, index:0x0, isstd:false, isutc:false},
-            {when:-608137200, index:0x1, isstd:false, isutc:false},
-            {when:-589384800, index:0x0, isstd:false, isutc:false},
-            {when:-576082800, index:0x1, isstd:false, isutc:false},
-            {when:-557935200, index:0x0, isstd:false, isutc:false},
-            {when:-544633200, index:0x1, isstd:false, isutc:false},
-            {when:-526485600, index:0x0, isstd:false, isutc:false},
-            {when:-513183600, index:0x1, isstd:false, isutc:false},
-            {when:-495036000, index:0x0, isstd:false, isutc:false},
-            {when:-481734000, index:0x1, isstd:false, isutc:false},
-            {when:-463586400, index:0x0, isstd:false, isutc:false},
-            {when:-450284400, index:0x1, isstd:false, isutc:false},
-            {when:-431532000, index:0x0, isstd:false, isutc:false},
-            {when:-418230000, index:0x1, isstd:false, isutc:false},
-            {when:-400082400, index:0x0, isstd:false, isutc:false},
-            {when:-386780400, index:0x1, isstd:false, isutc:false},
-            {when:-368632800, index:0x0, isstd:false, isutc:false},
-            {when:-355330800, index:0x1, isstd:false, isutc:false},
-            {when:-337183200, index:0x0, isstd:false, isutc:false},
-            {when:-323881200, index:0x1, isstd:false, isutc:false},
-            {when:-305733600, index:0x0, isstd:false, isutc:false},
-            {when:-292431600, index:0x1, isstd:false, isutc:false},
-            {when:-273679200, index:0x0, isstd:false, isutc:false},
-            {when:-260982000, index:0x1, isstd:false, isutc:false},
-            {when:-242229600, index:0x0, isstd:false, isutc:false},
-            {when:-226508400, index:0x1, isstd:false, isutc:false},
-            {when:-210780000, index:0x0, isstd:false, isutc:false},
-            {when:-195058800, index:0x1, isstd:false, isutc:false},
-            {when:-179330400, index:0x0, isstd:false, isutc:false},
-            {when:-163609200, index:0x1, isstd:false, isutc:false},
-            {when:-147880800, index:0x0, isstd:false, isutc:false},
-            {when:-131554800, index:0x1, isstd:false, isutc:false},
-            {when:-116431200, index:0x0, isstd:false, isutc:false},
-            {when:-100105200, index:0x1, isstd:false, isutc:false},
-            {when:-84376800, index:0x0, isstd:false, isutc:false},
-            {when:-68655600, index:0x1, isstd:false, isutc:false},
-            {when:-52927200, index:0x0, isstd:false, isutc:false},
-            {when:-37206000, index:0x1, isstd:false, isutc:false},
-            {when:-21477600, index:0x0, isstd:false, isutc:false},
-            {when:-5756400, index:0x1, isstd:false, isutc:false},
-            {when:9972000, index:0x0, isstd:false, isutc:false},
-            {when:25693200, index:0x1, isstd:false, isutc:false},
-            {when:41421600, index:0x0, isstd:false, isutc:false},
-            {when:57747600, index:0x1, isstd:false, isutc:false},
-            {when:73476000, index:0x0, isstd:false, isutc:false},
-            {when:89197200, index:0x1, isstd:false, isutc:false},
-            {when:104925600, index:0x0, isstd:false, isutc:false},
-            {when:120646800, index:0x1, isstd:false, isutc:false},
-            {when:126698400, index:0x0, isstd:false, isutc:false},
-            {when:152096400, index:0x1, isstd:false, isutc:false},
-            {when:162381600, index:0x0, isstd:false, isutc:false},
-            {when:183546000, index:0x1, isstd:false, isutc:false},
-            {when:199274400, index:0x0, isstd:false, isutc:false},
-            {when:215600400, index:0x1, isstd:false, isutc:false},
-            {when:230724000, index:0x0, isstd:false, isutc:false},
-            {when:247050000, index:0x1, isstd:false, isutc:false},
-            {when:262778400, index:0x0, isstd:false, isutc:false},
-            {when:278499600, index:0x1, isstd:false, isutc:false},
-            {when:294228000, index:0x0, isstd:false, isutc:false},
-            {when:309949200, index:0x1, isstd:false, isutc:false},
-            {when:325677600, index:0x0, isstd:false, isutc:false},
-            {when:341398800, index:0x1, isstd:false, isutc:false},
-            {when:357127200, index:0x0, isstd:false, isutc:false},
-            {when:372848400, index:0x1, isstd:false, isutc:false},
-            {when:388576800, index:0x0, isstd:false, isutc:false},
-            {when:404902800, index:0x1, isstd:false, isutc:false},
-            {when:420026400, index:0x0, isstd:false, isutc:false},
-            {when:436352400, index:0x1, isstd:false, isutc:false},
-            {when:452080800, index:0x0, isstd:false, isutc:false},
-            {when:467802000, index:0x1, isstd:false, isutc:false},
-            {when:483530400, index:0x0, isstd:false, isutc:false},
-            {when:499251600, index:0x1, isstd:false, isutc:false},
-            {when:514980000, index:0x0, isstd:false, isutc:false},
-            {when:530701200, index:0x1, isstd:false, isutc:false},
-            {when:544615200, index:0x0, isstd:false, isutc:false},
-            {when:562150800, index:0x1, isstd:false, isutc:false},
-            {when:576064800, index:0x0, isstd:false, isutc:false},
-            {when:594205200, index:0x1, isstd:false, isutc:false},
-            {when:607514400, index:0x0, isstd:false, isutc:false},
-            {when:625654800, index:0x1, isstd:false, isutc:false},
-            {when:638964000, index:0x0, isstd:false, isutc:false},
-            {when:657104400, index:0x1, isstd:false, isutc:false},
-            {when:671018400, index:0x0, isstd:false, isutc:false},
-            {when:688554000, index:0x1, isstd:false, isutc:false},
-            {when:702468000, index:0x0, isstd:false, isutc:false},
-            {when:720003600, index:0x1, isstd:false, isutc:false},
-            {when:733917600, index:0x0, isstd:false, isutc:false},
-            {when:752058000, index:0x1, isstd:false, isutc:false},
-            {when:765367200, index:0x0, isstd:false, isutc:false},
-            {when:783507600, index:0x1, isstd:false, isutc:false},
-            {when:796816800, index:0x0, isstd:false, isutc:false},
-            {when:814957200, index:0x1, isstd:false, isutc:false},
-            {when:828871200, index:0x0, isstd:false, isutc:false},
-            {when:846406800, index:0x1, isstd:false, isutc:false},
-            {when:860320800, index:0x0, isstd:false, isutc:false},
-            {when:877856400, index:0x1, isstd:false, isutc:false},
-            {when:891770400, index:0x0, isstd:false, isutc:false},
-            {when:909306000, index:0x1, isstd:false, isutc:false},
-            {when:923220000, index:0x0, isstd:false, isutc:false},
-            {when:941360400, index:0x1, isstd:false, isutc:false},
-            {when:954669600, index:0x0, isstd:false, isutc:false},
-            {when:972810000, index:0x1, isstd:false, isutc:false},
-            {when:986119200, index:0x0, isstd:false, isutc:false},
-            {when:1004259600, index:0x1, isstd:false, isutc:false},
-            {when:1018173600, index:0x0, isstd:false, isutc:false},
-            {when:1035709200, index:0x1, isstd:false, isutc:false},
-            {when:1049623200, index:0x0, isstd:false, isutc:false},
-            {when:1067158800, index:0x1, isstd:false, isutc:false},
-            {when:1081072800, index:0x0, isstd:false, isutc:false},
-            {when:1099213200, index:0x1, isstd:false, isutc:false},
-            {when:1112522400, index:0x0, isstd:false, isutc:false},
-            {when:1130662800, index:0x1, isstd:false, isutc:false},
-            {when:1143972000, index:0x0, isstd:false, isutc:false},
-            {when:1162112400, index:0x1, isstd:false, isutc:false},
-            {when:1173607200, index:0x0, isstd:false, isutc:false},
-            {when:1194166800, index:0x1, isstd:false, isutc:false},
-            {when:1205056800, index:0x0, isstd:false, isutc:false},
-            {when:1225616400, index:0x1, isstd:false, isutc:false},
-            {when:1236506400, index:0x0, isstd:false, isutc:false},
-            {when:1257066000, index:0x1, isstd:false, isutc:false},
-            {when:1268560800, index:0x0, isstd:false, isutc:false},
-            {when:1289120400, index:0x1, isstd:false, isutc:false},
-            {when:1300010400, index:0x0, isstd:false, isutc:false},
-            {when:1320570000, index:0x1, isstd:false, isutc:false},
-            {when:1331460000, index:0x0, isstd:false, isutc:false},
-            {when:1352019600, index:0x1, isstd:false, isutc:false},
-            {when:1362909600, index:0x0, isstd:false, isutc:false},
-            {when:1383469200, index:0x1, isstd:false, isutc:false},
-            {when:1394359200, index:0x0, isstd:false, isutc:false},
-            {when:1414918800, index:0x1, isstd:false, isutc:false},
-            {when:1425808800, index:0x0, isstd:false, isutc:false},
-            {when:1446368400, index:0x1, isstd:false, isutc:false},
-            {when:1457863200, index:0x0, isstd:false, isutc:false},
-            {when:1478422800, index:0x1, isstd:false, isutc:false},
-            {when:1489312800, index:0x0, isstd:false, isutc:false},
-            {when:1509872400, index:0x1, isstd:false, isutc:false},
-            {when:1520762400, index:0x0, isstd:false, isutc:false},
-            {when:1541322000, index:0x1, isstd:false, isutc:false},
-            {when:1552212000, index:0x0, isstd:false, isutc:false},
-            {when:1572771600, index:0x1, isstd:false, isutc:false},
-            {when:1583661600, index:0x0, isstd:false, isutc:false},
-            {when:1604221200, index:0x1, isstd:false, isutc:false},
-            {when:1615716000, index:0x0, isstd:false, isutc:false},
-            {when:1636275600, index:0x1, isstd:false, isutc:false},
-            {when:1647165600, index:0x0, isstd:false, isutc:false},
-            {when:1667725200, index:0x1, isstd:false, isutc:false},
-            {when:1678615200, index:0x0, isstd:false, isutc:false},
-            {when:1699174800, index:0x1, isstd:false, isutc:false},
-            {when:1710064800, index:0x0, isstd:false, isutc:false},
-            {when:1730624400, index:0x1, isstd:false, isutc:false},
-            {when:1741514400, index:0x0, isstd:false, isutc:false},
-            {when:1762074000, index:0x1, isstd:false, isutc:false},
-            {when:1772964000, index:0x0, isstd:false, isutc:false},
-            {when:1793523600, index:0x1, isstd:false, isutc:false},
-            {when:1805018400, index:0x0, isstd:false, isutc:false},
-            {when:1825578000, index:0x1, isstd:false, isutc:false},
-            {when:1836468000, index:0x0, isstd:false, isutc:false},
-            {when:1857027600, index:0x1, isstd:false, isutc:false},
-            {when:1867917600, index:0x0, isstd:false, isutc:false},
-            {when:1888477200, index:0x1, isstd:false, isutc:false},
-            {when:1899367200, index:0x0, isstd:false, isutc:false},
-            {when:1919926800, index:0x1, isstd:false, isutc:false},
-            {when:1930816800, index:0x0, isstd:false, isutc:false},
-            {when:1951376400, index:0x1, isstd:false, isutc:false},
-            {when:1962871200, index:0x0, isstd:false, isutc:false},
-            {when:1983430800, index:0x1, isstd:false, isutc:false},
-            {when:1994320800, index:0x0, isstd:false, isutc:false},
-            {when:2014880400, index:0x1, isstd:false, isutc:false},
-            {when:2025770400, index:0x0, isstd:false, isutc:false},
-            {when:2046330000, index:0x1, isstd:false, isutc:false},
-            {when:2057220000, index:0x0, isstd:false, isutc:false},
-            {when:2077779600, index:0x1, isstd:false, isutc:false},
-            {when:2088669600, index:0x0, isstd:false, isutc:false},
-            {when:2109229200, index:0x1, isstd:false, isutc:false},
-            {when:2120119200, index:0x0, isstd:false, isutc:false},
-            {when:2140678800, index:0x1, isstd:false, isutc:false},
-        },
-        cacheStart: 1457863200,
-        cacheEnd:   1478422800,
-        cacheZone:  &time.zone{(CYCLIC REFERENCE)},
-    },
-}
-[36;1m2016-09-11T23:16:07.623-07:00 main [36m[0m JSON Config: {
+[36;1m2016-09-19T21:14:45.93-07:00 NewConfig [36m[0m Home: /Users/csharp/Dropbox/go/src/github.com/coccyx/gogen
+[36;1m2016-09-19T21:14:45.93-07:00 parseFileConfig [36m[0m Config Path: /Users/csharp/Dropbox/go/src/github.com/coccyx/gogen/config/default/global.yml
+[36;1m2016-09-19T21:14:45.93-07:00 parseFileConfig [36m[0m Config Path: /Users/csharp/Dropbox/go/src/github.com/coccyx/gogen/config/default/sample.yml
+[36;1m2016-09-19T21:14:45.93-07:00 func1 [36m[0m Walking, at /Users/csharp/Dropbox/go/src/github.com/coccyx/gogen/config/default/tokens
+[36;1m2016-09-19T21:14:45.931-07:00 func1 [36m[0m Walking, at /Users/csharp/Dropbox/go/src/github.com/coccyx/gogen/config/default/tokens/guid-template.yml
+[36;1m2016-09-19T21:14:45.931-07:00 parseFileConfig [36m[0m Config Path: /Users/csharp/Dropbox/go/src/github.com/coccyx/gogen/config/default/tokens/guid-template.yml
+[36;1m2016-09-19T21:14:45.931-07:00 func1 [36m[0m Walking, at /Users/csharp/Dropbox/go/src/github.com/coccyx/gogen/config/default/tokens/integerid-template.yml
+[36;1m2016-09-19T21:14:45.931-07:00 parseFileConfig [36m[0m Config Path: /Users/csharp/Dropbox/go/src/github.com/coccyx/gogen/config/default/tokens/integerid-template.yml
+[36;1m2016-09-19T21:14:45.931-07:00 func1 [36m[0m Walking, at /Users/csharp/Dropbox/go/src/github.com/coccyx/gogen/config/default/tokens/ts-ymdhmsms-regex.yml
+[36;1m2016-09-19T21:14:45.931-07:00 parseFileConfig [36m[0m Config Path: /Users/csharp/Dropbox/go/src/github.com/coccyx/gogen/config/default/tokens/ts-ymdhmsms-regex.yml
+[36;1m2016-09-19T21:14:45.931-07:00 func1 [36m[0m Walking, at /Users/csharp/Dropbox/go/src/github.com/coccyx/gogen/config/default/tokens/usernames-template.yml
+[36;1m2016-09-19T21:14:45.931-07:00 parseFileConfig [36m[0m Config Path: /Users/csharp/Dropbox/go/src/github.com/coccyx/gogen/config/default/tokens/usernames-template.yml
+[36;1m2016-09-19T21:14:45.932-07:00 func1 [36m[0m Walking, at /Users/csharp/Dropbox/go/src/github.com/coccyx/gogen/config/default/templates
+[36;1m2016-09-19T21:14:45.932-07:00 func1 [36m[0m Walking, at /Users/csharp/Dropbox/go/src/github.com/coccyx/gogen/config/default/templates/json.yml
+[36;1m2016-09-19T21:14:45.932-07:00 parseFileConfig [36m[0m Config Path: /Users/csharp/Dropbox/go/src/github.com/coccyx/gogen/config/default/templates/json.yml
+[36;1m2016-09-19T21:14:45.932-07:00 func1 [36m[0m Walking, at /Users/csharp/Dropbox/go/src/github.com/coccyx/gogen/config/default/templates/raw.yml
+[36;1m2016-09-19T21:14:45.932-07:00 parseFileConfig [36m[0m Config Path: /Users/csharp/Dropbox/go/src/github.com/coccyx/gogen/config/default/templates/raw.yml
+[36;1m2016-09-19T21:14:45.932-07:00 func1 [36m[0m Walking, at /Users/csharp/Dropbox/go/src/github.com/coccyx/gogen/config/templates
+[36;1m2016-09-19T21:14:45.932-07:00 func1 [36m[0m Walking, at /Users/csharp/Dropbox/go/src/github.com/coccyx/gogen/config/samples
+[36;1m2016-09-19T21:14:45.933-07:00 func1 [36m[0m Walking, at /Users/csharp/Dropbox/go/src/github.com/coccyx/gogen/config/samples/markets.csv
+[36;1m2016-09-19T21:14:45.933-07:00 func1 [36m[0m Walking, at /Users/csharp/Dropbox/go/src/github.com/coccyx/gogen/config/samples/markets.csv.bak
+[36;1m2016-09-19T21:14:45.933-07:00 func1 [36m[0m Walking, at /Users/csharp/Dropbox/go/src/github.com/coccyx/gogen/config/samples/test1.yml
+[36;1m2016-09-19T21:14:45.933-07:00 func1 [36m[0m Walking, at /Users/csharp/Dropbox/go/src/github.com/coccyx/gogen/config/samples/usernames.sample
+[36;1m2016-09-19T21:14:45.933-07:00 func1 [36m[0m Walking, at /Users/csharp/Dropbox/go/src/github.com/coccyx/gogen/config/samples/usernames.sample.bak
+[36;1m2016-09-19T21:14:45.933-07:00 func1 [36m[0m Walking, at /Users/csharp/Dropbox/go/src/github.com/coccyx/gogen/config/samples
+[36;1m2016-09-19T21:14:45.933-07:00 func1 [36m[0m Walking, at /Users/csharp/Dropbox/go/src/github.com/coccyx/gogen/config/samples/markets.csv
+[36;1m2016-09-19T21:14:45.933-07:00 func1 [36m[0m Walking, at /Users/csharp/Dropbox/go/src/github.com/coccyx/gogen/config/samples/markets.csv.bak
+[36;1m2016-09-19T21:14:45.933-07:00 func1 [36m[0m Walking, at /Users/csharp/Dropbox/go/src/github.com/coccyx/gogen/config/samples/test1.yml
+[36;1m2016-09-19T21:14:45.933-07:00 func1 [36m[0m Walking, at /Users/csharp/Dropbox/go/src/github.com/coccyx/gogen/config/samples/usernames.sample
+[36;1m2016-09-19T21:14:45.933-07:00 func1 [36m[0m Walking, at /Users/csharp/Dropbox/go/src/github.com/coccyx/gogen/config/samples/usernames.sample.bak
+[36;1m2016-09-19T21:14:45.933-07:00 func1 [36m[0m Walking, at /Users/csharp/Dropbox/go/src/github.com/coccyx/gogen/config/samples
+[36;1m2016-09-19T21:14:45.933-07:00 func1 [36m[0m Walking, at /Users/csharp/Dropbox/go/src/github.com/coccyx/gogen/config/samples/markets.csv
+[36;1m2016-09-19T21:14:45.933-07:00 func1 [36m[0m Walking, at /Users/csharp/Dropbox/go/src/github.com/coccyx/gogen/config/samples/markets.csv.bak
+[36;1m2016-09-19T21:14:45.933-07:00 func1 [36m[0m Walking, at /Users/csharp/Dropbox/go/src/github.com/coccyx/gogen/config/samples/test1.yml
+[36;1m2016-09-19T21:14:45.933-07:00 parseFileConfig [36m[0m Config Path: /Users/csharp/Dropbox/go/src/github.com/coccyx/gogen/config/samples/test1.yml
+[36;1m2016-09-19T21:14:45.934-07:00 func1 [36m[0m Walking, at /Users/csharp/Dropbox/go/src/github.com/coccyx/gogen/config/samples/usernames.sample
+[36;1m2016-09-19T21:14:45.934-07:00 func1 [36m[0m Walking, at /Users/csharp/Dropbox/go/src/github.com/coccyx/gogen/config/samples/usernames.sample.bak
+[36;1m2016-09-19T21:14:45.934-07:00 resolve [36m[0m Resolving sample 'markets.csv' to token 'markets.csv'
+[36;1m2016-09-19T21:14:45.934-07:00 resolve [36m[0m Resolving sample 'markets.csv' to token 'markets.csv'
+[36;1m2016-09-19T21:14:45.934-07:00 resolve [36m[0m Resolving sample 'markets.csv' to token 'markets.csv'
+[36;1m2016-09-19T21:14:45.934-07:00 main [36m[0m Global: config.Global{Debug:false, Verbose:false, UseOutputQueue:true, GeneratorWorkers:1, OutputWorkers:1}
+[36;1m2016-09-19T21:14:45.934-07:00 main [36m[0m Default Tokens: []*config.Token{(*config.Token)(0xc4200aa460), (*config.Token)(0xc4200aa540), (*config.Token)(0xc4200aa620), (*config.Token)(0xc4200aa700)}
+[36;1m2016-09-19T21:14:45.934-07:00 main [36m[0m Default Sample: config.Sample{Name:"", Disabled:false, Generator:"sample", Outputter:"stdout", OutputTemplate:"raw", Rater:"config", Interval:60, Delay:0, Count:0, Earliest:"now", Latest:"now", Begin:"", End:"", RandomizeCount:0.2, RandomizeEvents:true, Tokens:[]config.Token(nil), Lines:[]map[string]string(nil), Field:"_raw", Log:(*logging.Logger)(nil), Gen:config.Generator(nil), Out:config.Outputter(nil), EarliestParsed:0, LatestParsed:0, BeginParsed:time.Time{sec:0, nsec:0, loc:(*time.Location)(nil)}, EndParsed:time.Time{sec:0, nsec:0, loc:(*time.Location)(nil)}, Current:time.Time{sec:0, nsec:0, loc:(*time.Location)(nil)}, Realtime:false}
+[36;1m2016-09-19T21:14:45.934-07:00 main [36m[0m Samples: []*config.Sample{(*config.Sample)(0xc4200ead80), (*config.Sample)(0xc4200eaf00), (*config.Sample)(0xc4200eb200)}
+[36;1m2016-09-19T21:14:45.935-07:00 main [36m[0m JSON Config: {
   "global": {
     "debug": false,
     "verbose": false,
@@ -700,6 +56,7 @@
       "disabled": true,
       "generator": "",
       "outputter": "",
+      "outputTemplate": "",
       "rater": "",
       "interval": 0,
       "delay": 0,
@@ -712,34 +69,75 @@
       "randomizeEvents": false,
       "tokens": null,
       "lines": [
-        "birodivulga162",
-        "nildajcbonanno",
-        "ivettaadelima",
-        "pckomono",
-        "Looreeto",
-        "JooPedro1591",
-        "claaarecurlingg",
-        "acciokcavote",
-        "JungD",
-        "InaraAllves",
-        "Haroldmcaol",
-        "xNessaa",
-        "stylesdofunk",
-        "meltemmeltemm",
-        "emapujig",
-        "cellphones4deal",
-        "amisisuvi",
-        "MegSeecharran95",
-        "MargueritaYociu",
-        "MarcioBFasano"
+        {
+          "_raw": "birodivulga162"
+        },
+        {
+          "_raw": "nildajcbonanno"
+        },
+        {
+          "_raw": "ivettaadelima"
+        },
+        {
+          "_raw": "pckomono"
+        },
+        {
+          "_raw": "Looreeto"
+        },
+        {
+          "_raw": "JooPedro1591"
+        },
+        {
+          "_raw": "claaarecurlingg"
+        },
+        {
+          "_raw": "acciokcavote"
+        },
+        {
+          "_raw": "JungD"
+        },
+        {
+          "_raw": "InaraAllves"
+        },
+        {
+          "_raw": "Haroldmcaol"
+        },
+        {
+          "_raw": "xNessaa"
+        },
+        {
+          "_raw": "stylesdofunk"
+        },
+        {
+          "_raw": "meltemmeltemm"
+        },
+        {
+          "_raw": "emapujig"
+        },
+        {
+          "_raw": "cellphones4deal"
+        },
+        {
+          "_raw": "amisisuvi"
+        },
+        {
+          "_raw": "MegSeecharran95"
+        },
+        {
+          "_raw": "MargueritaYociu"
+        },
+        {
+          "_raw": "MarcioBFasano"
+        }
       ],
-      "linesMap": null
+      "field": ""
     },
     {
       "name": "markets.csv",
       "disabled": true,
       "generator": "",
       "outputter": "",
+      "outputTemplate": "",
       "rater": "",
       "interval": 0,
       "delay": 0,
@@ -751,8 +149,7 @@
       "randomizeCount": 0,
       "randomizeEvents": false,
       "tokens": null,
-      "lines": null,
-      "linesMap": [
+      "lines": [
         {
           "city": "SPRINGFIELD",
           "county": "HAMPDEN",
@@ -905,17 +302,19 @@
           "state": "MA",
           "zip": "1151"
         }
-      ]
+      ],
+      "field": ""
     },
     {
       "name": "test1",
       "disabled": false,
       "generator": "sample",
       "outputter": "stdout",
+      "outputTemplate": "raw",
       "rater": "config",
       "interval": 1,
       "delay": 0,
-      "count": 3,
+      "count": 5,
       "earliest": "-3s",
       "latest": "now",
       "begin": "",
@@ -930,7 +329,7 @@
           "type": "timestamp",
           "replacement": "%Y-%m-%d %H:%M:%S,%3n",
           "sample": "",
-          "field": "",
+          "field": "_raw",
           "precision": 0,
           "lower": 0,
           "upper": 0,
@@ -945,7 +344,7 @@
           "type": "percChoice",
           "replacement": "",
           "sample": "",
-          "field": "",
+          "field": "_raw",
           "precision": 0,
           "lower": 0,
           "upper": 0,
@@ -970,7 +369,7 @@
           "type": "integerid",
           "replacement": "100000",
           "sample": "",
-          "field": "",
+          "field": "_raw",
           "precision": 0,
           "lower": 0,
           "upper": 0,
@@ -985,7 +384,7 @@
           "type": "random",
           "replacement": "guid",
           "sample": "",
-          "field": "",
+          "field": "_raw",
           "precision": 0,
           "lower": 0,
           "upper": 0,
@@ -1000,7 +399,7 @@
           "type": "choice",
           "replacement": "",
           "sample": "usernames",
-          "field": "",
+          "field": "_raw",
           "precision": 0,
           "lower": 0,
           "upper": 0,
@@ -1327,7 +726,7 @@
               "zip": "1151"
             }
           ],
-          "choice": null
+          "choice": []
         },
         {
           "name": "markets-state",
@@ -1648,7 +1047,7 @@
               "zip": "1151"
             }
           ],
-          "choice": null
+          "choice": []
         },
         {
           "name": "markets-city",
@@ -1969,7 +1368,7 @@
               "zip": "1151"
             }
           ],
-          "choice": null
+          "choice": []
         },
         {
           "name": "value",
@@ -1978,7 +1377,7 @@
           "type": "random",
           "replacement": "float",
           "sample": "",
-          "field": "",
+          "field": "_raw",
           "precision": 3,
           "lower": 0,
           "upper": 10,
@@ -1988,9 +1387,14 @@
         }
       ],
       "lines": [
-        "2012-09-14 16:30:20,072 transType=ReplaceMe transID=000000 transGUID=0A0B0C userName=bob city=\"City\" state=State zip=00000 value=0"
+        {
+          "_raw": "2012-09-14 16:30:20,072 transType=ReplaceMe transID=000000 transGUID=0A0B0C userName=bob city=\"City\" state=State zip=00000 value=0"
+        },
+        {
+          "_raw": "2012-09-15 16:30:20,072 transType=ReplaceMe transID=000000 transGUID=0A0B0C userName=bob city=\"City\" state=State zip=00000 value=0"
+        }
       ],
-      "linesMap": null
+      "field": "_raw"
     }
   ],
   "defaultTokens": [
@@ -2054,5 +1458,52 @@
       "fieldChoice": null,
       "choice": null
     }
+  ],
+  "defaultSample": {
+    "name": "",
+    "disabled": false,
+    "generator": "sample",
+    "outputter": "stdout",
+    "outputTemplate": "raw",
+    "rater": "config",
+    "interval": 60,
+    "delay": 0,
+    "count": 0,
+    "earliest": "now",
+    "latest": "now",
+    "begin": "",
+    "end": "",
+    "randomizeCount": 0.2,
+    "randomizeEvents": true,
+    "tokens": null,
+    "lines": null,
+    "field": "_raw"
+  },
+  "templates": [
+    {
+      "name": "json",
+      "header": "",
+      "row": "{{ json . | printf \"%s\" }}",
+      "footer": ""
+    },
+    {
+      "name": "raw",
+      "header": "",
+      "row": "{{ ._raw }}",
+      "footer": ""
+    }
   ]
 }
+2016-09-19T21:14:45.935-07:00 main [0m Starting Timers
+2016-09-19T21:14:45.935-07:00 main [0m Starting Generators
+[36;1m2016-09-19T21:14:45.935-07:00 main [36m[0m Starting Generator 0
+[36;1m2016-09-19T21:14:45.935-07:00 main [36m[0m Starting Outputter 0
+2016-09-19T21:14:46.937-07:00 Start [0m Setting sample 'test1' to generator 'sample'
+[36;1m2016-09-19T21:14:46.937-07:00 Gen [36m[0m Gen Queue Item &config.GenQueueItem{S:(*config.Sample)(0xc4200eb200), Count:5, Earliest:time.Time{sec:63609941683, nsec:937168720, loc:(*time.Location)(0x2bc500)}, Latest:time.Time{sec:63609941686, nsec:937168861, loc:(*time.Location)(0x2bc500)}, OQ:(chan *config.OutQueueItem)(0xc420175c80)}
+[36;1m2016-09-19T21:14:46.937-07:00 Gen [36m[0m Generating sample 'test1' with count 5, et: '2016-09-19 21:14:43.93716872 -0700 PDT', lt: '2016-09-19 21:14:46.937168861 -0700 PDT'
+[36;1m2016-09-19T21:14:46.937-07:00 Gen [36m[0m Random filling events for sample 'test1' with 5 events
+[36;1m2016-09-19T21:14:46.937-07:00 Gen [36m[0m Events: []map[string]string{map[string]string{"_raw":"2012-09-15 16:30:20,072 transType=ReplaceMe transID=000000 transGUID=0A0B0C userName=bob city=\"City\" state=State zip=00000 value=0"}, map[string]string{"_raw":"2012-09-15 16:30:20,072 transType=ReplaceMe transID=000000 transGUID=0A0B0C userName=bob city=\"City\" state=State zip=00000 value=0"}, map[string]string{"_raw":"2012-09-15 16:30:20,072 transType=ReplaceMe transID=000000 transGUID=0A0B0C userName=bob city=\"City\" state=State zip=00000 value=0"}, map[string]string{"_raw":"2012-09-15 16:30:20,072 transType=ReplaceMe transID=000000 transGUID=0A0B0C userName=bob city=\"City\" state=State zip=00000 value=0"}, map[string]string{"_raw":"2012-09-15 16:30:20,072 transType=ReplaceMe transID=000000 transGUID=0A0B0C userName=bob city=\"City\" state=State zip=00000 value=0"}}
+2016-09-19T21:14:46.937-07:00 Start [0m Setting sample 'test1' to outputter 'stdout'
+[36;1m2016-09-19T21:14:46.937-07:00 Send [36m[0m Out Queue Item &config.OutQueueItem{S:(*config.Sample)(0xc4200eb200), Events:[]map[string]string{map[string]string{"_raw":"&config.GenQueueItem{S:(*config.Sample)(0xc4200eb200), Count:5, Earliest:time.Time{sec:63609941683, nsec:937168720, loc:(*time.Location)(0x2bc500)}, Latest:time.Time{sec:63609941686, nsec:937168861, loc:(*time.Location)(0x2bc500)}, OQ:(chan *config.OutQueueItem)(0xc420175c80)}"}}}
+&config.GenQueueItem{S:(*config.Sample)(0xc4200eb200), Count:5, Earliest:time.Time{sec:63609941683, nsec:937168720, loc:(*time.Location)(0x2bc500)}, Latest:time.Time{sec:63609941686, nsec:937168861, loc:(*time.Location)(0x2bc500)}, OQ:(chan *config.OutQueueItem)(0xc420175c80)}
+signal: interrupt

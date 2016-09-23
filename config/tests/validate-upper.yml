@@ -1,0 +1,5 @@
+name: validate-upper
+tokens:
+  - name: random_int
+    type: random
+    replacement: int

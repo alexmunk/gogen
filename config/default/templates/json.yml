@@ -1,0 +1,4 @@
+name: json
+header:
+row: '{{ json . | printf "%s" }}'
+footer:

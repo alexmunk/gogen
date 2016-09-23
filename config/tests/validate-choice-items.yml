@@ -1,0 +1,4 @@
+name: validate-choice-items
+tokens:
+  - name: choice
+    type: choice

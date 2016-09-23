@@ -11,6 +11,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/coccyx/gogen/template"
 	"github.com/coccyx/timeparser"
 	"github.com/ghodss/yaml"
 	_ "github.com/hhkbp2/go-strftime"
@@ -21,10 +22,11 @@ import (
 // Config is a struct representing a Singleton which contains a copy of the running config
 // across all processes.  Should mirror the structure of $GOGEN_HOME/configs/default/global.yml
 type Config struct {
-	Global        Global    `json:"global"`
-	Samples       []*Sample `json:"samples"`
-	DefaultTokens []*Token  `json:"defaultTokens"`
-	DefaultSample Sample    `json:"defaultSample"`
+	Global        Global      `json:"global"`
+	Samples       []*Sample   `json:"samples"`
+	DefaultTokens []*Token    `json:"defaultTokens"`
+	DefaultSample Sample      `json:"defaultSample"`
+	Templates     []*Template `json:"templates"`
 	initialized   bool
 
 	// Exported but internal use variables
@@ -52,18 +54,23 @@ func getConfig() *Config {
 }
 
 // NewConfig is a singleton constructor which will return a pointer to a global instance of Config
+// Environment variables will impact the function of how we configure ourselves
+// GOGEN_HOME: Change home directory where we will search for configs
+// GOGEN_SAMPLES_DIR: Change where we will look for samples
+// GOGEN_ALWAYS_REFRESH: Do not use singleton pattern and reparse configs
 func NewConfig() *Config {
-	c := getConfig()
-	if c.initialized {
-		return c
+	var c *Config
+	if os.Getenv("GOGEN_ALWAYS_REFRESH") != "1" {
+		c = getConfig()
+		if c.initialized {
+			return c
+		}
+	} else {
+		c = &Config{Log: logging.MustGetLogger("gogen"), initialized: false}
+		c.Log.Debugf("Always refresh on, using fresh config")
 	}
-	backend := logging.NewLogBackend(os.Stdout, "", 0)
-	format := logging.MustStringFormatter(
-		`%{color:bold}%{time} %{shortfunc} %{color:%{level:.1s}%{color:reset} %{message}`,
-	)
-	backendFormatter := logging.NewBackendFormatter(backend, format)
-	backendLeveled := logging.AddModuleLevel(backendFormatter)
-	logging.SetBackend(backendLeveled)
+
+	c.SetLoggingLevel(logging.INFO)
 
 	home := os.Getenv("GOGEN_HOME")
 	if len(home) == 0 {
@@ -72,9 +79,18 @@ func NewConfig() *Config {
 	}
 	c.Log.Debugf("Home: %v\n", home)
 
+	samplesDir := os.Getenv("GOGEN_SAMPLES_DIR")
+	if len(samplesDir) == 0 {
+		samplesDir = filepath.Join(home, "config", "samples")
+		c.Log.Debugf("GOGEN_SAMPLES_DIR not set, setting to '%s'", samplesDir)
+	}
+
 	// Parse defaults
 	if err := c.parseFileConfig(&c.Global, home, "config/default/global.yml"); err != nil {
 		c.Log.Panic(err)
+	}
+	if c.Global.Debug {
+		c.SetLoggingLevel(logging.DEBUG)
 	}
 	if err := c.parseFileConfig(&c.DefaultSample, home, "config/default/sample.yml"); err != nil {
 		c.Log.Panic(err)
@@ -98,10 +114,47 @@ func NewConfig() *Config {
 		return nil
 	})
 
-	// Read all flat file samples
-	fullPath = filepath.Join(home, "config", "samples")
-	acceptableExtensions = map[string]bool{".sample": true}
+	// Read all templates in $GOGEN_HOME/config/default/templates
+	fullPath = filepath.Join(home, "config", "default", "templates")
+	acceptableExtensions = map[string]bool{".yml": true, ".yaml": true, ".json": true}
 	c.walkPath(fullPath, acceptableExtensions, func(innerPath string) error {
+		t := new(Template)
+
+		if err := c.parseFileConfig(&t, innerPath); err != nil {
+			c.Log.Errorf("Error parsing config %s: %s", innerPath, err)
+			return err
+		}
+
+		_ = template.New(t.Name+"_header", t.Row)
+		_ = template.New(t.Name+"_row", t.Row)
+		_ = template.New(t.Name+"_footer", t.Footer)
+
+		c.Templates = append(c.Templates, t)
+		return nil
+	})
+
+	// Read all templates in $GOGEN_HOME/config/templates
+	fullPath = filepath.Join(home, "config", "templates")
+	acceptableExtensions = map[string]bool{".yml": true, ".yaml": true, ".json": true}
+	c.walkPath(fullPath, acceptableExtensions, func(innerPath string) error {
+		t := new(Template)
+
+		if err := c.parseFileConfig(&t, innerPath); err != nil {
+			c.Log.Errorf("Error parsing config %s: %s", innerPath, err)
+			return err
+		}
+
+		_ = template.New(t.Name+"_header", t.Row)
+		_ = template.New(t.Name+"_row", t.Row)
+		_ = template.New(t.Name+"_footer", t.Footer)
+
+		c.Templates = append(c.Templates, t)
+		return nil
+	})
+
+	// Read all flat file samples
+	acceptableExtensions = map[string]bool{".sample": true}
+	c.walkPath(samplesDir, acceptableExtensions, func(innerPath string) error {
 		s := new(Sample)
 		s.Name = filepath.Base(innerPath)
 		s.Disabled = true
@@ -115,16 +168,15 @@ func NewConfig() *Config {
 
 		scanner := bufio.NewScanner(file)
 		for scanner.Scan() {
-			s.Lines = append(s.Lines, scanner.Text())
+			s.Lines = append(s.Lines, map[string]string{"_raw": scanner.Text()})
 		}
 		c.Samples = append(c.Samples, s)
 		return nil
 	})
 
 	// Read all csv file samples
-	fullPath = filepath.Join(home, "config", "samples")
 	acceptableExtensions = map[string]bool{".csv": true}
-	c.walkPath(fullPath, acceptableExtensions, func(innerPath string) error {
+	c.walkPath(samplesDir, acceptableExtensions, func(innerPath string) error {
 		s := new(Sample)
 		s.Name = filepath.Base(innerPath)
 		s.Disabled = true
@@ -154,22 +206,19 @@ func NewConfig() *Config {
 		for _, row := range rows {
 			fieldsmap := map[string]string{}
 			for i := 0; i < len(fields); i++ {
-				if fields[i] == "_raw" {
-					s.Lines = append(s.Lines, row[i])
-				} else {
-					fieldsmap[fields[i]] = row[i]
-				}
+				fieldsmap[fields[i]] = row[i]
 			}
-			s.LinesMap = append(s.LinesMap, fieldsmap)
+			s.Lines = append(s.Lines, fieldsmap)
 		}
 		c.Samples = append(c.Samples, s)
 		return nil
 	})
 
 	// Read all YAML & JSON samples in $GOGEN_HOME/config/samples directory
+
 	fullPath = filepath.Join(home, "config", "samples")
 	acceptableExtensions = map[string]bool{".yml": true, ".yaml": true, ".json": true}
-	c.walkPath(fullPath, acceptableExtensions, func(innerPath string) error {
+	c.walkPath(samplesDir, acceptableExtensions, func(innerPath string) error {
 		s := c.DefaultSample
 		if err := c.parseFileConfig(&s, innerPath); err != nil {
 			c.Log.Errorf("Error parsing config %s: %s", innerPath, err)
@@ -231,6 +280,11 @@ func NewConfig() *Config {
 			t := &s.Tokens[i]
 			tf := reflect.ValueOf(t).Elem()
 			// typeOfT := tf.Type()
+
+			// Manually set field to default from default sample
+			if t.Field == "" {
+				t.Field = c.DefaultSample.Field
+			}
 
 			// Iterate through all DefaultTokens looking for a name match
 			for _, dt := range c.DefaultTokens {
@@ -295,6 +349,7 @@ func NewConfig() *Config {
 	// There area references from tokens to samples, need to resolve those references
 	for i := 0; i < len(c.Samples); i++ {
 		c.resolve(c.Samples[i])
+		c.validate(c.Samples[i])
 	}
 
 	c.initialized = true
@@ -303,17 +358,98 @@ func NewConfig() *Config {
 
 // resolve takes a sample, finds any references from tokens to other samples and
 // updates the token to point to the sample data
+// Also fixes up any additional things which are needed, like weighted choice string
+// string map to the randutil Choice struct
 func (c *Config) resolve(s *Sample) {
 	// c.Log.Debugf("Resolving '%s'", s.Name)
 	for i := 0; i < len(s.Tokens); i++ {
 		// c.Log.Debugf("Resolving token '%s' for sample '%s'", s.Tokens[i].Name, s.Name)
 		for j := 0; j < len(c.Samples); j++ {
-			if s.Tokens[i].Sample == c.Samples[j].Name {
-				c.Log.Debugf("Resolving sample '%s' to token '%s'", c.Samples[j].Name, s.Tokens[i].Sample)
-				s.Tokens[i].FieldChoice = c.Samples[j].LinesMap
-				s.Tokens[i].PercChoice = c.Samples[j].LinesMap
-				s.Tokens[i].Choice = c.Samples[j].Lines
+			if s.Tokens[i].SampleString == c.Samples[j].Name {
+				c.Log.Debugf("Resolving sample '%s' to token '%s'", c.Samples[j].Name, s.Tokens[i].SampleString)
+				s.Tokens[i].Sample = c.Samples[j]
+				s.Tokens[i].FieldChoice = c.Samples[j].Lines
+				// s.Tokens[i].WeightedChoice = c.Samples[j].Lines
+				temp := make([]string, 0, len(c.Samples[j].Lines))
+				for _, line := range c.Samples[j].Lines {
+					if _, ok := line["_raw"]; ok {
+						if len(line["_raw"]) > 0 {
+							temp = append(temp, line["_raw"])
+						}
+					}
+				}
+				s.Tokens[i].Choice = temp
 				break
+			}
+		}
+	}
+}
+
+// SetLoggingLevel sets the logging level for everyone
+func (c *Config) SetLoggingLevel(level logging.Level) {
+	backend := logging.NewLogBackend(os.Stderr, "", 0)
+	format := logging.MustStringFormatter(
+		`%{color:bold}%{time} %{shortfunc} %{color:%{level:.1s}%{color:reset} %{message}`,
+	)
+	backendFormatter := logging.NewBackendFormatter(backend, format)
+	backendLeveled := logging.AddModuleLevel(backendFormatter)
+	backendLeveled.SetLevel(level, "")
+
+	logging.SetBackend(backendLeveled)
+}
+
+// validate takes a sample and checks against any rules which may cause the configuration to be invalid.
+// This hopefully centralizes logic for valid configs, disabling any samples which are not valid and
+// preventing this logic from sprawling all over the code base.
+func (c *Config) validate(s *Sample) {
+	if s.EarliestParsed > s.LatestParsed {
+		s.Log.Errorf("Earliest time cannot be greater than latest for sample '%s', disabling Sample", s.Name)
+		s.Disabled = true
+		return
+	}
+	for _, t := range s.Tokens {
+		switch t.Type {
+		case "random", "rated":
+			if t.Replacement == "int" || t.Replacement == "float" {
+				if t.Lower > t.Upper {
+					s.Log.Errorf("Lower cannot be greater than Upper for token '%s' in sample '%s', disabling Sample", t.Name, s.Name)
+					s.Disabled = true
+				} else if t.Upper == 0 {
+					s.Log.Errorf("Upper cannot be zero for token '%s' in sample '%s', disabling Sample", t.Name, s.Name)
+					s.Disabled = true
+				}
+			} else if t.Replacement == "string" || t.Replacement == "hex" {
+				if t.Length == 0 {
+					s.Log.Errorf("Length cannot be zero for token '%s' in sample '%s', disabling Sample", t.Name, s.Name)
+					s.Disabled = true
+				}
+			} else {
+				if t.Replacement != "guid" && t.Replacement != "ipv4" && t.Replacement != "ipv6" {
+					s.Log.Errorf("Replacement '%s' is invalid for token '%s' in sample '%s'", t.Replacement, t.Name, s.Name)
+					s.Disabled = true
+				}
+			}
+		case "choice":
+			if len(t.Choice) == 0 || t.Choice == nil {
+				s.Log.Errorf("Zero choice items for token '%s' in sample '%s', disabling Sample", t.Name, s.Name)
+				s.Disabled = true
+			}
+		case "weightedChoice":
+			if len(t.WeightedChoice) == 0 || t.WeightedChoice == nil {
+				s.Log.Errorf("Zero choice items for token '%s' in sample '%s', disabling Sample", t.Name, s.Name)
+				s.Disabled = true
+			}
+		case "fieldChoice":
+			if len(t.FieldChoice) == 0 || t.FieldChoice == nil {
+				s.Log.Errorf("Zero choice items for token '%s' in sample '%s', disabling Sample", t.Name, s.Name)
+				s.Disabled = true
+			}
+			for _, choice := range t.FieldChoice {
+				if _, ok := choice[t.SrcField]; !ok {
+					s.Log.Errorf("Source field '%s' does not exist for token '%s' in row '%#v' in sample '%s', disabling Sample", t.SrcField, t.Name, choice, s.Name)
+					s.Disabled = true
+					break
+				}
 			}
 		}
 	}

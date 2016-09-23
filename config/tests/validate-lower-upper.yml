@@ -1,0 +1,7 @@
+name: validate-lower-upper
+tokens:
+  - name: random_int
+    type: random
+    replacement: int
+    lower: 10
+    upper: 0

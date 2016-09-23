@@ -3,7 +3,7 @@ package timer
 import (
 	"time"
 
-	"github.com/coccyx/gogen/config"
+	"github.com/coccyx/gogen/internal"
 )
 
 // Timer will put work into the generator queue on an interval specified by the Sample.

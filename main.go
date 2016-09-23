@@ -1,8 +1,10 @@
 package main
 
 import (
-	"github.com/coccyx/gogen/config"
+	"encoding/json"
+
 	"github.com/coccyx/gogen/generator"
+	"github.com/coccyx/gogen/internal"
 	"github.com/coccyx/gogen/outputter"
 	"github.com/coccyx/gogen/timer"
 )
@@ -16,8 +18,8 @@ func main() {
 	c.Log.Debugf("Default Sample: %#v", c.DefaultSample)
 	c.Log.Debugf("Samples: %#v", c.Samples)
 	// c.Log.Debugf("Pretty Values %# v\n", pretty.Formatter(c))
-	// j, _ := json.MarshalIndent(c, "", "  ")
-	// c.Log.Debugf("JSON Config: %s\n", j)
+	j, _ := json.MarshalIndent(c, "", "  ")
+	c.Log.Debugf("JSON Config: %s\n", j)
 
 	c.Log.Infof("Starting Timers")
 

@@ -1,7 +1,0 @@
-{
-	"Type": "template",
-	"Name": "raw",
-	"Header": "",
-	"Row": "$_raw$",
-	"Footer": ""
-}

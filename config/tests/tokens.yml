@@ -1,0 +1,68 @@
+name: tokens
+tokens:
+  - name: static
+    type: static
+    replacement: foo
+  - name: random_int
+    type: random
+    replacement: int
+    lower: 0
+    upper: 10
+  - name: random_float
+    type: random
+    replacement: float
+    lower: 0
+    upper: 1
+    precision: 3
+  - name: random_string
+    type: random
+    replacement: string
+    length: 10
+  - name: random_hex
+    type: random
+    replacement: hex
+    length: 5
+  - name: choice
+    type: choice
+    choice:
+    - a
+    - b
+    - c
+  - name: weightedChoice
+    type: weightedChoice
+    weightedChoice:
+      - weight: 3
+        choice: a
+      - weight: 5
+        choice: b
+      - weight: 1
+        choice: c
+  - name: fieldChoice
+    type: fieldChoice
+    srcField: c
+    fieldChoice:
+      - a: 1
+        b: 2
+        c: 3
+        d: 4
+      - a: 5
+        b: 6
+        c: 7
+        d: 8
+      - a: 9
+        b: 10
+        c: 11
+        d: 12
+  - name: random_guid
+    type: random
+    replacement: guid
+  - name: random_ipv4
+    type: random
+    replacement: ipv4
+  - name: random_ipv6
+    type: random
+    replacement: ipv6
+  - name: timestamp
+    type: timestamp
+    replacement: "%Y-%m-%d %H:%M:%S,%3n"
+    

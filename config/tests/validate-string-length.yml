@@ -1,0 +1,6 @@
+name: validate-string-length
+tokens:
+  - name: random_string
+    type: random
+    replacement: string
+    length: 0

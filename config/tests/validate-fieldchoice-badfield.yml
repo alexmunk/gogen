@@ -1,0 +1,12 @@
+name: validate-fieldchoice-badfield
+tokens:
+  - name: fieldChoice
+    type: fieldChoice
+    srcField: badfield
+    fieldChoice:
+    - a: 1
+      b: 2
+      c: 3
+    - a: 4
+      b: 5
+      c: 6

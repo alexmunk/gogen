@@ -1,6 +1,8 @@
 package outputter
 
-import "github.com/coccyx/gogen/config"
+import (
+	"github.com/coccyx/gogen/internal"
+)
 
 func Start(oq chan *config.OutQueueItem) {
 	for {
