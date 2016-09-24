@@ -30,6 +30,7 @@ type Sample struct {
 	Latest          string              `json:"latest"`
 	Begin           string              `json:"begin"`
 	End             string              `json:"end"`
+	EndIntervals    int                 `json:"endIntervals"`
 	RandomizeCount  float32             `json:"randomizeCount"`
 	RandomizeEvents bool                `json:"randomizeEvents"`
 	Tokens          []Token             `json:"tokens"`
@@ -109,7 +110,7 @@ func (t Token) Replace(event *string, choice *int, et time.Time, lt time.Time) e
 			part1 := e[:pos]
 			part2 := e[pos+len(t.Token):]
 			temps := part1 + replacement + part2
-			event = &temps
+			*event = temps
 		} else {
 			return fmt.Errorf("Token '%s' not found in field '%s' of event '%s'", t.Token, t.Field, *event)
 		}

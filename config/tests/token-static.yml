@@ -1,0 +1,9 @@
+name: token-static
+tokens:
+  - name: static
+    type: static
+    replacement: foo
+    format: template
+    token: $static$
+lines:
+- "_raw": $static$

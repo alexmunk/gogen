@@ -407,6 +407,11 @@ func (c *Config) validate(s *Sample) {
 		s.Disabled = true
 		return
 	}
+	// If no interval is set, generate one time and exit
+	if s.Interval == 0 {
+		s.Log.Infof("No interval set for sample '%s', setting endIntervals to 1", s.Name)
+		s.EndIntervals = 1
+	}
 	for _, t := range s.Tokens {
 		switch t.Type {
 		case "random", "rated":

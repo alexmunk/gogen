@@ -1,7 +1,6 @@
 package generator
 
 import (
-	"fmt"
 	"math"
 	"math/rand"
 
@@ -16,7 +15,7 @@ func (foo sample) Gen(item *config.GenQueueItem) error {
 		item.Count = len(s.Lines)
 	}
 	s.Log.Debugf("Gen Queue Item %#v", item)
-	outstr := []map[string]string{{"_raw": fmt.Sprintf("%#v", item)}}
+	// outstr := []map[string]string{{"_raw": fmt.Sprintf("%#v", item)}}
 
 	s.Log.Debugf("Generating sample '%s' with count %d, et: '%s', lt: '%s'", s.Name, item.Count, item.Earliest, item.Latest)
 	// startTime := time.Now()
@@ -57,15 +56,23 @@ func (foo sample) Gen(item *config.GenQueueItem) error {
 	for i := 0; i < item.Count; i++ {
 		for _, token := range s.Tokens {
 			if fieldval, ok := events[i][token.Field]; ok {
-				token.Replace(&fieldval, choices[token.Name], item.Earliest, item.Latest)
-				events[i][token.Field] = fieldval
+				s.Log.Debugf("Replacing token '%s' in fieldval: %s", token.Name, fieldval)
+				if choices[token.Name] == nil {
+					choices[token.Name] = new(int)
+				}
+				if err := token.Replace(&fieldval, choices[token.Name], item.Earliest, item.Latest); err == nil {
+					events[i][token.Field] = fieldval
+				} else {
+					s.Log.Error(err)
+				}
 			} else {
 				s.Log.Errorf("Field %s not found in event for sample %s", token.Field, s.Name)
 			}
 		}
 	}
 
-	outitem := &config.OutQueueItem{S: item.S, Events: outstr}
+	// s.Log.Debugf("Outstr: ", outstr)
+	outitem := &config.OutQueueItem{S: item.S, Events: events}
 	select {
 	case item.OQ <- outitem:
 	default:

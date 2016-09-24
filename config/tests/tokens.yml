@@ -65,4 +65,3 @@ tokens:
   - name: timestamp
     type: timestamp
     replacement: "%Y-%m-%d %H:%M:%S,%3n"
-    
