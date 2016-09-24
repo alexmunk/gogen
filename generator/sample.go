@@ -27,11 +27,13 @@ func (foo sample) Gen(item *config.GenQueueItem) error {
 		s.Log.Debugf("Random filling events for sample '%s' with %d events", s.Name, item.Count)
 
 		for i := 0; i < item.Count; i++ {
-			events = append(events, s.Lines[rand.Intn(slen)])
+			events = append(events, copyevent(s.Lines[rand.Intn(slen)]))
 		}
 	} else {
 		if item.Count <= slen {
-			copy(events, s.Lines[0:item.Count])
+			for i := 0; i < item.Count; i++ {
+				events = append(events, copyevent(s.Lines[i]))
+			}
 		} else {
 			iters := int(math.Ceil(float64(item.S.Count) / float64(slen)))
 			s.Log.Debugf("Sequentially filling events for sample '%s' of size %d with %d events over %d iterations", s.Name, slen, item.Count, iters)
@@ -45,25 +47,34 @@ func (foo sample) Gen(item *config.GenQueueItem) error {
 				}
 				s.Log.Debugf("Appending %d events from lines, length %d", count, slen)
 				// end := (i * slen) + count
-				events = append(events, s.Lines[0:count]...)
+				for j := 0; j < count; j++ {
+					events = append(events, copyevent(s.Lines[j]))
+				}
 			}
 		}
 	}
 
 	s.Log.Debugf("Events: %#v", events)
 
-	choices := make(map[string]*int)
 	for i := 0; i < item.Count; i++ {
+		choices := make(map[int]*int)
 		for _, token := range s.Tokens {
 			if fieldval, ok := events[i][token.Field]; ok {
-				s.Log.Debugf("Replacing token '%s' in fieldval: %s", token.Name, fieldval)
-				if choices[token.Name] == nil {
-					choices[token.Name] = new(int)
+				var choice *int
+				if choices[token.Group] != nil {
+					choice = choices[token.Group]
+				} else {
+					choice = new(int)
+					*choice = -1
 				}
-				if err := token.Replace(&fieldval, choices[token.Name], item.Earliest, item.Latest); err == nil {
+				s.Log.Debugf("Replacing token '%s' with choice %d in fieldval: %s", token.Name, *choice, fieldval)
+				if err := token.Replace(&fieldval, choice, item.Earliest, item.Latest); err == nil {
 					events[i][token.Field] = fieldval
 				} else {
 					s.Log.Error(err)
+				}
+				if token.Group > 0 {
+					choices[token.Group] = choice
 				}
 			} else {
 				s.Log.Errorf("Field %s not found in event for sample %s", token.Field, s.Name)
@@ -78,4 +89,12 @@ func (foo sample) Gen(item *config.GenQueueItem) error {
 	default:
 	}
 	return nil
+}
+
+func copyevent(src map[string]string) (dst map[string]string) {
+	dst = make(map[string]string)
+	for k, v := range src {
+		dst[k] = v
+	}
+	return dst
 }

@@ -20,6 +20,7 @@ func (t *Timer) NewTimer() {
 		for i := 0; i < t.S.EndIntervals-1; i++ {
 			t.loop()
 		}
+		t.S.Log.Infof("Timer for sample '%s' shutting down after %d intervals", t.S.Name, t.S.EndIntervals)
 	} else {
 		for {
 			t.loop()
@@ -35,12 +36,11 @@ func (t *Timer) loop() {
 }
 
 func (t *Timer) genWork() {
-	// c := config.NewConfig()
 	// TODO Implement backfill & rating
 	earliest := t.S.Now().Add(t.S.EarliestParsed)
 	latest := t.S.Now().Add(t.S.LatestParsed)
 	item := &config.GenQueueItem{S: t.S, Count: t.S.Count, Earliest: earliest, Latest: latest, OQ: t.OQ}
-	// c.Log.Debugf("Generating work for item %#v", item)
+	t.S.Log.Debugf("Placing item in queue for sample '%s': %#v", t.S.Name, item)
 	select {
 	case t.GQ <- item:
 	default:

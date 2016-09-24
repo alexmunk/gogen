@@ -39,7 +39,7 @@ func TestSampleGen(t *testing.T) {
 	gen = new(sample)
 	go gen.Gen(gqi)
 	oqi = <-oq
-	assert.Equal(t, "foo foo", oqi.Events[0]["_raw"])
+	assert.Equal(t, "foo foo bar", oqi.Events[0]["_raw"])
 }
 
 func FindSampleInFile(home string, name string) *config.Sample {

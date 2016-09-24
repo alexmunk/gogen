@@ -2,6 +2,7 @@
 
 * Implement rating for event counts and rated fields
     * Rating should support lua based raters as well
+* Implement header and footer for output templates to allow for CSV & XML generation
 * Implement replay generator
 * Integrate LUA interpret for custom generators and raters
 * Implement outputting flattened configs to JSON

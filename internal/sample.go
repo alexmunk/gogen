@@ -102,6 +102,7 @@ func (t Token) Replace(event *string, choice *int, et time.Time, lt time.Time) e
 
 	switch t.Format {
 	// TODO Replacing template tokens one by one is inefficient, but test to see how inefficient before optimizing
+	// TODO Simplify... replacement is slicing up string whether regex or template, unify the code between execution paths
 	case "template":
 		if pos := strings.Index(e, t.Token); pos >= 0 {
 			replacement, err := t.GenReplacement(choice, et, lt)
@@ -126,8 +127,8 @@ func (t Token) Replace(event *string, choice *int, et time.Time, lt time.Time) e
 			if err != nil {
 				return err
 			}
-			part1 := e[:match[0]]
-			part2 := e[match[1]:]
+			part1 := e[:match[2]]
+			part2 := e[match[3]:]
 			temps := part1 + replacement + part2
 			*event = temps
 		}
@@ -216,9 +217,7 @@ func (t Token) GenReplacement(choice *int, et time.Time, lt time.Time) (string, 
 				break
 			}
 		}
-		if *choice > 0 {
-			return t.WeightedChoice[*choice].Choice, nil
-		}
+		return t.WeightedChoice[*choice].Choice, nil
 	case "fieldChoice":
 		if c == -1 {
 			c = rand.Intn(len(t.FieldChoice))
@@ -226,5 +225,5 @@ func (t Token) GenReplacement(choice *int, et time.Time, lt time.Time) (string, 
 		}
 		return t.FieldChoice[c][t.SrcField], nil
 	}
-	return "", fmt.Errorf("getReplacement called with invalid type")
+	return "", fmt.Errorf("GenReplacement called with invalid type for token '%s' with type '%s'", t.Name, t.Type)
 }

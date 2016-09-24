@@ -17,7 +17,7 @@ tokens:
       choice: Change
     - weight: 1
       choice: Delete
-  - name: integerid-template # References existing default token
+  # - name: integerid-template # References existing default token
   - name: guid-template      # References existing default token
   - name: usernames-template # References existing default token
   - name: markets-city 
