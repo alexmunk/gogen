@@ -402,6 +402,9 @@ func (c *Config) SetLoggingLevel(level logging.Level) {
 // This hopefully centralizes logic for valid configs, disabling any samples which are not valid and
 // preventing this logic from sprawling all over the code base.
 func (c *Config) validate(s *Sample) {
+	if s.Log == nil {
+		return
+	}
 	if s.EarliestParsed > s.LatestParsed {
 		s.Log.Errorf("Earliest time cannot be greater than latest for sample '%s', disabling Sample", s.Name)
 		s.Disabled = true

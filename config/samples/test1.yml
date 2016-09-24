@@ -7,6 +7,7 @@ latest: now
 tokens:
   - name: ts-ymdhmsms-regex  # References existing default token
   - name: transtype          # An inline token defined in this YAML
+    format: regex
     token: transType=(\w+)
     type: weightedChoice
     weightedChoice:
@@ -21,21 +22,21 @@ tokens:
   - name: usernames-template # References existing default token
   - name: markets-city 
     format: template
-    token: city
+    token: $city$
     type: fieldChoice
     sample: markets.csv
     srcField: city
     group: 1
   - name: markets-state 
     format: template
-    token: city
+    token: $state$
     type: fieldChoice
     sample: markets.csv
     srcField: state
     group: 1
-  - name: markets-city 
+  - name: markets-zip
     format: template
-    token: city
+    token: $zip$
     type: fieldChoice
     sample: markets.csv
     srcField: zip
@@ -50,5 +51,4 @@ tokens:
     upper: 10
 
 lines:
-  - _raw: 2012-09-14 16:30:20,072 transType=ReplaceMe transID=000000 transGUID=0A0B0C userName=bob city="City" state=State zip=00000 value=0
-  - _raw: 2012-09-15 16:30:20,072 transType=ReplaceMe transID=000000 transGUID=0A0B0C userName=bob city="City" state=State zip=00000 value=0
+  - _raw: 2012-09-14 16:30:20,072 transType=ReplaceMe transID=$integerid$ transGUID=$guid$ userName=$username$ city="$city$" state=$state$ zip=$zip$ value=0

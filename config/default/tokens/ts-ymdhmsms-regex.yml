@@ -1,4 +1,5 @@
 name: ts-ymdhmsms-regex
 format: regex
+token: "(\\d{4}-\\d{1,2}-\\d{1,2} \\d{1,2}:\\d{1,2}:\\d{1,2},\\d{0,6})"
 type: timestamp
 replacement: "%Y-%m-%d %H:%M:%S,%3n"

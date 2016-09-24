@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -102,7 +103,7 @@ func (t Token) Replace(event *string, choice *int, et time.Time, lt time.Time) e
 	switch t.Format {
 	// TODO Replacing template tokens one by one is inefficient, but test to see how inefficient before optimizing
 	case "template":
-		if pos := strings.Index(t.Token, e); pos >= 0 {
+		if pos := strings.Index(e, t.Token); pos >= 0 {
 			replacement, err := t.GenReplacement(choice, et, lt)
 			if err != nil {
 				return err
@@ -113,6 +114,22 @@ func (t Token) Replace(event *string, choice *int, et time.Time, lt time.Time) e
 			*event = temps
 		} else {
 			return fmt.Errorf("Token '%s' not found in field '%s' of event '%s'", t.Token, t.Field, *event)
+		}
+	case "regex":
+		re, err := regexp.Compile(t.Token)
+		if err != nil {
+			return err
+		}
+		match := re.FindStringSubmatchIndex(e)
+		if match != nil {
+			replacement, err := t.GenReplacement(choice, et, lt)
+			if err != nil {
+				return err
+			}
+			part1 := e[:match[0]]
+			part2 := e[match[1]:]
+			temps := part1 + replacement + part2
+			*event = temps
 		}
 	}
 	return nil

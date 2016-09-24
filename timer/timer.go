@@ -18,11 +18,11 @@ type Timer struct {
 func (t *Timer) NewTimer() {
 	if t.S.EndIntervals > 0 {
 		for i := 0; i < t.S.EndIntervals-1; i++ {
-			loop()
+			t.loop()
 		}
 	} else {
 		for {
-			loop()
+			t.loop()
 		}
 	}
 

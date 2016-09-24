@@ -33,6 +33,13 @@ func TestSampleGen(t *testing.T) {
 	go gen.Gen(gqi)
 	oqi := <-oq
 	assert.Equal(t, "foo", oqi.Events[0]["_raw"])
+
+	s = FindSampleInFile(home, "token-regex")
+	gqi = &config.GenQueueItem{Count: 1, Earliest: now(), Latest: now(), S: s, OQ: oq}
+	gen = new(sample)
+	go gen.Gen(gqi)
+	oqi = <-oq
+	assert.Equal(t, "foo foo", oqi.Events[0]["_raw"])
 }
 
 func FindSampleInFile(home string, name string) *config.Sample {
