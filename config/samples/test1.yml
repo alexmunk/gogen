@@ -1,5 +1,5 @@
 name: test1
-interval: 3
+interval: 1
 count: 5
 randomizeEvents: true
 earliest: -3s
@@ -51,4 +51,5 @@ tokens:
     upper: 10
 
 lines:
-  - _raw: 2012-09-14 16:30:20,072 transType=ReplaceMe transID=$integerid$ transGUID=$guid$ userName=$username$ city="$city$" state=$state$ zip=$zip$ value=0
+  - _raw: 2012-09-14 16:30:20,072 line1 transType=ReplaceMe transID=$integerid$ transGUID=$guid$ userName=$username$ city="$city$" state=$state$ zip=$zip$ value=0
+  - _raw: 2012-09-14 16:30:20,072 line2 transType=ReplaceMe transID=$integerid$ transGUID=$guid$ userName=$username$ city="$city$" state=$state$ zip=$zip$ value=0

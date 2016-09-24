@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"math/rand"
 	"time"
 
 	"github.com/coccyx/gogen/generator"
@@ -11,7 +12,7 @@ import (
 )
 
 func main() {
-
+	rand.Seed(time.Now().UnixNano())
 	// filename := os.Args[1]
 	c := config.NewConfig()
 	c.Log.Debugf("Global: %#v", c.Global)
