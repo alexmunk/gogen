@@ -13,6 +13,7 @@ func Start(gq chan *config.GenQueueItem) {
 				item.S.Gen = s
 			}
 		}
+		item.S.Log.Debugf("Generating item %#v", item)
 		item.S.Gen.Gen(item)
 	}
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"time"
 
 	"github.com/coccyx/gogen/generator"
 	"github.com/coccyx/gogen/internal"
@@ -22,11 +23,9 @@ func main() {
 	c.Log.Debugf("JSON Config: %s\n", j)
 
 	c.Log.Infof("Starting Timers")
-
 	var timers []timer.Timer
 	gq := make(chan *config.GenQueueItem)
 	oq := make(chan *config.OutQueueItem)
-
 	for i := 0; i < len(c.Samples); i++ {
 		s := c.Samples[i]
 		if !s.Disabled {
@@ -37,18 +36,18 @@ func main() {
 	}
 
 	c.Log.Infof("Starting Generators")
-
 	for i := 0; i < c.Global.GeneratorWorkers; i++ {
 		c.Log.Debugf("Starting Generator %d", i)
 		go generator.Start(gq)
 	}
 
+	c.Log.Infof("Starting Outputters")
 	for i := 0; i < c.Global.OutputWorkers; i++ {
 		c.Log.Debugf("Starting Outputter %d", i)
 		go outputter.Start(oq)
 	}
 
 	for {
-
+		time.Sleep(time.Second)
 	}
 }
