@@ -3,12 +3,15 @@ interval: 1
 endIntervals: 100
 count: 1000
 tokens:
-  - name: ts-dmyhmsms-regex
+  - name: ts-dmyhmsms-template
+    format: template
+    token: $ts$
+    type: timestamp
+    replacement: "%d/%b/%Y %H:%M:%S:%L"
   - name: host
-    format: regex
+    format: template
     type: fieldChoice
     srcField: host
-    token: (.*)
     field: host
     sample: webhosts.csv
     group: 1
@@ -54,5 +57,5 @@ lines:
 - index: main
   sourcetype: access_combined
   source: /var/log/httpd/access_log
-  host: foo.bar.com
-  _raw: $ip$ $clientip$ - - [29/Apr/2013 18:09:05:132] "GET /product.screen?product_id=HolyGouda&JSESSIONID=SD3SL1FF7ADFF8 HTTP 1.1" $status$ $timetaken$ "http://shop.buttercupgames.com/cart.do?action=view&itemId=HolyGouda" "$useragent$" $size$
+  host: $host$
+  _raw: $ip$ $clientip$ - - [$ts$] "GET /product.screen?product_id=HolyGouda&JSESSIONID=SD3SL1FF7ADFF8 HTTP 1.1" $status$ $timetaken$ "http://shop.buttercupgames.com/cart.do?action=view&itemId=HolyGouda" "$useragent$" $size$

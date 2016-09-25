@@ -102,7 +102,7 @@ func (foo sample) Gen(item *config.GenQueueItem) error {
 }
 
 func copyevent(src map[string]string) (dst map[string]string) {
-	dst = make(map[string]string)
+	dst = make(map[string]string, len(src))
 	for k, v := range src {
 		dst[k] = v
 	}

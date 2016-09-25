@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	strftime "github.com/hhkbp2/go-strftime"
+	strftime "github.com/cactus/gostrftime"
 	logging "github.com/op/go-logging"
 	"github.com/satori/go.uuid"
 )

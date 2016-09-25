@@ -2,3 +2,4 @@ out.log
 *.pprof
 *.pdf
 gogen
+test.out
