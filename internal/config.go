@@ -359,6 +359,7 @@ func NewConfig() *Config {
 // Also fixes up any additional things which are needed, like weighted choice string
 // string map to the randutil Choice struct
 func (c *Config) resolve(s *Sample) {
+	s.UseOutputQueue = c.Global.UseOutputQueue
 	// c.Log.Debugf("Resolving '%s'", s.Name)
 	for i := 0; i < len(s.Tokens); i++ {
 		// If format is template, then create a default token of $tokenname$

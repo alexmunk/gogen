@@ -17,15 +17,22 @@ func Start(oq chan *config.OutQueueItem, oqs chan int) {
 			break
 		}
 		item.Rand = generator
-		// Check to see if our outputter is not set
-		if item.S.Out == nil {
-			item.S.Log.Infof("Setting sample '%s' to outputter '%s'", item.S.Name, item.S.Outputter)
-			switch item.S.Outputter {
-			case "stdout":
-				o := new(stdout)
-				item.S.Out = o
-			}
-		}
+		SetOutputter(item.S)
 		item.S.Out.Send(item)
+	}
+}
+
+func SetOutputter(s *config.Sample) {
+	// Check to see if our outputter is not set
+	if s.Out == nil {
+		s.Log.Infof("Setting sample '%s' to outputter '%s'", s.Name, s.Outputter)
+		switch s.Outputter {
+		case "stdout":
+			o := new(stdout)
+			s.Out = o
+		case "devnull":
+			o := new(devnull)
+			s.Out = o
+		}
 	}
 }

@@ -36,6 +36,13 @@ func setup(clic *cli.Context) {
 		c.Log.Infof("Setting generators to %d", clic.Int("outputters"))
 		c.Global.OutputWorkers = clic.Int("outputters")
 	}
+	if clic.Bool("disableOutputQueue") {
+		c.Log.Infof("Disabling Output Queue, sending directly from generators")
+		c.Global.UseOutputQueue = false
+		for i := 0; i < len(c.Samples); i++ {
+			c.Samples[i].UseOutputQueue = false
+		}
+	}
 
 	// c.Log.Debugf("Global: %#v", c.Global)
 	// c.Log.Debugf("Default Tokens: %#v", c.DefaultTokens)
@@ -155,6 +162,7 @@ func main() {
 				cli.IntFlag{Name: "interval, i"},
 				cli.IntFlag{Name: "endIntervals, ei"},
 				cli.StringFlag{Name: "outputTemplate, ot"},
+				cli.StringFlag{Name: "outputter, o"},
 			},
 			Action: func(clic *cli.Context) error {
 				if len(clic.String("sample")) > 0 {
@@ -178,6 +186,10 @@ func main() {
 							if clic.Int("endIntervals") > 0 {
 								c.Log.Infof("Setting endIntervals to %d for sample '%s'", clic.Int("endIntervals"), c.Samples[i].Name)
 								c.Samples[i].EndIntervals = clic.Int("endIntervals")
+							}
+							if len(clic.String("outputter")) > 0 {
+								c.Log.Infof("Setting outputter to '%s' for sample '%s'", clic.String("outputter"), c.Samples[i].Name)
+								c.Samples[i].Outputter = clic.String("outputter")
 							}
 						} else {
 							c.Samples[i].Disabled = true
@@ -229,6 +241,7 @@ func main() {
 		cli.BoolFlag{Name: "debug, vv"},
 		cli.IntFlag{Name: "generators, g"},
 		cli.IntFlag{Name: "outputters, o"},
+		cli.BoolFlag{Name: "disableOutputQueue, doq"},
 	}
 	app.Run(os.Args)
 }

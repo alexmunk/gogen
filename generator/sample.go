@@ -4,6 +4,7 @@ import (
 	"math"
 
 	"github.com/coccyx/gogen/internal"
+	"github.com/coccyx/gogen/outputter"
 )
 
 type sample struct{}
@@ -21,8 +22,11 @@ func (foo sample) Gen(item *config.GenQueueItem) error {
 
 	slen := len(s.Lines)
 
+	// Make a template of events we'll be generating every interval, by randomly sampling from the sample
+	// or filling in sequentially.  When done, cache the output and copy that cached output rather
+	// than reallocate every interval.
 	var events []map[string]string
-	if s.Events == nil {
+	if s.Events == nil || len(s.Events) != item.Count {
 		events = make([]map[string]string, 0, item.Count)
 		if s.RandomizeEvents {
 			s.Log.Debugf("Random filling events for sample '%s' with %d events", s.Name, item.Count)
@@ -87,13 +91,13 @@ func (foo sample) Gen(item *config.GenQueueItem) error {
 		}
 	}
 
-	// s.Log.Debugf("Outstr: ", outstr)
 	outitem := &config.OutQueueItem{S: item.S, Events: events}
-	item.OQ <- outitem
-	// select {
-	// case item.OQ <- outitem:
-	// default:
-	// }
+	if s.UseOutputQueue {
+		item.OQ <- outitem
+	} else {
+		outputter.SetOutputter(s)
+		item.S.Out.Send(outitem)
+	}
 	return nil
 }
 

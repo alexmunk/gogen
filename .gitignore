@@ -1,1 +1,4 @@
 out.log
+*.pprof
+*.pdf
+gogen
