@@ -28,24 +28,17 @@ func TestSampleGen(t *testing.T) {
 
 	// gq := make(chan *config.GenQueueItem)
 	oq := make(chan *config.OutQueueItem)
-	s := FindSampleInFile(home, "token-static")
+	s := config.FindSampleInFile(home, "token-static")
 	gqi := &config.GenQueueItem{Count: 1, Earliest: now(), Latest: now(), S: s, OQ: oq, Rand: randgen}
 	gen := new(sample)
 	go gen.Gen(gqi)
 	oqi := <-oq
 	assert.Equal(t, "foo", oqi.Events[0]["_raw"])
 
-	s = FindSampleInFile(home, "token-regex")
+	s = config.FindSampleInFile(home, "token-regex")
 	gqi = &config.GenQueueItem{Count: 1, Earliest: now(), Latest: now(), S: s, OQ: oq, Rand: randgen}
 	gen = new(sample)
 	go gen.Gen(gqi)
 	oqi = <-oq
 	assert.Equal(t, "foo foo bar", oqi.Events[0]["_raw"])
-}
-
-func FindSampleInFile(home string, name string) *config.Sample {
-	os.Setenv("GOGEN_SAMPLES_DIR", filepath.Join(home, "config", "tests", name+".yml"))
-	c := config.NewConfig()
-	// c.Log.Debugf("Pretty Values %# v\n", pretty.Formatter(c))
-	return c.FindSampleByName(name)
 }

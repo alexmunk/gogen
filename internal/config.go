@@ -234,17 +234,25 @@ func NewConfig() *Config {
 
 		// Setup Begin & End
 		// If End is not set, then we're intended to always run in realtime
-		if s.End == "" {
+		if s.Begin == "" && s.End == "" {
 			s.Realtime = true
+		}
+		// Cache a time so we can get a delta for parsed begin, end, earliest and latest
+		n := time.Now()
+		now := func() time.Time {
+			return n
 		}
 		var err error
 		if len(s.Begin) > 0 {
-			if s.BeginParsed, err = timeparser.TimeParserNow(s.Begin, time.Now); err != nil {
+			if s.BeginParsed, err = timeparser.TimeParserNow(s.Begin, now); err != nil {
 				c.Log.Errorf("Error parsing Begin for sample %s: %v", s.Name, err)
+			} else {
+				s.Current = s.BeginParsed
+				s.Realtime = false
 			}
 		}
 		if len(s.End) > 0 {
-			if s.EndParsed, err = timeparser.TimeParserNow(s.End, time.Now); err != nil {
+			if s.EndParsed, err = timeparser.TimeParserNow(s.End, now); err != nil {
 				c.Log.Errorf("Error parsing End for sample %s: %v", s.Name, err)
 			}
 		}
@@ -252,12 +260,6 @@ func NewConfig() *Config {
 		//
 		// Parse earliest and latest as relative times
 		//
-
-		// Cache a time so we can get a delta for parsed earliest and latest
-		n := time.Now()
-		now := func() time.Time {
-			return n
-		}
 
 		var p time.Time
 		if p, err = timeparser.TimeParserNow(s.Earliest, now); err != nil {
@@ -502,11 +504,11 @@ func (c *Config) parseFileConfig(out interface{}, path ...string) error {
 	switch filepath.Ext(fullPath) {
 	case ".yml", ".yaml":
 		if err := yaml.Unmarshal(contents, out); err != nil {
-			c.Log.Panicf("YAML parsing error: %v", err)
+			c.Log.Panicf("YAML parsing error in file '%s': %v", fullPath, err)
 		}
 	case ".json":
 		if err := json.Unmarshal(contents, out); err != nil {
-			c.Log.Panicf("JSON parsing error: %v", err)
+			c.Log.Panicf("JSON parsing errorin file '%s': %v", fullPath, err)
 		}
 	}
 	// c.Log.Debugf("Out: %#v\n", out)

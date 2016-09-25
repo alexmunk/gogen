@@ -24,8 +24,34 @@ func (t *Timer) NewTimer() {
 		t.S.Log.Infof("Timer for sample '%s' shutting down after %d intervals", t.S.Name, t.S.EndIntervals)
 		t.Done <- 1
 	} else {
-		for {
-			t.loop()
+		if !t.S.Realtime {
+			var endtime time.Time
+			n := time.Now()
+			if t.S.EndParsed.Before(n) && !t.S.EndParsed.IsZero() {
+				endtime = t.S.EndParsed
+			} else {
+				endtime = n
+			}
+			for ; t.S.Current.Before(endtime); t.S.Current = t.S.Current.Add(time.Duration(t.S.Interval) * time.Second) {
+				// t.S.Log.Debugf("Backfilling, at %s, ending at %s", t.S.Current, endtime)
+				t.genWork()
+			}
+			if t.S.EndParsed.IsZero() {
+				t.S.Realtime = true
+			}
+		}
+		// We'll be greater than now but we still need to continue to the end
+		if !t.S.Realtime {
+			for ; t.S.Current.Before(t.S.EndParsed); t.S.Current = t.S.Current.Add(time.Duration(t.S.Interval) * time.Second) {
+				t.genWork()
+			}
+		}
+		if t.S.Realtime {
+			for {
+				t.loop()
+			}
+		} else {
+			t.Done <- 1
 		}
 	}
 }
@@ -37,7 +63,7 @@ func (t *Timer) loop() {
 }
 
 func (t *Timer) genWork() {
-	// TODO Implement backfill & rating
+	// TODO Implement rating
 	earliest := t.S.Now().Add(t.S.EarliestParsed)
 	latest := t.S.Now().Add(t.S.LatestParsed)
 	item := &config.GenQueueItem{S: t.S, Count: t.S.Count, Earliest: earliest, Latest: latest, OQ: t.OQ}

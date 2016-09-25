@@ -1,0 +1,4 @@
+name: csv
+header: '{{ keys . | join "," }}'
+row: '{{ values . | join "," }}'
+footer:
