@@ -123,9 +123,13 @@ func NewConfig() *Config {
 			return err
 		}
 
-		_ = template.New(t.Name+"_header", t.Row)
+		if len(t.Header) > 0 {
+			_ = template.New(t.Name+"_header", t.Header)
+		}
 		_ = template.New(t.Name+"_row", t.Row)
-		_ = template.New(t.Name+"_footer", t.Footer)
+		if len(t.Footer) > 0 {
+			_ = template.New(t.Name+"_footer", t.Footer)
+		}
 
 		c.Templates = append(c.Templates, t)
 		return nil

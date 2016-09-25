@@ -1,7 +1,6 @@
 package template
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -32,5 +31,15 @@ func TestTemplate(t *testing.T) {
 	// Multiple variables, one replacement
 	err = New("test4", "{{ ._raw }}{{ .foo }}")
 	temp, err = Exec("test4", row)
-	fmt.Printf("Test4: %s", temp)
+	assert.Equal(t, "foo<no value>", temp)
+
+	err = New("testheader", `{{ keys . | join "," }}`)
+	temp, err = Exec("testheader", row)
+	assert.Equal(t, "_raw,host,index", temp)
+	// fmt.Println(temp)
+
+	err = New("testvalues", `{{ values . | join "," }}`)
+	temp, err = Exec("testvalues", row)
+	assert.Equal(t, "foo,barhost,fooindex", temp)
+	// fmt.Println(temp)
 }

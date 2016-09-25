@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"sort"
+	"strings"
 	ttemplate "text/template"
 )
 
@@ -25,6 +27,35 @@ func New(name string, template string) error {
 				a, _ := json.Marshal(v)
 				return string(a)
 			},
+			"keys": func(m map[string]string) []string {
+				keys := make([]string, len(m))
+				i := 0
+				for k := range m {
+					keys[i] = k
+					i++
+				}
+				sort.Strings(keys)
+				return keys
+			},
+			"values": func(m map[string]string) []string {
+				keys := make([]string, len(m))
+				values := make([]string, len(m))
+				i := 0
+				for k := range m {
+					keys[i] = k
+					i++
+				}
+				sort.Strings(keys)
+				i = 0
+				for _, k := range keys {
+					values[i] = m[k]
+					i++
+				}
+				return values
+			},
+			"join": func(arg string, value []string) string {
+				return strings.Join(value, arg)
+			},
 		}
 		// Create template, add Func map
 		tmpl, err = ttemplate.New(name).Funcs(funcMap).Parse(template)
@@ -34,6 +65,15 @@ func New(name string, template string) error {
 		cache[name] = tmpl
 	}
 	return nil
+}
+
+// Exists checks whether a given template has been created
+func Exists(name string) bool {
+	if _, ok := cache[name]; !ok {
+		return false
+	} else {
+		return true
+	}
 }
 
 // Exec returns a fully executed template substituted with a string map of row
