@@ -18,7 +18,8 @@ func TestGenReplacement(t *testing.T) {
 	home := ".."
 	os.Setenv("GOGEN_SAMPLES_DIR", filepath.Join(home, "config", "tests", "tokens.yml"))
 	loc, _ := time.LoadLocation("Local")
-	rand.Seed(0)
+	source := rand.NewSource(0)
+	randgen := rand.New(source)
 
 	n := time.Date(2001, 10, 20, 12, 0, 0, 100000, loc)
 	now := func() time.Time {
@@ -30,41 +31,41 @@ func TestGenReplacement(t *testing.T) {
 	token := s.Tokens[0]
 
 	choice := -1
-	replacement, _ := token.GenReplacement(&choice, now(), now())
+	replacement, _ := token.GenReplacement(&choice, now(), now(), randgen)
 	assert.Equal(t, "foo", replacement)
 
 	choice = -1
 	token = s.Tokens[1]
-	replacement, _ = token.GenReplacement(&choice, now(), now())
+	replacement, _ = token.GenReplacement(&choice, now(), now(), randgen)
 	assert.Equal(t, "4", replacement)
 
 	choice = -1
 	token = s.Tokens[2]
-	replacement, _ = token.GenReplacement(&choice, now(), now())
+	replacement, _ = token.GenReplacement(&choice, now(), now(), randgen)
 	assert.Equal(t, "0.514", replacement)
 
 	choice = -1
 	token = s.Tokens[3]
-	replacement, _ = token.GenReplacement(&choice, now(), now())
+	replacement, _ = token.GenReplacement(&choice, now(), now(), randgen)
 	assert.Equal(t, "NERA9rI2cv", replacement)
 
 	choice = -1
 	token = s.Tokens[4]
-	replacement, _ = token.GenReplacement(&choice, now(), now())
+	replacement, _ = token.GenReplacement(&choice, now(), now(), randgen)
 	assert.Equal(t, "56289", replacement)
 
 	choice = -1
 	token = s.Tokens[5]
-	replacement, _ = token.GenReplacement(&choice, now(), now())
+	replacement, _ = token.GenReplacement(&choice, now(), now(), randgen)
 	assert.Equal(t, "c", replacement)
-	replacement, _ = token.GenReplacement(&choice, now(), now())
+	replacement, _ = token.GenReplacement(&choice, now(), now(), randgen)
 	assert.Equal(t, "c", replacement)
 
 	token = s.Tokens[6]
 	choices := make(map[int]int)
 	for i := 0; i < 1000; i++ {
 		choice = -1
-		_, _ = token.GenReplacement(&choice, now(), now())
+		_, _ = token.GenReplacement(&choice, now(), now(), randgen)
 		choices[choice] = choices[choice] + 1
 	}
 	if choices[0] != 312 || choices[1] != 572 || choices[2] != 116 {
@@ -72,23 +73,23 @@ func TestGenReplacement(t *testing.T) {
 	}
 
 	token = s.Tokens[7]
-	replacement, _ = token.GenReplacement(&choice, now(), now())
+	replacement, _ = token.GenReplacement(&choice, now(), now(), randgen)
 	assert.Equal(t, "7", replacement)
 
 	token = s.Tokens[8]
-	replacement, _ = token.GenReplacement(&choice, now(), now())
+	replacement, _ = token.GenReplacement(&choice, now(), now(), randgen)
 	fmt.Printf("UUID: %s\n", replacement)
 
 	token = s.Tokens[9]
-	replacement, _ = token.GenReplacement(&choice, now(), now())
+	replacement, _ = token.GenReplacement(&choice, now(), now(), randgen)
 	assert.Equal(t, "184.226.113.189", replacement)
 
 	token = s.Tokens[10]
-	replacement, _ = token.GenReplacement(&choice, now(), now())
+	replacement, _ = token.GenReplacement(&choice, now(), now(), randgen)
 	assert.Equal(t, "c9bb:42d4:abc1:7cea:9f7f:bbb2:caf4:a3ef", replacement)
 
 	token = s.Tokens[11]
-	replacement, _ = token.GenReplacement(&choice, now(), now())
+	replacement, _ = token.GenReplacement(&choice, now(), now(), randgen)
 	assert.Equal(t, "2001-10-20 12:00:00,000", replacement)
 
 	// choice = -1

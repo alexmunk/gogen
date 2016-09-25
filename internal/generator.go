@@ -1,6 +1,9 @@
 package config
 
-import "time"
+import (
+	"math/rand"
+	"time"
+)
 
 // GenQueueItem represents one generation job
 type GenQueueItem struct {
@@ -9,6 +12,7 @@ type GenQueueItem struct {
 	Earliest time.Time
 	Latest   time.Time
 	OQ       chan *OutQueueItem
+	Rand     *rand.Rand
 }
 
 // Generator will generate count events from earliest to latest time and put them

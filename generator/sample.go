@@ -2,7 +2,6 @@ package generator
 
 import (
 	"math"
-	"math/rand"
 
 	"github.com/coccyx/gogen/internal"
 )
@@ -27,7 +26,7 @@ func (foo sample) Gen(item *config.GenQueueItem) error {
 		s.Log.Debugf("Random filling events for sample '%s' with %d events", s.Name, item.Count)
 
 		for i := 0; i < item.Count; i++ {
-			events = append(events, copyevent(s.Lines[rand.Intn(slen)]))
+			events = append(events, copyevent(s.Lines[item.Rand.Intn(slen)]))
 		}
 	} else {
 		if item.Count <= slen {
@@ -67,8 +66,8 @@ func (foo sample) Gen(item *config.GenQueueItem) error {
 					choice = new(int)
 					*choice = -1
 				}
-				s.Log.Debugf("Replacing token '%s' with choice %d in fieldval: %s", token.Name, *choice, fieldval)
-				if err := token.Replace(&fieldval, choice, item.Earliest, item.Latest); err == nil {
+				s.Log.Debugf("Replacing token '%s':'%s' with choice %d in fieldval: %s", token.Name, token.Token, *choice, fieldval)
+				if err := token.Replace(&fieldval, choice, item.Earliest, item.Latest, item.Rand); err == nil {
 					events[i][token.Field] = fieldval
 				} else {
 					s.Log.Error(err)
@@ -84,10 +83,11 @@ func (foo sample) Gen(item *config.GenQueueItem) error {
 
 	// s.Log.Debugf("Outstr: ", outstr)
 	outitem := &config.OutQueueItem{S: item.S, Events: events}
-	select {
-	case item.OQ <- outitem:
-	default:
-	}
+	item.OQ <- outitem
+	// select {
+	// case item.OQ <- outitem:
+	// default:
+	// }
 	return nil
 }
 

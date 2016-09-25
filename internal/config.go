@@ -14,9 +14,7 @@ import (
 	"github.com/coccyx/gogen/template"
 	"github.com/coccyx/timeparser"
 	"github.com/ghodss/yaml"
-	_ "github.com/hhkbp2/go-strftime"
 	"github.com/op/go-logging"
-	_ "github.com/pbnjay/strptime"
 )
 
 // Config is a struct representing a Singleton which contains a copy of the running config
@@ -363,10 +361,14 @@ func NewConfig() *Config {
 func (c *Config) resolve(s *Sample) {
 	// c.Log.Debugf("Resolving '%s'", s.Name)
 	for i := 0; i < len(s.Tokens); i++ {
+		// If format is template, then create a default token of $tokenname$
+		if s.Tokens[i].Format == "template" && s.Tokens[i].Token == "" {
+			s.Tokens[i].Token = "$" + s.Tokens[i].Name + "$"
+		}
 		// c.Log.Debugf("Resolving token '%s' for sample '%s'", s.Tokens[i].Name, s.Name)
 		for j := 0; j < len(c.Samples); j++ {
 			if s.Tokens[i].SampleString == c.Samples[j].Name {
-				c.Log.Debugf("Resolving sample '%s' to token '%s'", c.Samples[j].Name, s.Tokens[i].SampleString)
+				c.Log.Debugf("Resolving sample '%s' for token '%s'", c.Samples[j].Name, s.Tokens[i].Name)
 				s.Tokens[i].Sample = c.Samples[j]
 				s.Tokens[i].FieldChoice = c.Samples[j].Lines
 				// s.Tokens[i].WeightedChoice = c.Samples[j].Lines

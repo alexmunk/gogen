@@ -1,0 +1,14 @@
+name: token-regex
+tokens:
+  - name: static
+    type: static
+    replacement: foo
+    format: regex
+    token: "^foo (\\w+)"
+  - name: static2
+    type: static
+    replacement: bar
+    format: regex
+    token: "^foo foo (\\w+)"
+lines:
+- "_raw": foo replaceme baz

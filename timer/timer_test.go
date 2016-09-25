@@ -1,6 +1,7 @@
 package timer
 
 import (
+	"os"
 	"reflect"
 	"testing"
 	"time"
@@ -10,8 +11,9 @@ import (
 )
 
 func TestTimer(t *testing.T) {
+	os.Setenv("GOGEN_HOME", "..")
 	c := config.NewConfig()
-	s := c.FindSampleByName("test1")
+	s := c.FindSampleByName("translog")
 	gq := make(chan *config.GenQueueItem)
 	oq := make(chan *config.OutQueueItem)
 
