@@ -20,37 +20,43 @@ func (foo sample) Gen(item *config.GenQueueItem) error {
 	// startTime := time.Now()
 
 	slen := len(s.Lines)
-	events := make([]map[string]string, 0, item.Count)
 
-	if s.RandomizeEvents {
-		s.Log.Debugf("Random filling events for sample '%s' with %d events", s.Name, item.Count)
+	var events []map[string]string
+	if s.Events == nil {
+		events = make([]map[string]string, 0, item.Count)
+		if s.RandomizeEvents {
+			s.Log.Debugf("Random filling events for sample '%s' with %d events", s.Name, item.Count)
 
-		for i := 0; i < item.Count; i++ {
-			events = append(events, copyevent(s.Lines[item.Rand.Intn(slen)]))
-		}
-	} else {
-		if item.Count <= slen {
 			for i := 0; i < item.Count; i++ {
-				events = append(events, copyevent(s.Lines[i]))
+				events = append(events, copyevent(s.Lines[item.Rand.Intn(slen)]))
 			}
 		} else {
-			iters := int(math.Ceil(float64(item.S.Count) / float64(slen)))
-			s.Log.Debugf("Sequentially filling events for sample '%s' of size %d with %d events over %d iterations", s.Name, slen, item.Count, iters)
-			for i := 0; i < iters; i++ {
-				var count int
-				// start := i * slen
-				if i == iters-1 {
-					count = (item.S.Count - (i * slen))
-				} else {
-					count = slen
+			if item.Count <= slen {
+				for i := 0; i < item.Count; i++ {
+					events = append(events, copyevent(s.Lines[i]))
 				}
-				s.Log.Debugf("Appending %d events from lines, length %d", count, slen)
-				// end := (i * slen) + count
-				for j := 0; j < count; j++ {
-					events = append(events, copyevent(s.Lines[j]))
+			} else {
+				iters := int(math.Ceil(float64(item.S.Count) / float64(slen)))
+				s.Log.Debugf("Sequentially filling events for sample '%s' of size %d with %d events over %d iterations", s.Name, slen, item.Count, iters)
+				for i := 0; i < iters; i++ {
+					var count int
+					// start := i * slen
+					if i == iters-1 {
+						count = (item.S.Count - (i * slen))
+					} else {
+						count = slen
+					}
+					s.Log.Debugf("Appending %d events from lines, length %d", count, slen)
+					// end := (i * slen) + count
+					for j := 0; j < count; j++ {
+						events = append(events, copyevent(s.Lines[j]))
+					}
 				}
 			}
 		}
+		copy(s.Events, events)
+	} else {
+		copy(events, s.Events)
 	}
 
 	s.Log.Debugf("Events: %#v", events)

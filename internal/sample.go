@@ -41,15 +41,16 @@ type Sample struct {
 	Field           string              `json:"field"`
 
 	// Internal use variables
-	Log            *logging.Logger `json:"-"`
-	Gen            Generator       `json:"-"`
-	Out            Outputter       `json:"-"`
-	EarliestParsed time.Duration   `json:"-"`
-	LatestParsed   time.Duration   `json:"-"`
-	BeginParsed    time.Time       `json:"-"`
-	EndParsed      time.Time       `json:"-"`
-	Current        time.Time       `json:"-"` // If we are backfilling or generating for a specified time window, what time is it?
-	Realtime       bool            `json:"-"` // Are we done doing batch backfill or specified time window?
+	Log            *logging.Logger     `json:"-"`
+	Gen            Generator           `json:"-"`
+	Out            Outputter           `json:"-"`
+	EarliestParsed time.Duration       `json:"-"`
+	LatestParsed   time.Duration       `json:"-"`
+	BeginParsed    time.Time           `json:"-"`
+	EndParsed      time.Time           `json:"-"`
+	Current        time.Time           `json:"-"` // If we are backfilling or generating for a specified time window, what time is it?
+	Realtime       bool                `json:"-"` // Are we done doing batch backfill or specified time window?
+	Events         []map[string]string `json:"-"`
 }
 
 // Clock allows for implementers to keep track of their own view

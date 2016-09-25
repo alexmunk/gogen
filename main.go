@@ -13,6 +13,7 @@ import (
 	"github.com/coccyx/gogen/timer"
 	"github.com/ghodss/yaml"
 	logging "github.com/op/go-logging"
+	"github.com/pkg/profile"
 	"gopkg.in/urfave/cli.v1"
 )
 
@@ -129,6 +130,7 @@ Loop3:
 }
 
 func main() {
+	defer profile.Start(profile.CPUProfile, profile.ProfilePath(".")).Stop()
 	rand.Seed(time.Now().UnixNano())
 
 	app := cli.NewApp()
