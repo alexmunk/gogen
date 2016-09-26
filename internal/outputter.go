@@ -11,5 +11,5 @@ type OutQueueItem struct {
 
 // Outputter will output events using the designated output plugin
 type Outputter interface {
-	Send(item *OutQueueItem) error
+	Send(event string) error
 }
