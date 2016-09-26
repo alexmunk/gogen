@@ -48,18 +48,14 @@ func (t *Timer) NewTimer() {
 		}
 		if t.S.Realtime {
 			for {
-				t.loop()
+				timer := time.NewTimer(time.Duration(t.S.Interval) * time.Second)
+				<-timer.C
+				t.genWork()
 			}
 		} else {
 			t.Done <- 1
 		}
 	}
-}
-
-func (t *Timer) loop() {
-	timer := time.NewTimer(time.Duration(t.S.Interval) * time.Second)
-	<-timer.C
-	t.genWork()
 }
 
 func (t *Timer) genWork() {

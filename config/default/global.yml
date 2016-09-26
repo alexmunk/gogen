@@ -4,3 +4,4 @@ verbose: false
 useOutputQueue: true
 generatorWorkers: 1
 outputWorkers: 1
+rotInterval: 1

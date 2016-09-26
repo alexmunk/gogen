@@ -39,6 +39,7 @@ type Global struct {
 	UseOutputQueue   bool `json:"useOutputQueue"`
 	GeneratorWorkers int  `json:"generatorWorkers"`
 	OutputWorkers    int  `json:"outputWorkers"`
+	ROTInterval      int  `json:"rotInterval"`
 }
 
 var instance *Config
