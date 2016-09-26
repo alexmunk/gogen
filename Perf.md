@@ -9,10 +9,10 @@
     2016-09-25 10:49:17,479 INFO module='main' sample='null': GlobalEventsPerSec=213706.8 KilobytesPerSec=74564.968945 GigabytesPerDay=6143.964116
 
 # Gogen
-    gogen -g 4 --doq gen -ei 10000 -s weblog-regex | python ~/local/projects/sa-eventgen/bin/eventcount.py
-    2016-09-25 10:55:56 Events/Sec: 14054.2 Kilobytes/Sec: 4953.600000 GB/Day: 408.164062
+    gogen -g 6 -o 2 gen -s weblog-regex -ei 10000 -o devnull
+    2016-09-26T13:14:30.449-07:00 ROT  Events/Sec: 14000.00 Kilobytes/Sec: 4956.60 GB/Day: 408.41
 
-    gogen -g 4 --doq gen -ei 10000 -s weblog | python ~/local/projects/sa-eventgen/bin/eventcount.py
-    2016-09-25 10:54:48 Events/Sec: 98857.8 Kilobytes/Sec: 34841.600000 GB/Day: 2870.859375
+    gogen -g 6 -o 2 gen -s weblog -ei 10000 -o devnull
+    2016-09-26T13:15:30.409-07:00 ROT  Events/Sec: 113000.00 Kilobytes/Sec: 40066.22 GB/Day: 3301.35 
 
-Appears we're about 4-6x faster.
+Appears we're about 2-6x faster.
