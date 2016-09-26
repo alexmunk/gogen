@@ -54,6 +54,8 @@ func setup(clic *cli.Context) {
 }
 
 func gen() {
+	c.Log.Info("Starting ReadOutThread")
+	go outputter.ROT(c)
 	c.Log.Info("Starting Timers")
 	timerdone := make(chan int)
 	gq := make(chan *config.GenQueueItem)

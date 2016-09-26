@@ -15,16 +15,20 @@ var (
 	bytesWritten  int64
 	lastTS        time.Time
 	log           *logging.Logger
+	rotchan       chan *config.OutputStats
 )
 
-// InitROT starts the Read Out Thread which will log statistics about what's being output
-// InitROT is intended to be started as a goroutine which will log output every c.
-func InitROT(c *config.Config) {
+// ROT starts the Read Out Thread which will log statistics about what's being output
+// ROT is intended to be started as a goroutine which will log output every c.
+func ROT(c *config.Config) {
 	log = c.Log
+
+	rotchan = make(chan *config.OutputStats)
+	go readStats()
 
 	lastEventsWritten := eventsWritten
 	lastBytesWritten := bytesWritten
-	var gbday, eventssec, bytessec float64
+	var gbday, eventssec, kbytessec float64
 	var tempEW, tempBW int64
 	lastTS = time.Now()
 	for {
@@ -34,13 +38,31 @@ func InitROT(c *config.Config) {
 		tempEW = eventsWritten
 		tempBW = bytesWritten
 		eventssec = float64(tempEW-lastEventsWritten) / float64(int(n.Sub(lastTS))/int(time.Second)/c.Global.ROTInterval)
-		bytessec = float64(tempBW-lastBytesWritten) / float64(int(n.Sub(lastTS))/int(time.Second)/c.Global.ROTInterval)
-		gbday = (bytessec * 60 * 60 * 24) / 1024 / 1024 / 1024
-		log.Infof("Events/Sec: %2f Kilobytes/Sec: %2f GB/Day: %2f", eventssec, bytessec, gbday)
+		kbytessec = float64(tempBW-lastBytesWritten) / float64(int(n.Sub(lastTS))/int(time.Second)/c.Global.ROTInterval) / 1024
+		gbday = (kbytessec * 60 * 60 * 24) / 1024 / 1024
+		log.Infof("Events/Sec: %.2f Kilobytes/Sec: %.2f GB/Day: %.2f", eventssec, kbytessec, gbday)
 		lastTS = n
 		lastEventsWritten = tempEW
 		lastBytesWritten = tempBW
 	}
+}
+
+func readStats() {
+	for {
+		select {
+		case os := <-rotchan:
+			eventsWritten += os.EventsWritten
+			bytesWritten += os.BytesWritten
+		}
+	}
+}
+
+// Account sends eventsWritten and bytesWritten to the readStats() thread
+func Account(eventsWritten int64, bytesWritten int64) {
+	os := new(config.OutputStats)
+	os.EventsWritten = eventsWritten
+	os.BytesWritten = bytesWritten
+	rotchan <- os
 }
 
 func Start(oq chan *config.OutQueueItem, oqs chan int) {
@@ -66,10 +88,10 @@ func Start(oq chan *config.OutQueueItem, oqs chan int) {
 				}
 				getLine("footer", item.S, item.Events[last], item.IO.W)
 			}()
-		}
-		err := item.S.Out.Send(item)
-		if err != nil {
-			item.S.Log.Errorf("Error with Send(): %s", err)
+			err := item.S.Out.Send(item)
+			if err != nil {
+				item.S.Log.Errorf("Error with Send(): %s", err)
+			}
 		}
 	}
 }
