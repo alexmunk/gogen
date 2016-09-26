@@ -36,13 +36,6 @@ func setup(clic *cli.Context) {
 		c.Log.Infof("Setting generators to %d", clic.Int("outputters"))
 		c.Global.OutputWorkers = clic.Int("outputters")
 	}
-	if clic.Bool("disableOutputQueue") {
-		c.Log.Infof("Disabling Output Queue, sending directly from generators")
-		c.Global.UseOutputQueue = false
-		for i := 0; i < len(c.Samples); i++ {
-			c.Samples[i].UseOutputQueue = false
-		}
-	}
 
 	// c.Log.Debugf("Global: %#v", c.Global)
 	// c.Log.Debugf("Default Tokens: %#v", c.DefaultTokens)

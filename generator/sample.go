@@ -91,12 +91,7 @@ func (foo sample) Gen(item *config.GenQueueItem) error {
 	}
 
 	outitem := &config.OutQueueItem{S: item.S, Events: events}
-	// if s.UseOutputQueue {
 	item.OQ <- outitem
-	// } else {
-	// 	outputter.SetOutputter(s)
-	// 	item.S.Out.Send(outitem)
-	// }
 	return nil
 }
 

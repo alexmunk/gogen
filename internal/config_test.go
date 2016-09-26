@@ -19,7 +19,7 @@ func TestSingleton(t *testing.T) {
 func TestGlobal(t *testing.T) {
 	os.Setenv("GOGEN_HOME", "..")
 	c := NewConfig()
-	global := Global{Debug: false, Verbose: false, UseOutputQueue: true, GeneratorWorkers: 1, OutputWorkers: 1, ROTInterval: 1}
+	global := Global{Debug: false, Verbose: false, GeneratorWorkers: 1, OutputWorkers: 1, ROTInterval: 1}
 	assert.Equal(t, c.Global, global)
 }
 
