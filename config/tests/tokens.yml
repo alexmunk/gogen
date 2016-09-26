@@ -64,4 +64,4 @@ tokens:
     replacement: ipv6
   - name: timestamp
     type: timestamp
-    replacement: "%Y-%m-%d %H:%M:%S,%3n"
+    replacement: "%Y-%m-%d %H:%M:%S,%L"

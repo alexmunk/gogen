@@ -4,7 +4,6 @@ import (
 	"math"
 	"math/rand"
 	"os"
-	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -20,7 +19,7 @@ func TestSingleton(t *testing.T) {
 func TestGlobal(t *testing.T) {
 	os.Setenv("GOGEN_HOME", "..")
 	c := NewConfig()
-	global := Global{Debug: false, Verbose: false, UseOutputQueue: true, GeneratorWorkers: 1, OutputWorkers: 1}
+	global := Global{Debug: false, Verbose: false, UseOutputQueue: true, GeneratorWorkers: 1, OutputWorkers: 1, ROTInterval: 1}
 	assert.Equal(t, c.Global, global)
 }
 
@@ -88,11 +87,4 @@ func TestValidate(t *testing.T) {
 
 	s = FindSampleInFile(home, "validate-earliest-latest")
 	assert.Equal(t, true, s.Disabled)
-}
-
-func FindSampleInFile(home string, name string) *Sample {
-	os.Setenv("GOGEN_SAMPLES_DIR", filepath.Join(home, "config", "tests", name+".yml"))
-	c := NewConfig()
-	// c.Log.Debugf("Pretty Values %# v\n", pretty.Formatter(c))
-	return c.FindSampleByName(name)
 }
