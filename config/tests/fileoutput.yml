@@ -1,0 +1,10 @@
+debug: false
+verbose: false
+generatorWorkers: 1
+outputWorkers: 1
+rotInterval: 1
+output:
+  outputter: file
+  fileName: /tmp/fileoutput.log
+  maxBytes: 102400
+  outputTemplate: json   

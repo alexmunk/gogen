@@ -20,12 +20,14 @@ import (
 // Config is a struct representing a Singleton which contains a copy of the running config
 // across all processes.  Should mirror the structure of $GOGEN_HOME/configs/default/global.yml
 type Config struct {
-	Global        Global      `json:"global"`
-	Samples       []*Sample   `json:"samples"`
-	DefaultTokens []*Token    `json:"defaultTokens"`
-	DefaultSample Sample      `json:"defaultSample"`
-	Templates     []*Template `json:"templates"`
-	initialized   bool
+	Global            Global      `json:"global"`
+	Samples           []*Sample   `json:"samples"`
+	DefaultTokens     []*Token    `json:"defaultTokens"`
+	DefaultSample     Sample      `json:"defaultSample"`
+	DefaultFileOutput Output      `json:"defaultFileOutput"`
+	DefaultHTTPOutput Output      `json:"defaultHTTPOutput"`
+	Templates         []*Template `json:"templates"`
+	initialized       bool
 
 	// Exported but internal use variables
 	Log      *logging.Logger `json:"-"`
@@ -34,11 +36,22 @@ type Config struct {
 
 // Global represents global configuration options which apply to all of gogen
 type Global struct {
-	Debug            bool `json:"debug"`
-	Verbose          bool `json:"verbose"`
-	GeneratorWorkers int  `json:"generatorWorkers"`
-	OutputWorkers    int  `json:"outputWorkers"`
-	ROTInterval      int  `json:"rotInterval"`
+	Debug            bool   `json:"debug"`
+	Verbose          bool   `json:"verbose"`
+	GeneratorWorkers int    `json:"generatorWorkers"`
+	OutputWorkers    int    `json:"outputWorkers"`
+	ROTInterval      int    `json:"rotInterval"`
+	Output           Output `json:"output"`
+}
+
+// Output represents configuration for outputting data
+type Output struct {
+	FileName       string `json:"fileName"`
+	MaxBytes       int64  `json:"maxBytes"`
+	BackupFiles    int    `json:"backupFiles"`
+	BufferBytes    int    `json:"bufferBytes"`
+	Outputter      string `json:"outputter"`
+	OutputTemplate string `json:"outputTemplate"`
 }
 
 var instance *Config
@@ -84,7 +97,12 @@ func NewConfig() *Config {
 	}
 
 	// Parse defaults
-	if err := c.parseFileConfig(&c.Global, home, "config/default/global.yml"); err != nil {
+	globalFile := os.Getenv("GOGEN_GLOBAL")
+	if len(globalFile) == 0 {
+		globalFile = filepath.Join(home, "config", "global.yml")
+		c.Log.Debugf("GOGEN_HOME not set, setting to '%s'", globalFile)
+	}
+	if err := c.parseFileConfig(&c.Global, globalFile); err != nil {
 		c.Log.Panic(err)
 	}
 	if c.Global.Debug {
@@ -92,6 +110,32 @@ func NewConfig() *Config {
 	}
 	if err := c.parseFileConfig(&c.DefaultSample, home, "config/default/sample.yml"); err != nil {
 		c.Log.Panic(err)
+	}
+	if err := c.parseFileConfig(&c.DefaultFileOutput, home, "config/default/outputters/file.yml"); err != nil {
+		c.Log.Panic(err)
+	}
+	if err := c.parseFileConfig(&c.DefaultHTTPOutput, home, "config/default/outputters/http.yml"); err != nil {
+		c.Log.Panic(err)
+	}
+
+	//
+	// Setup defaults for outputs
+	//
+	switch c.Global.Output.Outputter {
+	case "file":
+		if c.Global.Output.FileName == "" {
+			c.Global.Output.FileName = c.DefaultFileOutput.FileName
+		}
+		if c.Global.Output.BackupFiles == 0 {
+			c.Global.Output.BackupFiles = c.DefaultFileOutput.BackupFiles
+		}
+		if c.Global.Output.MaxBytes == 0 {
+			c.Global.Output.MaxBytes = c.DefaultFileOutput.MaxBytes
+		}
+	case "http":
+		if c.Global.Output.BufferBytes == 0 {
+			c.Global.Output.BufferBytes = c.DefaultHTTPOutput.BufferBytes
+		}
 	}
 
 	// Setup timezone
@@ -340,11 +384,13 @@ func NewConfig() *Config {
 					// c.Log.Debugf("New tokens values: %#v", s.Tokens)
 				}
 			}
-
 		}
 
 		// Give us a logger we can use elsewhere
 		s.Log = c.Log
+
+		// Put the output into the sample for convenience
+		s.Output = &c.Global.Output
 
 		c.Samples = append(c.Samples, &s)
 		return nil

@@ -1,6 +1,0 @@
----
-debug: false
-verbose: false
-generatorWorkers: 1
-outputWorkers: 1
-rotInterval: 1

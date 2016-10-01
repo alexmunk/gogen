@@ -4,6 +4,7 @@ import (
 	"math"
 	"math/rand"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -19,8 +20,40 @@ func TestSingleton(t *testing.T) {
 func TestGlobal(t *testing.T) {
 	os.Setenv("GOGEN_HOME", "..")
 	c := NewConfig()
-	global := Global{Debug: false, Verbose: false, GeneratorWorkers: 1, OutputWorkers: 1, ROTInterval: 1}
-	assert.Equal(t, c.Global, global)
+	output := Output{Outputter: "stdout", OutputTemplate: "raw"}
+	global := Global{Debug: false, Verbose: false, GeneratorWorkers: 1, OutputWorkers: 1, ROTInterval: 1, Output: output}
+	assert.Equal(t, global, c.Global)
+}
+
+func TestFileOutput(t *testing.T) {
+	// Setup environment
+	os.Setenv("GOGEN_HOME", "..")
+	os.Setenv("GOGEN_ALWAYS_REFRESH", "1")
+	home := ".."
+	os.Setenv("GOGEN_GLOBAL", filepath.Join(home, "config", "tests", "fileoutput.yml"))
+	// os.Setenv("GOGEN_SAMPLES_DIR", filepath.Join(home, "config", "tests", "fileoutput.yml"))
+	c := NewConfig()
+
+	// Test Defaults
+	assert.Equal(t, "/tmp/test.log", c.DefaultFileOutput.FileName)
+	assert.Equal(t, int64(10485760), c.DefaultFileOutput.MaxBytes)
+	assert.Equal(t, 5, c.DefaultFileOutput.BackupFiles)
+
+	// Test flatten
+	assert.Equal(t, "/tmp/fileoutput.log", c.Global.Output.FileName)
+	assert.Equal(t, int64(102400), c.Global.Output.MaxBytes)
+	assert.Equal(t, "file", c.Global.Output.Outputter)
+	assert.Equal(t, "json", c.Global.Output.OutputTemplate)
+}
+
+func TestHTTPOutput(t *testing.T) {
+	// Setup environment
+	os.Setenv("GOGEN_HOME", "..")
+	os.Setenv("GOGEN_ALWAYS_REFRESH", "1")
+	home := ".."
+	os.Setenv("GOGEN_SAMPLES_DIR", filepath.Join(home, "config", "tests", "fileoutput.yml"))
+	c := NewConfig()
+	assert.Equal(t, 102400, c.DefaultHTTPOutput.BufferBytes)
 }
 
 func TestFlatten(t *testing.T) {
@@ -28,14 +61,15 @@ func TestFlatten(t *testing.T) {
 	os.Setenv("GOGEN_HOME", "..")
 	os.Setenv("GOGEN_ALWAYS_REFRESH", "1")
 	home := ".."
+	os.Setenv("GOGEN_GLOBAL", filepath.Join(home, "config", "global.yml"))
 	rand.Seed(0)
 
 	var s *Sample
 	s = FindSampleInFile(home, "flatten")
 	assert.Equal(t, false, s.Disabled)
 	assert.Equal(t, "sample", s.Generator)
-	assert.Equal(t, "stdout", s.Outputter)
-	assert.Equal(t, "raw", s.OutputTemplate)
+	assert.Equal(t, "stdout", s.Output.Outputter)
+	assert.Equal(t, "raw", s.Output.OutputTemplate)
 	assert.Equal(t, "config", s.Rater)
 	assert.Equal(t, 0, s.Interval)
 	assert.Equal(t, 0, s.Count)

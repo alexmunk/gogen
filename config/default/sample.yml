@@ -1,9 +1,7 @@
 ---
 # Defaults for samples
 disabled: false                  # Default disabled for all samples
-generator: sample                # Default generator for events
-outputter: stdout                # Default outputter for events
-outputTemplate: raw              # Default output template for events      
+generator: sample                # Default generator for events   
 rater: config                    # Default rater for events
 interval: 0                      # Default interval for events
 delay: 0                         # Delay before starting generation of events

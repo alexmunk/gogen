@@ -23,8 +23,6 @@ type Sample struct {
 	Name            string              `json:"name"`
 	Disabled        bool                `json:"disabled"`
 	Generator       string              `json:"generator"`
-	Outputter       string              `json:"outputter"`
-	OutputTemplate  string              `json:"outputTemplate"`
 	Rater           string              `json:"rater"`
 	Interval        int                 `json:"interval"`
 	Delay           int                 `json:"delay"`
@@ -44,6 +42,7 @@ type Sample struct {
 	Log            *logging.Logger     `json:"-"`
 	Gen            Generator           `json:"-"`
 	Out            Outputter           `json:"-"`
+	Output         *Output             `json:"-"`
 	EarliestParsed time.Duration       `json:"-"`
 	LatestParsed   time.Duration       `json:"-"`
 	BeginParsed    time.Time           `json:"-"`

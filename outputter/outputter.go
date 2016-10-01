@@ -97,8 +97,8 @@ func Start(oq chan *config.OutQueueItem, oqs chan int) {
 }
 
 func getLine(templatename string, s *config.Sample, line map[string]string, w io.Writer) error {
-	if template.Exists(s.OutputTemplate + "_" + templatename) {
-		linestr, err := template.Exec(s.OutputTemplate+"_"+templatename, line)
+	if template.Exists(s.Output.OutputTemplate + "_" + templatename) {
+		linestr, err := template.Exec(s.Output.OutputTemplate+"_"+templatename, line)
 		if err != nil {
 			s.Log.Errorf("Error from sample '%s' in template execution: %v", s.Name, err)
 			return err
@@ -106,7 +106,7 @@ func getLine(templatename string, s *config.Sample, line map[string]string, w io
 		// item.S.Log.Debugf("Outputting line %s", linestr)
 		_, err = w.Write([]byte(linestr + "\n"))
 		if err != nil {
-			s.Log.Errorf("Error sending event for sample '%s' to outputter '%s': %s", s.Name, s.Outputter, err)
+			s.Log.Errorf("Error sending event for sample '%s' to outputter '%s': %s", s.Name, s.Output.Outputter, err)
 		}
 	}
 	return nil
@@ -117,12 +117,14 @@ func setup(generator *rand.Rand, item *config.OutQueueItem) {
 	item.IO = config.NewOutputIO()
 	// Check to see if our outputter is not set
 	if item.S.Out == nil {
-		item.S.Log.Infof("Setting sample '%s' to outputter '%s'", item.S.Name, item.S.Outputter)
-		switch item.S.Outputter {
+		item.S.Log.Infof("Setting sample '%s' to outputter '%s'", item.S.Name, item.S.Output.Outputter)
+		switch item.S.Output.Outputter {
 		case "stdout":
 			item.S.Out = new(stdout)
 		case "devnull":
 			item.S.Out = new(devnull)
+		case "file":
+			item.S.Out = new(file)
 		}
 	}
 }
