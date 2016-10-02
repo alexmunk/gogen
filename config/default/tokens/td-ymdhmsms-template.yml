@@ -1,5 +1,0 @@
-name: ts-ymdhmsms-template
-format: template
-token: $ts$
-type: timestamp
-replacement: "%Y-%m-%d %H:%M:%S,%L"

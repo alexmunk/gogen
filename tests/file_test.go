@@ -16,8 +16,7 @@ func TestFileOutput(t *testing.T) {
 	os.Setenv("GOGEN_HOME", "..")
 	os.Setenv("GOGEN_ALWAYS_REFRESH", "1")
 	home := ".."
-	os.Setenv("GOGEN_GLOBAL", filepath.Join(home, "config", "tests", "fileoutput.yml"))
-	os.Setenv("GOGEN_SAMPLES_DIR", filepath.Join(home, "config", "tests", "outputsample.yml"))
+	os.Setenv("GOGEN_FULLCONFIG", filepath.Join(home, "tests", "fileoutput", "fileoutput.yml"))
 	c := config.NewConfig()
 	// s := c.FindSampleByName("backfill")
 	run.Run(c)

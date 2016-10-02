@@ -1,6 +1,5 @@
 # Todo
 
-* Implement configuration for different output plugins
 * Implement rating for event counts and rated fields
     * Rating should support lua based raters as well
 * Implement replay generator

@@ -1,0 +1,66 @@
+global:
+  samplesDir:
+    - $GOGEN_HOME/examples/weblog
+samples:
+- name: weblog-regex
+  interval: 1
+  endIntervals: 100
+  count: 1000
+  tokens:
+    - name: ts-dmyhmsms-regex
+      format: regex
+      token: "(\\d{1,2}/\\w{3}/\\d{4}\\s\\d{2}:\\d{2}:\\d{2}:\\d{1,3})"
+      type: timestamp
+      replacement: "%d/%b/%Y %H:%M:%S:%L"
+    - name: host
+      format: regex
+      type: fieldChoice
+      srcField: host
+      token: (.*)
+      field: host
+      sample: webhosts.csv
+      group: 1
+    - name: ip
+      format: template
+      type: fieldChoice
+      srcField: ip
+      sample: webhosts.csv
+      group: 1
+    - name: clientip
+      format: template
+      type: choice
+      sample: external_ips.sample
+    - name: status
+      format: template
+      type: weightedChoice
+      weightedChoice:
+      - weight: 10
+        choice: 200
+      - weight: 4
+        choice: 301
+      - weight: 3
+        choice: 404
+      - weight: 2
+        choice: 503
+    - name: timetaken
+      format: template
+      type: random
+      replacement: int
+      lower: 100
+      upper: 1000
+    - name: useragent
+      format: template
+      type: choice
+      sample: useragents.sample
+    - name: size
+      format: template
+      type: random
+      replacement: int
+      lower: 200
+      upper: 4000
+  lines:
+  - index: main
+    sourcetype: access_combined
+    source: /var/log/httpd/access_log
+    host: foo.bar.com
+    _raw: $ip$ $clientip$ - - [29/Apr/2013 18:09:05:132] "GET /product.screen?product_id=HolyGouda&JSESSIONID=SD3SL1FF7ADFF8 HTTP 1.1" $status$ $timetaken$ "http://shop.buttercupgames.com/cart.do?action=view&itemId=HolyGouda" "$useragent$" $size$

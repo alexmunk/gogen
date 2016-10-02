@@ -15,8 +15,8 @@ func TestSampleGen(t *testing.T) {
 	// Setup environment
 	os.Setenv("GOGEN_HOME", "..")
 	os.Setenv("GOGEN_ALWAYS_REFRESH", "1")
-	home := ".."
-	os.Setenv("GOGEN_SAMPLES_DIR", filepath.Join(home, "config", "tests", "tokens.yml"))
+	home := filepath.Join("..", "tests", "tokens")
+	os.Setenv("GOGEN_SAMPLES_DIR", home)
 	loc, _ := time.LoadLocation("Local")
 	source := rand.NewSource(0)
 	randgen := rand.New(source)

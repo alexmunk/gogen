@@ -41,8 +41,8 @@ func TestTimer(t *testing.T) {
 func TestBackfill(t *testing.T) {
 	os.Setenv("GOGEN_HOME", "..")
 	os.Setenv("GOGEN_ALWAYS_REFRESH", "1")
-	home := ".."
-	os.Setenv("GOGEN_SAMPLES_DIR", filepath.Join(home, "config", "tests", "tokens.yml"))
+	home := filepath.Join("..", "tests", "timer")
+	os.Setenv("GOGEN_SAMPLES_DIR", home)
 
 	s := config.FindSampleInFile(home, "backfill")
 
@@ -69,8 +69,8 @@ Loop:
 func TestBackfillRealtime(t *testing.T) {
 	os.Setenv("GOGEN_HOME", "..")
 	os.Setenv("GOGEN_ALWAYS_REFRESH", "1")
-	home := ".."
-	os.Setenv("GOGEN_SAMPLES_DIR", filepath.Join(home, "config", "tests", "tokens.yml"))
+	home := filepath.Join("..", "tests", "timer")
+	os.Setenv("GOGEN_SAMPLES_DIR", home)
 
 	s := config.FindSampleInFile(home, "backfillrealtime")
 
@@ -99,8 +99,8 @@ Loop:
 func TestBackfillFutureEnd(t *testing.T) {
 	os.Setenv("GOGEN_HOME", "..")
 	os.Setenv("GOGEN_ALWAYS_REFRESH", "1")
-	home := ".."
-	os.Setenv("GOGEN_SAMPLES_DIR", filepath.Join(home, "config", "tests", "tokens.yml"))
+	home := filepath.Join("..", "tests", "timer")
+	os.Setenv("GOGEN_SAMPLES_DIR", home)
 
 	s := config.FindSampleInFile(home, "backfillfutureend")
 

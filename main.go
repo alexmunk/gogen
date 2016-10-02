@@ -19,6 +19,11 @@ var c *config.Config
 
 // Setup the running environment
 func Setup(clic *cli.Context) {
+	if len(clic.String("config")) > 0 {
+		os.Setenv("GOGEN_FULLCONFIG", clic.String("config"))
+	} else if len(clic.String("samplesDir")) > 0 {
+		os.Setenv("GOGEN_SAMPLES_DIR", clic.String("samplesDir"))
+	}
 	c = config.NewConfig()
 
 	if clic.Bool("debug") {
@@ -146,11 +151,30 @@ func main() {
 		return nil
 	}
 	app.Flags = []cli.Flag{
-		cli.BoolFlag{Name: "info, v"},
-		cli.BoolFlag{Name: "debug, vv"},
-		cli.IntFlag{Name: "generators, g"},
-		cli.IntFlag{Name: "outputters, o"},
-		cli.BoolFlag{Name: "disableOutputQueue, doq"},
+		cli.BoolFlag{
+			Name:  "info, v",
+			Usage: "Sets info level logging",
+		},
+		cli.BoolFlag{
+			Name:  "debug, vv",
+			Usage: "Sets debug level logging",
+		},
+		cli.IntFlag{
+			Name:  "generators, g",
+			Usage: "Sets number of generator `threads`",
+		},
+		cli.IntFlag{
+			Name:  "outputters, o",
+			Usage: "Sets number of outputter `threads`",
+		},
+		cli.StringFlag{
+			Name:  "samplesDir, sd",
+			Usage: "Sets `directory` to search for sample files, default 'config/samples'",
+		},
+		cli.StringFlag{
+			Name:  "config, c",
+			Usage: "`Path` or URL to a full config",
+		},
 	}
 	app.Run(os.Args)
 }

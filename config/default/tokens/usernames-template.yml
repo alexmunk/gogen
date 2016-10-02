@@ -1,5 +1,0 @@
-name: usernames-template
-format: template
-token: $username$
-type: choice
-sample: usernames.sample
