@@ -8,6 +8,7 @@ import (
 	"time"
 
 	config "github.com/coccyx/gogen/internal"
+	"github.com/coccyx/gogen/tests"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -28,14 +29,14 @@ func TestSampleGen(t *testing.T) {
 
 	// gq := make(chan *config.GenQueueItem)
 	oq := make(chan *config.OutQueueItem)
-	s := config.FindSampleInFile(home, "token-static")
+	s := tests.FindSampleInFile(home, "token-static")
 	gqi := &config.GenQueueItem{Count: 1, Earliest: now(), Latest: now(), S: s, OQ: oq, Rand: randgen}
 	gen := new(sample)
 	go gen.Gen(gqi)
 	oqi := <-oq
 	assert.Equal(t, "foo", oqi.Events[0]["_raw"])
 
-	s = config.FindSampleInFile(home, "token-regex")
+	s = tests.FindSampleInFile(home, "token-regex")
 	gqi = &config.GenQueueItem{Count: 1, Earliest: now(), Latest: now(), S: s, OQ: oq, Rand: randgen}
 	gen = new(sample)
 	go gen.Gen(gqi)

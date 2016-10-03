@@ -113,3 +113,10 @@ func TestValidate(t *testing.T) {
 		assert.Nil(t, s, "%s not nil", v)
 	}
 }
+
+func FindSampleInFile(home string, name string) *Sample {
+	os.Setenv("GOGEN_SAMPLES_DIR", filepath.Join(home, name+".yml"))
+	c := NewConfig()
+	// c.Log.Debugf("Pretty Values %# v\n", pretty.Formatter(c))
+	return c.FindSampleByName(name)
+}

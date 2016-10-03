@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/coccyx/gogen/internal"
+	"github.com/coccyx/gogen/tests"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -44,7 +45,7 @@ func TestBackfill(t *testing.T) {
 	home := filepath.Join("..", "tests", "timer")
 	os.Setenv("GOGEN_SAMPLES_DIR", home)
 
-	s := config.FindSampleInFile(home, "backfill")
+	s := tests.FindSampleInFile(home, "backfill")
 
 	gq := make(chan *config.GenQueueItem, 1000)
 	oq := make(chan *config.OutQueueItem)
@@ -72,7 +73,7 @@ func TestBackfillRealtime(t *testing.T) {
 	home := filepath.Join("..", "tests", "timer")
 	os.Setenv("GOGEN_SAMPLES_DIR", home)
 
-	s := config.FindSampleInFile(home, "backfillrealtime")
+	s := tests.FindSampleInFile(home, "backfillrealtime")
 
 	gq := make(chan *config.GenQueueItem, 1000)
 	oq := make(chan *config.OutQueueItem)
@@ -102,7 +103,7 @@ func TestBackfillFutureEnd(t *testing.T) {
 	home := filepath.Join("..", "tests", "timer")
 	os.Setenv("GOGEN_SAMPLES_DIR", home)
 
-	s := config.FindSampleInFile(home, "backfillfutureend")
+	s := tests.FindSampleInFile(home, "backfillfutureend")
 
 	gq := make(chan *config.GenQueueItem, 1000)
 	oq := make(chan *config.OutQueueItem)
