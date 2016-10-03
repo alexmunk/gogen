@@ -51,7 +51,9 @@ func Setup(clic *cli.Context) {
 }
 
 func main() {
-	defer profile.Start(profile.CPUProfile, profile.ProfilePath(".")).Stop()
+	if config.DefaultLoggingLevel == logging.DEBUG {
+		defer profile.Start(profile.CPUProfile, profile.ProfilePath(".")).Stop()
+	}
 	rand.Seed(time.Now().UnixNano())
 
 	app := cli.NewApp()

@@ -5,6 +5,7 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"path/filepath"
 	"sync"
@@ -79,7 +80,7 @@ func NewConfig() *Config {
 		c.Log.Debugf("Always refresh on, using fresh config")
 	}
 
-	c.SetLoggingLevel(defaultLoggingLevel)
+	c.SetLoggingLevel(DefaultLoggingLevel)
 	// Setup timezone
 	c.Timezone, _ = time.LoadLocation("Local")
 
@@ -99,10 +100,17 @@ func NewConfig() *Config {
 
 	fullConfig := os.Getenv("GOGEN_FULLCONFIG")
 	if len(fullConfig) > 0 {
-		if err := c.parseFileConfig(&c, fullConfig); err != nil {
-			c.Log.Panic(err)
+		if fullConfig[0:4] == "http" {
+			c.Log.Infof("Fetching config from '%s'", fullConfig)
+			if err := c.parseWebConfig(&c, fullConfig); err != nil {
+				c.Log.Panic(err)
+			}
+		} else {
+			if err := c.parseFileConfig(&c, fullConfig); err != nil {
+				c.Log.Panic(err)
+			}
+			c.Global.SamplesDir = append(c.Global.SamplesDir, filepath.Dir(fullConfig))
 		}
-		c.Global.SamplesDir = append(c.Global.SamplesDir, filepath.Dir(fullConfig))
 		for i := 0; i < len(c.Samples); i++ {
 			c.Samples[i].realSample = true
 		}
@@ -572,6 +580,26 @@ func (c *Config) parseFileConfig(out interface{}, path ...string) error {
 		}
 	}
 	// c.Log.Debugf("Out: %#v\n", out)
+	return nil
+}
+
+func (c *Config) parseWebConfig(out interface{}, url string) error {
+	resp, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+	contents, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+	// Try YAML then JSON
+	err = yaml.Unmarshal(contents, out)
+	if err != nil {
+		err = json.Unmarshal(contents, out)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
