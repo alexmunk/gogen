@@ -1,0 +1,9 @@
+global:
+  samplesDir: 
+    - $GOGEN_HOME/examples/common
+  generatorWorkers: 6
+  outputWorkers: 1
+  rotInterval: 1
+samples:
+  - name: weblog
+    fromSample: weblog-common
