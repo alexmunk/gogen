@@ -16,6 +16,7 @@ var (
 	lastTS        time.Time
 	log           *logging.Logger
 	rotchan       chan *config.OutputStats
+	gout          [config.MaxOutputThreads]config.Outputter
 )
 
 // ROT starts the Read Out Thread which will log statistics about what's being output
@@ -65,16 +66,22 @@ func Account(eventsWritten int64, bytesWritten int64) {
 	rotchan <- os
 }
 
-func Start(oq chan *config.OutQueueItem, oqs chan int) {
+// Start starts an output thread and runs until notified to shut down
+func Start(oq chan *config.OutQueueItem, oqs chan int, num int) {
 	source := rand.NewSource(time.Now().UnixNano())
 	generator := rand.New(source)
+
+	var lastS *config.Sample
+	var out config.Outputter
 	for {
 		item, ok := <-oq
 		if !ok {
+			lastS.Log.Infof("Closing output for sample '%s'", lastS.Name)
+			out.Close()
 			oqs <- 1
 			break
 		}
-		setup(generator, item)
+		out = setup(generator, item, num)
 		if len(item.Events) > 0 {
 			go func() {
 				defer item.IO.W.Close()
@@ -88,11 +95,12 @@ func Start(oq chan *config.OutQueueItem, oqs chan int) {
 				}
 				getLine("footer", item.S, item.Events[last], item.IO.W)
 			}()
-			err := item.S.Out.Send(item)
+			err := out.Send(item)
 			if err != nil {
 				item.S.Log.Errorf("Error with Send(): %s", err)
 			}
 		}
+		lastS = item.S
 	}
 }
 
@@ -112,21 +120,26 @@ func getLine(templatename string, s *config.Sample, line map[string]string, w io
 	return nil
 }
 
-func setup(generator *rand.Rand, item *config.OutQueueItem) {
+func setup(generator *rand.Rand, item *config.OutQueueItem, num int) config.Outputter {
 	item.Rand = generator
 	item.IO = config.NewOutputIO()
-	// Check to see if our outputter is not set
-	if item.S.Out == nil {
+
+	if gout[num] == nil {
 		item.S.Log.Infof("Setting sample '%s' to outputter '%s'", item.S.Name, item.S.Output.Outputter)
 		switch item.S.Output.Outputter {
 		case "stdout":
-			item.S.Out = new(stdout)
+			gout[num] = new(stdout)
 		case "devnull":
-			item.S.Out = new(devnull)
+			gout[num] = new(devnull)
 		case "file":
-			item.S.Out = new(file)
+			gout[num] = new(file)
+		case "http":
+			gout[num] = new(httpout)
+		default:
+			gout[num] = new(stdout)
 		}
 	}
+	return gout[num]
 }
 
 // // Writer implements io.Writer, but allows for Teeing the data for the ReadOutThread

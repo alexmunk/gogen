@@ -15,3 +15,7 @@ func (foo devnull) Send(item *config.OutQueueItem) error {
 	Account(int64(len(item.Events)), bytes)
 	return err
 }
+
+func (foo devnull) Close() error {
+	return nil
+}

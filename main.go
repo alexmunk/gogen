@@ -71,14 +71,61 @@ func main() {
 			Name:  "gen",
 			Usage: "Generate Events",
 			Flags: []cli.Flag{
-				cli.StringFlag{Name: "sample, s"},
-				cli.IntFlag{Name: "count, c"},
-				cli.IntFlag{Name: "interval, i"},
-				cli.IntFlag{Name: "endIntervals, ei"},
-				cli.StringFlag{Name: "outputTemplate, ot"},
-				cli.StringFlag{Name: "outputter, o"},
+				cli.StringFlag{
+					Name:  "sample, s",
+					Usage: "Only run sample `name`",
+				},
+				cli.IntFlag{
+					Name:  "count, c",
+					Usage: "Output `number` events",
+				},
+				cli.IntFlag{
+					Name:  "interval, i",
+					Usage: "Output every `seconds` seconds"},
+				cli.IntFlag{
+					Name:  "endIntervals, ei",
+					Usage: "Only run from `number` intervals",
+				},
+				cli.StringFlag{
+					Name:  "outputTemplate, ot",
+					Usage: "Use output template `(raw|csv|json)` for formatting output",
+				},
+				cli.StringFlag{
+					Name:  "outputter, o",
+					Usage: "Use outputter `(stdout|devnull|file|http) for output",
+				},
+				cli.StringFlag{
+					Name:  "filename, f",
+					Usage: "Set `filename`, only usable with file output",
+				},
+				cli.StringFlag{
+					Name:  "url",
+					Usage: "Override all endpoint URLs to just `url` url",
+				},
 			},
 			Action: func(clic *cli.Context) error {
+				for i := 0; i < len(c.Samples); i++ {
+					if len(clic.String("outputTemplate")) > 0 {
+						c.Log.Infof("Setting outputTempalte to '%s'", clic.String("outputTemplate"))
+						c.Samples[i].Output.OutputTemplate = clic.String("outputTemplate")
+					}
+					if clic.Int("endIntervals") > 0 {
+						c.Log.Infof("Setting endIntervals to %d", clic.Int("endIntervals"))
+						c.Samples[i].EndIntervals = clic.Int("endIntervals")
+					}
+					if len(clic.String("outputter")) > 0 {
+						c.Log.Infof("Setting outputter to '%s'", clic.String("outputter"))
+						c.Samples[i].Output.Outputter = clic.String("outputter")
+					}
+					if len(clic.String("filename")) > 0 {
+						c.Log.Infof("Setting filename to '%s'")
+						c.Samples[i].Output.FileName = clic.String("filename")
+					}
+					if len(clic.String("url")) > 0 {
+						c.Log.Infof("Setting all endpoint urls to '%s'")
+						c.Samples[i].Output.Endpoints = []string{clic.String("url")}
+					}
+				}
 				if len(clic.String("sample")) > 0 {
 					c.Log.Infof("Generating only for sample '%s'", clic.String("sample"))
 					matched := false
@@ -92,18 +139,6 @@ func main() {
 							if clic.Int("interval") > 0 {
 								c.Log.Infof("Setting interval to %d for sample '%s'", clic.Int("interval"), c.Samples[i].Name)
 								c.Samples[i].Interval = clic.Int("interval")
-							}
-							if len(clic.String("outputTemplate")) > 0 {
-								c.Log.Infof("Setting outputTempalte to '%s' for sample '%s'", clic.String("outputTemplate"), c.Samples[i].Name)
-								c.Samples[i].Output.OutputTemplate = clic.String("outputTemplate")
-							}
-							if clic.Int("endIntervals") > 0 {
-								c.Log.Infof("Setting endIntervals to %d for sample '%s'", clic.Int("endIntervals"), c.Samples[i].Name)
-								c.Samples[i].EndIntervals = clic.Int("endIntervals")
-							}
-							if len(clic.String("outputter")) > 0 {
-								c.Log.Infof("Setting outputter to '%s' for sample '%s'", clic.String("outputter"), c.Samples[i].Name)
-								c.Samples[i].Output.Outputter = clic.String("outputter")
 							}
 						} else {
 							c.Samples[i].Disabled = true

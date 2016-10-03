@@ -4,6 +4,7 @@ import (
 	"math/rand"
 	"os"
 	"path/filepath"
+	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -39,14 +40,21 @@ func TestFileOutput(t *testing.T) {
 	assert.Equal(t, "json", c.Global.Output.OutputTemplate)
 }
 
-// func TestHTTPOutput(t *testing.T) {
-// 	// Setup environment
-// 	os.Setenv("GOGEN_HOME", "..")
-// 	os.Setenv("GOGEN_ALWAYS_REFRESH", "1")
-// 	home := ".."
-// 	os.Setenv("GOGEN_SAMPLES_DIR", filepath.Join(home, "config", "tests", "fileoutput.yml"))
-// 	c := NewConfig()
-// }
+func TestHTTPOutput(t *testing.T) {
+	// Setup environment
+	os.Setenv("GOGEN_HOME", "..")
+	os.Setenv("GOGEN_ALWAYS_REFRESH", "1")
+	os.Setenv("GOGEN_FULLCONFIG", filepath.Join("..", "tests", "httpoutput", "httpoutput.yml"))
+	// os.Setenv("GOGEN_SAMPLES_DIR", filepath.Join(home, "config", "tests", "fileoutput.yml"))
+	c := NewConfig()
+
+	headers := map[string]string{"Authorization": "Splunk 00112233-4455-6677-8899-AABBCCDDEEFF"}
+	endpoints := []string{"http://requestb.in/18yarph1"}
+	de := reflect.DeepEqual(headers, c.Global.Output.Headers)
+	assert.True(t, de, "Headers do not match: %#v vs %#v", headers, c.Global.Output.Headers)
+	de = reflect.DeepEqual(endpoints, c.Global.Output.Endpoints)
+	assert.True(t, de, "Endpoints do not match: %#v vs %#v", endpoints, c.Global.Output.Endpoints)
+}
 
 func TestFlatten(t *testing.T) {
 	// Setup environment

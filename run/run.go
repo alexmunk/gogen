@@ -1,11 +1,22 @@
 package run
 
 import (
+	"time"
+
 	"github.com/coccyx/gogen/generator"
 	config "github.com/coccyx/gogen/internal"
 	"github.com/coccyx/gogen/outputter"
 	"github.com/coccyx/gogen/timer"
 )
+
+// ROT reads out data every ROTInterval seconds
+func ROT(c *config.Config, gq chan *config.GenQueueItem, oq chan *config.OutQueueItem) {
+	for {
+		timer := time.NewTimer(time.Duration(c.Global.ROTInterval) * time.Second)
+		<-timer.C
+		c.Log.Infof("Generator Queue: %d Output Queue: %d", len(gq), len(oq))
+	}
+}
 
 // Run runs the mainline of the program
 func Run(c *config.Config) {
@@ -13,9 +24,9 @@ func Run(c *config.Config) {
 	go outputter.ROT(c)
 	c.Log.Info("Starting Timers")
 	timerdone := make(chan int)
-	gq := make(chan *config.GenQueueItem)
+	gq := make(chan *config.GenQueueItem, config.MaxGenQueueLength)
 	gqs := make(chan int)
-	oq := make(chan *config.OutQueueItem)
+	oq := make(chan *config.OutQueueItem, config.MaxOutQueueLength)
 	oqs := make(chan int)
 	gens := 0
 	outs := 0
@@ -40,9 +51,11 @@ func Run(c *config.Config) {
 	c.Log.Infof("Starting Outputters")
 	for i := 0; i < c.Global.OutputWorkers; i++ {
 		c.Log.Infof("Starting Outputter %d", i)
-		go outputter.Start(oq, oqs)
+		go outputter.Start(oq, oqs, i)
 		outs++
 	}
+
+	go ROT(c, gq, oq)
 
 	// time.Sleep(1000 * time.Millisecond)
 
@@ -89,6 +102,13 @@ Loop3:
 			}
 		}
 	}
+
+	// for _, s := range c.Samples {
+	// 	err := s.Out.Close()
+	// 	if err != nil {
+	// 		c.Log.Errorf("Error closing output for sample '%s': %s", s.Name, err)
+	// 	}
+	// }
 
 	// time.Sleep(100 * time.Millisecond)
 }

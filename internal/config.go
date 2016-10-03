@@ -42,14 +42,14 @@ type Global struct {
 
 // Output represents configuration for outputting data
 type Output struct {
-	FileName       string   `json:"fileName"`
-	MaxBytes       int64    `json:"maxBytes"`
-	BackupFiles    int      `json:"backupFiles"`
-	BufferBytes    int      `json:"bufferBytes"`
-	Outputter      string   `json:"outputter"`
-	OutputTemplate string   `json:"outputTemplate"`
-	Endpoints      []string `json:"endpoints"`
-	Headers        []string `json:"headers"`
+	FileName       string            `json:"fileName"`
+	MaxBytes       int64             `json:"maxBytes"`
+	BackupFiles    int               `json:"backupFiles"`
+	BufferBytes    int               `json:"bufferBytes"`
+	Outputter      string            `json:"outputter"`
+	OutputTemplate string            `json:"outputTemplate"`
+	Endpoints      []string          `json:"endpoints"`
+	Headers        map[string]string `json:"headers"`
 }
 
 var instance *Config

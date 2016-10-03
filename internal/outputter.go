@@ -36,4 +36,5 @@ func NewOutputIO() *OutputIO {
 // Outputter will do the work of actually sending events
 type Outputter interface {
 	Send(item *OutQueueItem) error
+	Close() error
 }

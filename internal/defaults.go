@@ -2,7 +2,7 @@ package config
 
 import logging "github.com/op/go-logging"
 
-const defaultLoggingLevel = logging.DEBUG
+const defaultLoggingLevel = logging.ERROR
 
 // Default global values
 const defaultGeneratorWorkers = 1
@@ -25,6 +25,15 @@ const defaultBackupFiles = 5
 
 // Default HTTP output values
 const defaultBufferBytes = 102400
+
+// MaxOutputThreads defines how large an array we'll define for output threads
+const MaxOutputThreads = 100
+
+// MaxGenQueueLength defines how many items can be in the Generator queue at a given time
+const MaxGenQueueLength = 100
+
+// MaxOutQueueLength defines how many items can be in the Output queue at a given time
+const MaxOutQueueLength = 100
 
 var (
 	defaultCSVTemplate  *Template
