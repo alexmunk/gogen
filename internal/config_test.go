@@ -96,30 +96,20 @@ func TestValidate(t *testing.T) {
 	// }
 
 	var s *Sample
-	s = FindSampleInFile(home, "validate-lower-upper")
-	assert.Equal(t, true, s.Disabled)
-
-	s = FindSampleInFile(home, "validate-upper")
-	assert.Equal(t, true, s.Disabled)
-
-	s = FindSampleInFile(home, "validate-string-length")
-	assert.Equal(t, true, s.Disabled)
-
-	s = FindSampleInFile(home, "validate-choice-items")
-	assert.Equal(t, true, s.Disabled)
-
-	s = FindSampleInFile(home, "validate-weightedchoice-items")
-	assert.Equal(t, true, s.Disabled)
-
-	s = FindSampleInFile(home, "validate-fieldchoice-items")
-	assert.Equal(t, true, s.Disabled)
-
-	s = FindSampleInFile(home, "validate-fieldchoice-badfield")
-	assert.Equal(t, true, s.Disabled)
-
-	s = FindSampleInFile(home, "validate-badrandom")
-	assert.Equal(t, true, s.Disabled)
-
-	s = FindSampleInFile(home, "validate-earliest-latest")
-	assert.Equal(t, true, s.Disabled)
+	checks := []string{
+		"validate-lower-upper",
+		"validate-upper",
+		"validate-string-length",
+		"validate-choice-items",
+		"validate-weightedchoice-items",
+		"validate-fieldchoice-items",
+		"validate-fieldchoice-items",
+		"validate-fieldchoice-badfield",
+		"validate-badrandom",
+		"validate-earliest-latest",
+	}
+	for _, v := range checks {
+		s = FindSampleInFile(home, v)
+		assert.Nil(t, s, "%s not nil", v)
+	}
 }

@@ -158,7 +158,7 @@ func NewConfig() *Config {
 	}
 
 	// Add default templates
-	templates := []*Template{defaultCSVTemplate, defaultJSONTemplate, defaultRawTemplate}
+	templates := []*Template{defaultCSVTemplate, defaultJSONTemplate, defaultSplunkHECTemplate, defaultRawTemplate}
 	for _, t := range templates {
 		if len(t.Header) > 0 {
 			_ = template.New(t.Name+"_header", t.Header)
@@ -200,10 +200,57 @@ func NewConfig() *Config {
 		c.readSamplesDir(sd)
 	}
 
+	// Add a clause to allow copying from other samples
+	for i := 0; i < len(c.Samples); i++ {
+		if len(c.Samples[i].FromSample) > 0 {
+			for j := 0; j < len(c.Samples); j++ {
+				if c.Samples[j].Name == c.Samples[i].FromSample {
+					c.Log.Debugf("Copying sample '%s' to sample '%s' because fromSample set", c.Samples[j].Name, c.Samples[i].Name)
+					tempname := c.Samples[i].Name
+					tempcount := c.Samples[i].Count
+					tempinterval := c.Samples[i].Interval
+					tempendintervals := c.Samples[i].EndIntervals
+					tempbegin := c.Samples[i].Begin
+					tempend := c.Samples[i].End
+					temp := *c.Samples[j]
+					c.Samples[i] = &temp
+					c.Samples[i].Disabled = false
+					c.Samples[i].Name = tempname
+					c.Samples[i].FromSample = ""
+					if tempcount > 0 {
+						c.Samples[i].Count = tempcount
+					}
+					if tempinterval > 0 {
+						c.Samples[i].Interval = tempinterval
+					}
+					if tempendintervals > 0 {
+						c.Samples[i].EndIntervals = tempendintervals
+					}
+					if len(tempbegin) > 0 {
+						c.Samples[i].Begin = tempbegin
+					}
+					if len(tempend) > 0 {
+						c.Samples[i].End = tempend
+					}
+					break
+				}
+			}
+		}
+	}
+
 	// There area references from tokens to samples, need to resolve those references
 	for i := 0; i < len(c.Samples); i++ {
 		c.validate(c.Samples[i])
 	}
+
+	// Clean up disabled and informational samples
+	samples := make([]*Sample, 0, len(c.Samples))
+	for i := 0; i < len(c.Samples); i++ {
+		if c.Samples[i].realSample && !c.Samples[i].Disabled {
+			samples = append(samples, c.Samples[i])
+		}
+	}
+	c.Samples = samples
 
 	c.initialized = true
 	return c
@@ -316,6 +363,12 @@ func (c *Config) validate(s *Sample) {
 			s.realSample = true
 		}
 
+		// Give us a logger we can use elsewhere
+		s.Log = c.Log
+
+		// Put the output into the sample for convenience
+		s.Output = &c.Global.Output
+
 		// Setup defaults
 		if s.Generator == "" {
 			s.Generator = defaultGenerator
@@ -376,14 +429,6 @@ func (c *Config) validate(s *Sample) {
 			s.LatestParsed = n.Sub(p) * -1
 		}
 
-		// Give us a logger we can use elsewhere
-		s.Log = c.Log
-
-		// Put the output into the sample for convenience
-		s.Output = &c.Global.Output
-
-		// Resolve logic
-
 		// c.Log.Debugf("Resolving '%s'", s.Name)
 		for i := 0; i < len(s.Tokens); i++ {
 			if s.Tokens[i].Field == "" {
@@ -398,17 +443,30 @@ func (c *Config) validate(s *Sample) {
 				if s.Tokens[i].SampleString == c.Samples[j].Name {
 					c.Log.Debugf("Resolving sample '%s' for token '%s'", c.Samples[j].Name, s.Tokens[i].Name)
 					s.Tokens[i].Sample = c.Samples[j]
-					s.Tokens[i].FieldChoice = c.Samples[j].Lines
-					// s.Tokens[i].WeightedChoice = c.Samples[j].Lines
-					temp := make([]string, 0, len(c.Samples[j].Lines))
-					for _, line := range c.Samples[j].Lines {
-						if _, ok := line["_raw"]; ok {
-							if len(line["_raw"]) > 0 {
-								temp = append(temp, line["_raw"])
+					// See if a field exists other than _raw, if so, FieldChoice
+					otherfield := false
+					if len(c.Samples[j].Lines) > 0 {
+						for k := range c.Samples[j].Lines[0] {
+							if k != "_raw" {
+								otherfield = true
+								break
 							}
 						}
 					}
-					s.Tokens[i].Choice = temp
+					if otherfield {
+						s.Tokens[i].FieldChoice = c.Samples[j].Lines
+					} else {
+						// s.Tokens[i].WeightedChoice = c.Samples[j].Lines
+						temp := make([]string, 0, len(c.Samples[j].Lines))
+						for _, line := range c.Samples[j].Lines {
+							if _, ok := line["_raw"]; ok {
+								if len(line["_raw"]) > 0 {
+									temp = append(temp, line["_raw"])
+								}
+							}
+						}
+						s.Tokens[i].Choice = temp
+					}
 					break
 				}
 			}

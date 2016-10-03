@@ -12,7 +12,7 @@ global:
     headers:
       Authorization: Splunk 00112233-4455-6677-8899-AABBCCDDEEFF
 samples:
-  - name: outputsample
+  - name: outputhttpsample
     endIntervals: 1
     interval: 1
     count: 1
@@ -21,18 +21,16 @@ samples:
         format: template
         token: $ts$
         type: timestamp
-        field: event
         replacement: "%d/%b/%Y %H:%M:%S:%L"
       - name: tsepoch
         format: template
         token: $epochts$
-        field: time
+        field: _time
         type: timestamp
         replacement: "%s.%L"
       - name: transtype    
         format: template
         type: weightedChoice
-        field: event
         weightedChoice:
         - weight: 3
           choice: New
@@ -43,7 +41,6 @@ samples:
       - name: value
         format: template
         type: random
-        field: event
         replacement: float
         precision: 3
         lower: 0
@@ -54,5 +51,5 @@ samples:
         source: gogen
         host: gogen
         index: main
-        time: $epochts$
-        event: $ts$ transtype=$transtype$ value=$value$
+        _time: $epochts$
+        _raw: $ts$ transtype=$transtype$ value=$value$

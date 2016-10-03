@@ -36,9 +36,10 @@ const MaxGenQueueLength = 100
 const MaxOutQueueLength = 100
 
 var (
-	defaultCSVTemplate  *Template
-	defaultJSONTemplate *Template
-	defaultRawTemplate  *Template
+	defaultCSVTemplate       *Template
+	defaultJSONTemplate      *Template
+	defaultSplunkHECTemplate *Template
+	defaultRawTemplate       *Template
 )
 
 func init() {
@@ -52,6 +53,12 @@ func init() {
 		Name:   "json",
 		Header: "",
 		Row:    `{{ json . | printf "%s" }}`,
+		Footer: "",
+	}
+	defaultSplunkHECTemplate = &Template{
+		Name:   "splunkhec",
+		Header: "",
+		Row:    `{{ splunkhec . | printf "%s" }}`,
 		Footer: "",
 	}
 	defaultRawTemplate = &Template{

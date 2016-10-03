@@ -37,6 +37,7 @@ type Sample struct {
 	Tokens          []Token             `json:"tokens"`
 	Lines           []map[string]string `json:"lines"`
 	Field           string              `json:"field"`
+	FromSample      string              `json:"fromSample"`
 
 	// Internal use variables
 	Log            *logging.Logger     `json:"-"`

@@ -27,6 +27,19 @@ func New(name string, template string) error {
 				a, _ := json.Marshal(v)
 				return string(a)
 			},
+			"splunkhec": func(v interface{}) string {
+				tv := v.(map[string]string)
+				if _, ok := tv["_raw"]; ok {
+					tv["event"] = tv["_raw"]
+					delete(tv, "_raw")
+				}
+				if _, ok = tv["_time"]; ok {
+					tv["time"] = tv["_time"]
+					delete(tv, "_time")
+				}
+				a, _ := json.Marshal(tv)
+				return string(a)
+			},
 			"keys": func(m map[string]string) []string {
 				keys := make([]string, len(m))
 				i := 0
@@ -71,9 +84,8 @@ func New(name string, template string) error {
 func Exists(name string) bool {
 	if _, ok := cache[name]; !ok {
 		return false
-	} else {
-		return true
 	}
+	return true
 }
 
 // Exec returns a fully executed template substituted with a string map of row

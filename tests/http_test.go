@@ -22,5 +22,8 @@ func TestHTTPOutput(t *testing.T) {
 
 	os.Setenv("GOGEN_FULLCONFIG", filepath.Join(home, "tests", "httpoutput", "splunkoutput.yml"))
 	c = config.NewConfig()
-	run.Run(c)
+	s := c.FindSampleByName("outputsample")
+	if s != nil {
+		run.Run(c)
+	}
 }
