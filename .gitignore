@@ -4,3 +4,4 @@ out.log
 gogen
 test.out
 .vscode
+build.sh

@@ -58,6 +58,22 @@
 			"Rev": "d77da356e56a7428ad25149ca77381849a6a5232"
 		},
 		{
+			"ImportPath": "golang.org/x/net/context",
+			"Rev": "de35ec43e7a9aabd6a9c54d2898220ea7e44de7d"
+		},
+		{
+			"ImportPath": "golang.org/x/oauth2",
+			"Rev": "3c3a985cb79f52a3190fbc056984415ca6763d01"
+		},
+		{
+			"ImportPath": "golang.org/x/oauth2/github",
+			"Rev": "3c3a985cb79f52a3190fbc056984415ca6763d01"
+		},
+		{
+			"ImportPath": "golang.org/x/oauth2/internal",
+			"Rev": "3c3a985cb79f52a3190fbc056984415ca6763d01"
+		},
+		{
 			"ImportPath": "gopkg.in/urfave/cli.v1",
 			"Comment": "v1.18.1",
 			"Rev": "a14d7d367bc02b1f57d88de97926727f2d936387"

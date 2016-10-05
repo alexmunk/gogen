@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/coccyx/gogen/github"
 	"github.com/coccyx/gogen/internal"
 	"github.com/coccyx/gogen/run"
 	"github.com/ghodss/yaml"
@@ -175,6 +176,14 @@ func main() {
 				}
 				out := string(outb)
 				fmt.Print(out)
+				return nil
+			},
+		},
+		{
+			Name:  "login",
+			Usage: "Login to GitHub",
+			Action: func(clic *cli.Context) error {
+				_ = github.NewGitHub()
 				return nil
 			},
 		},
