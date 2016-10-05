@@ -4,9 +4,7 @@ os:
 - linux
 - osx
 go:
-- 1.5
-- 1.6
-- tip
+- 1.7
 script:
 - go test -v ./...
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]];   then go build -o build/osx/gogen  ; fi
