@@ -5,6 +5,8 @@ os:
 - osx
 go:
 - 1.7
+before_script:
+- cat $GITHUB_OAUTH_TOKEN > .githubtoken
 script:
 - go test -v ./...
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]];   then go build -o build/osx/gogen  ; fi

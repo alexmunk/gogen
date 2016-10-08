@@ -7,9 +7,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/coccyx/gogen/github"
 	"github.com/coccyx/gogen/internal"
 	"github.com/coccyx/gogen/run"
+	"github.com/coccyx/gogen/share"
 	"github.com/ghodss/yaml"
 	logging "github.com/op/go-logging"
 	"github.com/pkg/profile"
@@ -163,6 +163,9 @@ func main() {
 				cli.StringFlag{Name: "format, f"},
 			},
 			Action: func(clic *cli.Context) error {
+				os.Setenv("GOGEN_ALWAYS_REFRESH", "1")
+				os.Setenv("GOGEN_EXPORT", "1")
+				c = config.NewConfig()
 				var outb []byte
 				var err error
 				if clic.String("format") == "yaml" {
@@ -183,7 +186,7 @@ func main() {
 			Name:  "login",
 			Usage: "Login to GitHub",
 			Action: func(clic *cli.Context) error {
-				_ = github.NewGitHub()
+				_ = share.NewGitHub()
 				return nil
 			},
 		},

@@ -68,6 +68,8 @@ func getConfig() *Config {
 // GOGEN_HOME: Change home directory where we will search for configs
 // GOGEN_SAMPLES_DIR: Change where we will look for samples
 // GOGEN_ALWAYS_REFRESH: Do not use singleton pattern and reparse configs
+// GOGEN_FULLCONFIG: The reference is to a full exported config, so don't resolve or validate
+// GOGEN_EXPORT: Don't set defaults for export
 func NewConfig() *Config {
 	var c *Config
 	if os.Getenv("GOGEN_ALWAYS_REFRESH") != "1" {
@@ -126,57 +128,60 @@ func NewConfig() *Config {
 		c.SetLoggingLevel(logging.DEBUG)
 	}
 
-	//
-	// Setup defaults for global
-	//
-	if c.Global.GeneratorWorkers == 0 {
-		c.Global.GeneratorWorkers = defaultGeneratorWorkers
-	}
-	if c.Global.OutputWorkers == 0 {
-		c.Global.OutputWorkers = defaultOutputWorkers
-	}
-	if c.Global.ROTInterval == 0 {
-		c.Global.ROTInterval = defaultROTInterval
-	}
-	if c.Global.Output.Outputter == "" {
-		c.Global.Output.Outputter = defaultOutputter
-	}
-	if c.Global.Output.OutputTemplate == "" {
-		c.Global.Output.OutputTemplate = defaultOutputTemplate
-	}
-
-	//
-	// Setup defaults for outputs
-	//
-	switch c.Global.Output.Outputter {
-	case "file":
-		if c.Global.Output.FileName == "" {
-			c.Global.Output.FileName = defaultFileName
+	// Don't set defaults if we're exporting
+	if os.Getenv("GOGEN_EXPORT") != "1" {
+		//
+		// Setup defaults for global
+		//
+		if c.Global.GeneratorWorkers == 0 {
+			c.Global.GeneratorWorkers = defaultGeneratorWorkers
 		}
-		if c.Global.Output.BackupFiles == 0 {
-			c.Global.Output.BackupFiles = defaultBackupFiles
+		if c.Global.OutputWorkers == 0 {
+			c.Global.OutputWorkers = defaultOutputWorkers
 		}
-		if c.Global.Output.MaxBytes == 0 {
-			c.Global.Output.MaxBytes = defaultMaxBytes
+		if c.Global.ROTInterval == 0 {
+			c.Global.ROTInterval = defaultROTInterval
 		}
-	case "http":
-		if c.Global.Output.BufferBytes == 0 {
-			c.Global.Output.BufferBytes = defaultBufferBytes
+		if c.Global.Output.Outputter == "" {
+			c.Global.Output.Outputter = defaultOutputter
 		}
-	}
-
-	// Add default templates
-	templates := []*Template{defaultCSVTemplate, defaultJSONTemplate, defaultSplunkHECTemplate, defaultRawTemplate}
-	for _, t := range templates {
-		if len(t.Header) > 0 {
-			_ = template.New(t.Name+"_header", t.Header)
-		}
-		_ = template.New(t.Name+"_row", t.Row)
-		if len(t.Footer) > 0 {
-			_ = template.New(t.Name+"_footer", t.Footer)
+		if c.Global.Output.OutputTemplate == "" {
+			c.Global.Output.OutputTemplate = defaultOutputTemplate
 		}
 
-		c.Templates = append(c.Templates, t)
+		//
+		// Setup defaults for outputs
+		//
+		switch c.Global.Output.Outputter {
+		case "file":
+			if c.Global.Output.FileName == "" {
+				c.Global.Output.FileName = defaultFileName
+			}
+			if c.Global.Output.BackupFiles == 0 {
+				c.Global.Output.BackupFiles = defaultBackupFiles
+			}
+			if c.Global.Output.MaxBytes == 0 {
+				c.Global.Output.MaxBytes = defaultMaxBytes
+			}
+		case "http":
+			if c.Global.Output.BufferBytes == 0 {
+				c.Global.Output.BufferBytes = defaultBufferBytes
+			}
+		}
+
+		// Add default templates
+		templates := []*Template{defaultCSVTemplate, defaultJSONTemplate, defaultSplunkHECTemplate, defaultRawTemplate}
+		for _, t := range templates {
+			if len(t.Header) > 0 {
+				_ = template.New(t.Name+"_header", t.Header)
+			}
+			_ = template.New(t.Name+"_row", t.Row)
+			if len(t.Footer) > 0 {
+				_ = template.New(t.Name+"_footer", t.Footer)
+			}
+
+			c.Templates = append(c.Templates, t)
+		}
 	}
 
 	if len(fullConfig) == 0 {
@@ -543,7 +548,9 @@ func (c *Config) validate(s *Sample) {
 func (c *Config) walkPath(fullPath string, acceptableExtensions map[string]bool, callback func(string) error) error {
 	filepath.Walk(os.ExpandEnv(fullPath), func(path string, _ os.FileInfo, err error) error {
 		c.Log.Debugf("Walking, at %s", path)
-		if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		} else if err != nil {
 			c.Log.Errorf("Error from WalkFunc: %s", err)
 			return err
 		}
