@@ -76,9 +76,11 @@ func Start(oq chan *config.OutQueueItem, oqs chan int, num int) {
 	for {
 		item, ok := <-oq
 		if !ok {
-			lastS.Log.Infof("Closing output for sample '%s'", lastS.Name)
-			out.Close()
-			gout[num] = nil
+			if lastS != nil {
+				lastS.Log.Infof("Closing output for sample '%s'", lastS.Name)
+				out.Close()
+				gout[num] = nil
+			}
 			oqs <- 1
 			break
 		}

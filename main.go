@@ -151,6 +151,14 @@ func main() {
 						c.Log.Infof("Setting all endpoint urls to '%s'")
 						c.Samples[i].Output.Endpoints = []string{clic.String("url")}
 					}
+					if clic.Int("count") > 0 {
+						c.Log.Infof("Setting count to %d for sample '%s'", clic.Int("count"), c.Samples[i].Name)
+						c.Samples[i].Count = clic.Int("count")
+					}
+					if clic.Int("interval") > 0 {
+						c.Log.Infof("Setting interval to %d for sample '%s'", clic.Int("interval"), c.Samples[i].Name)
+						c.Samples[i].Interval = clic.Int("interval")
+					}
 				}
 				if len(clic.String("sample")) > 0 {
 					c.Log.Infof("Generating only for sample '%s'", clic.String("sample"))
@@ -158,14 +166,6 @@ func main() {
 					for i := 0; i < len(c.Samples); i++ {
 						if c.Samples[i].Name == clic.String("sample") {
 							matched = true
-							if clic.Int("count") > 0 {
-								c.Log.Infof("Setting count to %d for sample '%s'", clic.Int("count"), c.Samples[i].Name)
-								c.Samples[i].Count = clic.Int("count")
-							}
-							if clic.Int("interval") > 0 {
-								c.Log.Infof("Setting interval to %d for sample '%s'", clic.Int("interval"), c.Samples[i].Name)
-								c.Samples[i].Interval = clic.Int("interval")
-							}
 						} else {
 							c.Samples[i].Disabled = true
 						}

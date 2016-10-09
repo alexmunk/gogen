@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
@@ -97,9 +98,16 @@ func Pull(gogen string, dir string, deconstruct bool) {
 	gist := pull(gogen)
 	for _, file := range gist.Files {
 		filename := filepath.Join(dir, *file.Filename)
-		err := ioutil.WriteFile(filename, []byte(*file.Content), 444)
+		client := &http.Client{}
+		resp, err := client.Get(*file.RawURL)
+		f, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE, 0644)
+		defer f.Close()
 		if err != nil {
-			c.Log.Fatalf("Couldn't write file %s", filename)
+			c.Log.Fatalf("Couldn't open file %s: %s", filename, err)
+		}
+		_, err = io.Copy(f, resp.Body)
+		if err != nil {
+			c.Log.Fatalf("Error writing to file %s: %s", filename, err)
 		}
 		if deconstruct {
 			samplesDir := filepath.Join(dir, "samples")
@@ -203,9 +211,16 @@ func PullFile(gogen string, filename string) {
 	gist := pull(gogen)
 	for _, file := range gist.Files {
 		c.Log.Debugf("Writing config at file '%s' for gogen '%s'", filename, gogen)
-		err := ioutil.WriteFile(filename, []byte(*file.Content), 444)
+		client := &http.Client{}
+		resp, err := client.Get(*file.RawURL)
+		f, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE, 0644)
+		defer f.Close()
 		if err != nil {
-			c.Log.Fatalf("Couldn't write file %s", filename)
+			c.Log.Fatalf("Couldn't open file %s: %s", filename, err)
+		}
+		_, err = io.Copy(f, resp.Body)
+		if err != nil {
+			c.Log.Fatalf("Error writing to file %s: %s", filename, err)
 		}
 		break
 	}

@@ -125,7 +125,9 @@ func NewConfig() *Config {
 			if err := c.parseFileConfig(&c, fullConfig); err != nil {
 				c.Log.Panic(err)
 			}
-			c.Global.SamplesDir = append(c.Global.SamplesDir, filepath.Dir(fullConfig))
+			if filepath.Dir(fullConfig) != "." {
+				c.Global.SamplesDir = append(c.Global.SamplesDir, filepath.Dir(fullConfig))
+			}
 		}
 		for i := 0; i < len(c.Samples); i++ {
 			c.Samples[i].realSample = true
@@ -223,7 +225,7 @@ func NewConfig() *Config {
 
 	// Configuration allows for finding additional samples directories and reading them
 	for _, sd := range c.Global.SamplesDir {
-		c.Log.Debugf("Reading samplesDir: %s", sd)
+		c.Log.Debugf("Reading samplesDir from Global SamplesDir: %s", sd)
 		c.readSamplesDir(sd)
 	}
 
