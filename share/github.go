@@ -65,17 +65,7 @@ func (gh *GitHub) Push(name string) *github.Gist {
 	gist.Public = &public
 
 	var foundgist *github.Gist
-	gists, _, err := gh.client.Gists.List("", nil)
-findgist:
-	for _, testgist := range gists {
-		for _, gistfile := range testgist.Files {
-			gh.c.Log.Debugf("Testing %s if match %s", *gistfile.Filename, name+".json")
-			if *gistfile.Filename == name+".json" {
-				foundgist = testgist
-				break findgist
-			}
-		}
-	}
+	foundgist = gh.findgist(name)
 
 	if foundgist != nil {
 		gh.c.Log.Debugf("Found gist, updating")
@@ -93,80 +83,33 @@ findgist:
 	return newgist
 }
 
-// Here's some code that I'm saving that decomposed a sample into files, but I didn't like the way it worked for posting to GitHub
-// So now, we post the same way the old config command worked, one big file, but I'm saving this code because it'll allow me to later
-// deconstruct that, optionally, when pulling, into separate files for easier editing
+// Pull grabs a named gist from GitHub
+func (gh *GitHub) Pull(name string) *github.Gist {
+	var gist *github.Gist
+	gist = gh.findgist(name)
+	if gist == nil {
+		gh.c.Log.Fatalf("Error finding gist %s", name+".json")
+	}
+	return gist
+}
 
-// for _, s := range gh.c.Samples {
-// 	if len(s.Path) > 0 {
-// 		file := new(github.GistFile)
-// 		fname := filepath.Base(s.Path)
-// 		file.Filename = &fname
-// 		if fname[len(fname)-6:] == "sample" {
-// 			out := ""
-// 			for _, v := range s.Lines {
-// 				out += fmt.Sprintf("%s\n", v["_raw"])
-// 			}
-// 			file.Content = &out
-// 		} else if fname[len(fname)-3:] == "csv" {
-// 			if len(s.Lines) > 0 {
-// 				buf := new(bytes.Buffer)
-// 				w := csv.NewWriter(buf)
-
-// 				keys := make([]string, len(s.Lines[0]))
-// 				i := 0
-// 				for k := range s.Lines[0] {
-// 					keys[i] = k
-// 					i++
-// 				}
-// 				sort.Strings(keys)
-// 				w.Write(keys)
-
-// 				for _, l := range s.Lines {
-// 					values := make([]string, len(keys))
-// 					for j, k := range keys {
-// 						values[j] = l[k]
-// 					}
-// 					w.Write(values)
-// 				}
-
-// 				w.Flush()
-// 				outbs = new(string)
-// 				*outbs = buf.String()
-// 				file.Content = outbs
-// 			}
-// 		} else {
-// 			var outb []byte
-// 			var outbs *string
-// 			var err error
-// 			if outb, err = yaml.Marshal(s); err != nil {
-// 				gh.c.Log.Fatalf("Cannot Marshal sample '%s', err: %s", s.Name, err)
-// 			}
-// 			outbs = new(string)
-// 			*outbs = string(outb)
-// 			file.Content = outbs
-// 		}
-// 		files[github.GistFilename(filepath.Base(s.Path))] = *file
-// 	}
-// }
-
-// for _, t := range gh.c.Templates {
-// 	if len(t.Path) > 0 {
-// 		file := new(github.GistFile)
-// 		fname := filepath.Base(t.Path)
-// 		file.Filename = &fname
-// 		var outb []byte
-// 		var outbs *string
-// 		var err error
-// 		if outb, err = yaml.Marshal(t); err != nil {
-// 			gh.c.Log.Fatalf("Cannot Marshal template '%s', err: %s", t.Name, err)
-// 		}
-// 		outbs = new(string)
-// 		*outbs = string(outb)
-// 		file.Content = outbs
-// 		files[github.GistFilename(filepath.Base(t.Path))] = *file
-// 	}
-// }
+func (gh *GitHub) findgist(name string) (foundgist *github.Gist) {
+	gists, _, err := gh.client.Gists.List("", nil)
+	if err != nil {
+		gh.c.Log.Fatalf("Cannot pull Gists list: %s", err)
+	}
+findgist:
+	for _, testgist := range gists {
+		for _, gistfile := range testgist.Files {
+			gh.c.Log.Debugf("Testing %s if match %s", *gistfile.Filename, name+".json")
+			if *gistfile.Filename == name+".json" {
+				foundgist = testgist
+				break findgist
+			}
+		}
+	}
+	return foundgist
+}
 
 // NewGitHub returns a GitHub object, with a set auth token
 func NewGitHub() *GitHub {

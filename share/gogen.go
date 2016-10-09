@@ -3,9 +3,11 @@ package share
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"os"
 
 	config "github.com/coccyx/gogen/internal"
 	"github.com/kr/pretty"
@@ -80,6 +82,10 @@ func Get(q string) (g GogenInfo) {
 	client := &http.Client{}
 	resp, err := client.Get("https://api.gogen.io/v1/get/" + q)
 	if err != nil || resp.StatusCode != 200 {
+		if resp.StatusCode == 404 {
+			fmt.Printf("Could not find Gogen: %s\n", q)
+			os.Exit(1)
+		}
 		if resp.StatusCode != 200 {
 			body, _ := ioutil.ReadAll(resp.Body)
 			c.Log.Fatalf("Non 200 response code retrieving Gogen: %s", string(body))

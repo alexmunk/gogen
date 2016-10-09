@@ -23,7 +23,17 @@ var c *config.Config
 // Setup the running environment
 func Setup(clic *cli.Context) {
 	if len(clic.String("config")) > 0 {
-		os.Setenv("GOGEN_FULLCONFIG", clic.String("config"))
+		cstr := clic.String("config")
+		if cstr[0:4] == "http" || cstr[len(cstr)-3:] == "yml" || cstr[len(cstr)-4:] == "yaml" || cstr[len(cstr)-4:] == "json" {
+			os.Setenv("GOGEN_FULLCONFIG", cstr)
+		} else {
+			share.PullFile(cstr, ".config.json")
+			config.ResetConfig()
+			os.Setenv("GOGEN_FULLCONFIG", ".config.json")
+			defer func() {
+				os.Remove(".config.json")
+			}()
+		}
 	} else if len(clic.String("samplesDir")) > 0 {
 		os.Setenv("GOGEN_SAMPLES_DIR", clic.String("samplesDir"))
 	}
@@ -277,6 +287,25 @@ from the sample referenced by [name]`,
 				}
 				owner, id := share.Push(clic.Args().First())
 				fmt.Printf("Push successful.  Gist: https://gist.github.com/%s/%s\n", owner, id)
+				return nil
+			},
+		},
+		{
+			Name:      "pull",
+			Usage:     "Pull a config down for editing",
+			ArgsUsage: "[owner/name] [directory]",
+			Flags: []cli.Flag{
+				cli.BoolFlag{Name: "deconstruct, d"},
+			},
+			Action: func(clic *cli.Context) error {
+				if len(clic.Args()) == 0 {
+					fmt.Println("Error: Must specify a Gogen in owner/name format")
+					os.Exit(1)
+				} else if len(clic.Args()) < 2 {
+					fmt.Println("Error: Must specify a directory to place config files")
+					os.Exit(1)
+				}
+				share.Pull(clic.Args()[0], clic.Args()[1], clic.Bool("deconstruct"))
 				return nil
 			},
 		},

@@ -59,10 +59,18 @@ var instance *Config
 var once sync.Once
 
 func getConfig() *Config {
-	once.Do(func() {
+	// once.Do(func() {
+	// 	instance = &Config{Log: logging.MustGetLogger("gogen"), initialized: false}
+	// })
+	if instance == nil {
 		instance = &Config{Log: logging.MustGetLogger("gogen"), initialized: false}
-	})
+	}
 	return instance
+}
+
+// ResetConfig will delete any current running config
+func ResetConfig() {
+	instance = nil
 }
 
 // NewConfig is a singleton constructor which will return a pointer to a global instance of Config
@@ -110,6 +118,10 @@ func NewConfig() *Config {
 				c.Log.Panic(err)
 			}
 		} else {
+			_, err := os.Stat(fullConfig)
+			if err != nil {
+				c.Log.Fatalf("Cannot stat file %s", fullConfig)
+			}
 			if err := c.parseFileConfig(&c, fullConfig); err != nil {
 				c.Log.Panic(err)
 			}

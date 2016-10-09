@@ -22,6 +22,7 @@ samples:
       - weight: 1
         choice: Delete
     - name: usernames
+      field: username
       format: template
       token: $username$
       type: choice

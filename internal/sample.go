@@ -21,25 +21,25 @@ const randHexLetters = "ABCDEF0123456789"
 // Publicly exported options are brought in through YAML or JSON configs, and some state is maintained in private unexposed variables.
 type Sample struct {
 	Name            string              `json:"name"`
-	Description     string              `json:"description"`
-	Notes           string              `json:"notes"`
+	Description     string              `json:"description,omitempty"`
+	Notes           string              `json:"notes,omitempty"`
 	Disabled        bool                `json:"disabled"`
-	Generator       string              `json:"generator"`
-	Rater           string              `json:"rater"`
-	Interval        int                 `json:"interval"`
-	Delay           int                 `json:"delay"`
-	Count           int                 `json:"count"`
-	Earliest        string              `json:"earliest"`
-	Latest          string              `json:"latest"`
-	Begin           string              `json:"begin"`
-	End             string              `json:"end"`
-	EndIntervals    int                 `json:"endIntervals"`
-	RandomizeCount  float32             `json:"randomizeCount"`
-	RandomizeEvents bool                `json:"randomizeEvents"`
-	Tokens          []Token             `json:"tokens"`
-	Lines           []map[string]string `json:"lines"`
-	Field           string              `json:"field"`
-	FromSample      string              `json:"fromSample"`
+	Generator       string              `json:"generator,omitempty"`
+	Rater           string              `json:"rater,omitempty"`
+	Interval        int                 `json:"interval,omitempty"`
+	Delay           int                 `json:"delay,omitempty"`
+	Count           int                 `json:"count,omitempty"`
+	Earliest        string              `json:"earliest,omitempty"`
+	Latest          string              `json:"latest,omitempty"`
+	Begin           string              `json:"begin,omitempty"`
+	End             string              `json:"end,omitempty"`
+	EndIntervals    int                 `json:"endIntervals,omitempty"`
+	RandomizeCount  float32             `json:"randomizeCount,omitempty"`
+	RandomizeEvents bool                `json:"randomizeEvents,omitempty"`
+	Tokens          []Token             `json:"tokens,omitempty"`
+	Lines           []map[string]string `json:"lines,omitempty"`
+	Field           string              `json:"field,omitempty"`
+	FromSample      string              `json:"fromSample,omitempty"`
 
 	// Internal use variables
 	Log            *logging.Logger     `json:"-"`
@@ -81,19 +81,19 @@ type Token struct {
 	Format         string              `json:"format"`
 	Token          string              `json:"token"`
 	Type           string              `json:"type"`
-	Replacement    string              `json:"replacement"`
-	Group          int                 `json:"group"`
+	Replacement    string              `json:"replacement,omitempty"`
+	Group          int                 `json:"group,omitempty"`
 	Sample         *Sample             `json:"-"`
-	SampleString   string              `json:"sample"`
-	Field          string              `json:"field"`
-	SrcField       string              `json:"srcField"`
-	Precision      int                 `json:"precision"`
-	Lower          int                 `json:"lower"`
-	Upper          int                 `json:"upper"`
-	Length         int                 `json:"length"`
-	WeightedChoice []WeightedChoice    `json:"weightedChoice"`
-	FieldChoice    []map[string]string `json:"fieldChoice"`
-	Choice         []string            `json:"choice"`
+	SampleString   string              `json:"sample,omitempty"`
+	Field          string              `json:"field,omitempty"`
+	SrcField       string              `json:"srcField,omitempty"`
+	Precision      int                 `json:"precision,omitempty"`
+	Lower          int                 `json:"lower,omitempty"`
+	Upper          int                 `json:"upper,omitempty"`
+	Length         int                 `json:"length,omitempty"`
+	WeightedChoice []WeightedChoice    `json:"weightedChoice,omitempty"`
+	FieldChoice    []map[string]string `json:"fieldChoice,omitempty"`
+	Choice         []string            `json:"choice,omitempty"`
 }
 
 // WeightedChoice is a simple data structure for allowing a list of items with a Choice to pick and a Weight for that choice
