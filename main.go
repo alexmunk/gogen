@@ -230,17 +230,54 @@ func main() {
 			},
 		},
 		{
-			Name: "info",
-			Usage: "Get info on a specific Gogen",
+			Name:      "info",
+			Usage:     "Get info on a specific Gogen",
+			ArgsUsage: "[owner/name]",
 			Action: func(clic *cli.Context) error {
-				if len(clic.Args(0)) == 0 {
-					fmt.Errorf("Error: Must specify a Gogen")
+				if len(clic.Args()) == 0 {
+					fmt.Println("Error: Must specify a Gogen in owner/name format")
+					os.Exit(1)
 				}
-				g := share.Get(clic.Args(0))
-				// TODO Format the output
+				g := share.Get(clic.Args()[0])
+				fmt.Printf("Details for Gogen %s\n", g.Gogen)
+				fmt.Printf("------------------------------------------------------\n")
+				fmt.Printf("%15s : %s\n", "Gogen", g.Gogen)
+				fmt.Printf("%15s : %s\n", "Owner", g.Owner)
+				fmt.Printf("%15s : %s\n", "Name", g.Name)
+				fmt.Printf("%15s : %s\n\n", "Description", g.Description)
+				if len(g.Notes) > 0 {
+					fmt.Printf("Notes:\n")
+					fmt.Printf("------------------------------------------------------\n")
+					fmt.Printf("%s\n", g.Notes)
+				}
+				var event map[string]interface{}
+				var eventbytes []byte
+				_ = json.Unmarshal([]byte(g.SampleEvent), &event)
+				eventbytes, _ = json.MarshalIndent(event, "", "  ")
+				fmt.Printf("Sample Event:\n")
+				fmt.Printf("------------------------------------------------------\n")
+				fmt.Printf("%s\n", string(eventbytes))
 				return nil
-			}
-		}
+			},
+		},
+		{
+			Name:  "push",
+			Usage: "Push running config to Gogen sharing service",
+			ArgsUsage: "[name]\n\n" + `This will push your running config to the Gogen sharing API.  This will publish the running config in a Git Gist and make an entry in the
+Gogen API database pointing to the gist with a bit of metadata.app
+
+The [name] argument should be the name of the primary sample you are publishing.  The entry in the database will get its Name, Description and Notes
+from the sample referenced by [name]`,
+			Action: func(clic *cli.Context) error {
+				if len(clic.Args()) == 0 {
+					fmt.Println("Error: Must specify a name to publish this config")
+					os.Exit(1)
+				}
+				owner, id := share.Push(clic.Args().First())
+				fmt.Printf("Push successful.  Gist: https://gist.github.com/%s/%s\n", owner, id)
+				return nil
+			},
+		},
 	}
 	app.Before = func(clic *cli.Context) error {
 		Setup(clic)

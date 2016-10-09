@@ -1,4 +1,9 @@
 name: weblog-common
+description: Weblog data in Apache common format
+notes: >
+  Easily customizable for your own needs.  If you want your IP ranges, edit external_ips.sample.  
+  To modify server hostnames and client IPs, modify webhosts.csv.  Useragents.sample is also pretty dated,
+  so feel free to replace with a more modern list of user agents.
 disabled: true
 interval: 1
 endIntervals: 1000

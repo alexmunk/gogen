@@ -9,8 +9,8 @@ before_script:
 - cat $GITHUB_OAUTH_TOKEN > .githubtoken
 script:
 - go test -v ./...
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]];   then go build -o build/osx/gogen  ; fi
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then go build -o build/linux/gogen; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]];   then go build -ldflags "-X github.com/coccyx/gogen/share.gitHubClientID=$GITHUB_OAUTH_CLIENT_ID -X github.com/coccyx/gogen/share.gitHubClientSecret=$GITHUB_OAUTH_CLIENT_SECRET" -o build/osx/gogen  ; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then go build -ldflags "-X github.com/coccyx/gogen/share.gitHubClientID=$GITHUB_OAUTH_CLIENT_ID -X github.com/coccyx/gogen/share.gitHubClientSecret=$GITHUB_OAUTH_CLIENT_SECRET" -o build/linux/gogen; fi
 deploy:
   provider: s3
   region: us-west-1

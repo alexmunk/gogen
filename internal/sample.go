@@ -21,6 +21,8 @@ const randHexLetters = "ABCDEF0123456789"
 // Publicly exported options are brought in through YAML or JSON configs, and some state is maintained in private unexposed variables.
 type Sample struct {
 	Name            string              `json:"name"`
+	Description     string              `json:"description"`
+	Notes           string              `json:"notes"`
 	Disabled        bool                `json:"disabled"`
 	Generator       string              `json:"generator"`
 	Rater           string              `json:"rater"`

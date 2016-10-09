@@ -1,6 +1,7 @@
 package share
 
 import (
+	"bytes"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
@@ -41,8 +42,13 @@ func listsearch(url string) (ret []GogenList) {
 	c := config.NewConfig()
 	client := &http.Client{}
 	resp, err := client.Get(url)
-	if err != nil {
-		c.Log.Fatalf("Error retrieving list of Gogens: %s", err)
+	if err != nil || resp.StatusCode != 200 {
+		if resp.StatusCode != 200 {
+			body, _ := ioutil.ReadAll(resp.Body)
+			c.Log.Fatalf("Non 200 response code searching for Gogen: %s", string(body))
+		} else {
+			c.Log.Fatalf("Error retrieving list of Gogens: %s", err)
+		}
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -68,13 +74,18 @@ func listsearch(url string) (ret []GogenList) {
 	return ret
 }
 
-// Get calls /v1/Get
+// Get calls /v1/get
 func Get(q string) (g GogenInfo) {
 	c := config.NewConfig()
 	client := &http.Client{}
 	resp, err := client.Get("https://api.gogen.io/v1/get/" + q)
-	if err != nil {
-		c.Log.Fatalf("Error retrieving Gogen %s: %s", q, err)
+	if err != nil || resp.StatusCode != 200 {
+		if resp.StatusCode != 200 {
+			body, _ := ioutil.ReadAll(resp.Body)
+			c.Log.Fatalf("Non 200 response code retrieving Gogen: %s", string(body))
+		} else {
+			c.Log.Fatalf("Error retrieving Gogen %s: %s", q, err)
+		}
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -96,4 +107,29 @@ func Get(q string) (g GogenInfo) {
 	}
 	c.Log.Debugf("Gogen: %# v", pretty.Formatter(g))
 	return g
+}
+
+// Upsert calls /v1/upsert
+func Upsert(g GogenInfo) {
+	c := config.NewConfig()
+	gh := NewGitHub()
+	client := &http.Client{}
+
+	b, err := json.Marshal(g)
+	if err != nil {
+		c.Log.Fatalf("Error marshaling Gogen %#v: %s", g, err)
+	}
+
+	req, _ := http.NewRequest("POST", "https://api.gogen.io/v1/upsert", bytes.NewReader(b))
+	req.Header.Add("Authorization", "token "+gh.token)
+	resp, err := client.Do(req)
+	if err != nil || resp.StatusCode != 200 {
+		if resp.StatusCode != 200 {
+			body, _ := ioutil.ReadAll(resp.Body)
+			c.Log.Fatalf("Non 200 response code Upserting: %s", string(body))
+		} else {
+			c.Log.Fatalf("Error POSTing to upsert: %s", err)
+		}
+	}
+	c.Log.Debugf("Upserted: %# v", pretty.Formatter(g))
 }

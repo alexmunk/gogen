@@ -4,7 +4,6 @@ package share
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -42,7 +41,7 @@ type GitHub struct {
 }
 
 // Push will create a public gist of "name.json" from our running config
-func (gh *GitHub) Push(name string) {
+func (gh *GitHub) Push(name string) *github.Gist {
 	gist := new(github.Gist)
 	files := make(map[github.GistFilename]github.GistFile)
 
@@ -65,10 +64,33 @@ func (gh *GitHub) Push(name string) {
 	public := true
 	gist.Public = &public
 
-	_, _, err = gh.client.Gists.Create(gist)
+	var foundgist *github.Gist
+	gists, _, err := gh.client.Gists.List("", nil)
+findgist:
+	for _, testgist := range gists {
+		for _, gistfile := range testgist.Files {
+			gh.c.Log.Debugf("Testing %s if match %s", *gistfile.Filename, name+".json")
+			if *gistfile.Filename == name+".json" {
+				foundgist = testgist
+				break findgist
+			}
+		}
+	}
+
+	if foundgist != nil {
+		gh.c.Log.Debugf("Found gist, updating")
+		updatedgist, _, err := gh.client.Gists.Edit(*foundgist.ID, gist)
+		if err != nil {
+			gh.c.Log.Fatalf("Error updating gist %# v: %s", pretty.Formatter(gist), err)
+		}
+		return updatedgist
+	}
+	gh.c.Log.Debugf("Gist not found, creating")
+	newgist, _, err := gh.client.Gists.Create(gist)
 	if err != nil {
 		gh.c.Log.Fatalf("Error creating gist %# v: %s", pretty.Formatter(gist), err)
 	}
+	return newgist
 }
 
 // Here's some code that I'm saving that decomposed a sample into files, but I didn't like the way it worked for posting to GitHub
@@ -199,9 +221,10 @@ func (gh *GitHub) handleGitHubLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func (gh *GitHub) handleGitHubCallback(w http.ResponseWriter, r *http.Request) {
+	c := config.NewConfig()
 	state := r.FormValue("state")
 	if state != oauthStateString {
-		fmt.Printf("invalid oauth state, expected '%s', got '%s'\n", oauthStateString, state)
+		c.Log.Errorf("invalid oauth state, expected '%s', got '%s'\n", oauthStateString, state)
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
@@ -209,7 +232,7 @@ func (gh *GitHub) handleGitHubCallback(w http.ResponseWriter, r *http.Request) {
 	code := r.FormValue("code")
 	token, err := oauthConf.Exchange(oauth2.NoContext, code)
 	if err != nil {
-		fmt.Printf("Code exchange failed with '%s'\n", err)
+		c.Log.Errorf("Code exchange failed with '%s'\n", err)
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
 	}

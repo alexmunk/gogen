@@ -29,7 +29,7 @@ func TestLogin(t *testing.T) {
 }
 
 func TestPush(t *testing.T) {
-	gh.Push("test_config")
+	_ = gh.Push("test_config")
 
 	l, _, _ := gh.client.Gists.List("", nil)
 	inList := false

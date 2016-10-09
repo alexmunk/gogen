@@ -2,6 +2,7 @@ package config
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/csv"
 	"encoding/json"
 	"io/ioutil"
@@ -28,6 +29,7 @@ type Config struct {
 	// Exported but internal use variables
 	Log      *logging.Logger `json:"-"`
 	Timezone *time.Location  `json:"-"`
+	Buf      bytes.Buffer    `json:"-"`
 }
 
 // Global represents global configuration options which apply to all of gogen

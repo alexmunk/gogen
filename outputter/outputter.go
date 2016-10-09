@@ -136,6 +136,8 @@ func setup(generator *rand.Rand, item *config.OutQueueItem, num int) config.Outp
 			gout[num] = new(file)
 		case "http":
 			gout[num] = new(httpout)
+		case "buf":
+			gout[num] = new(buf)
 		default:
 			gout[num] = new(stdout)
 		}

@@ -25,6 +25,11 @@ func TestGet(t *testing.T) {
 	assert.Equal(t, "coccyx", g.Owner)
 }
 
+func TestUpsert(t *testing.T) {
+	g := Get("coccyx/weblog")
+	Upsert(g)
+}
+
 func validateList(t *testing.T, l []GogenList) {
 	if len(l) == 0 {
 		t.Fatalf("Length of List() is 0")
