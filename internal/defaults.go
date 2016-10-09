@@ -5,6 +5,9 @@ import logging "github.com/op/go-logging"
 // DefaultLoggingLevel sets the default logging level
 const DefaultLoggingLevel = logging.ERROR
 
+// ProfileOn determines whether we should run a CPU profiler for perf optimization
+const ProfileOn = false
+
 // Default global values
 const defaultGeneratorWorkers = 1
 const defaultOutputWorkers = 1

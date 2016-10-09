@@ -3,6 +3,10 @@ global:
     outputTemplate: csv
 samples:
 - name: csv
+  description: Simple CSV Example
+  notes: >
+    For CSV OutputTemplate, it's critial to note that it will only work well for one interval, due to the fact that
+    the output template will print a header for every interval.
   endIntervals: 1
   count: 100
   tokens:

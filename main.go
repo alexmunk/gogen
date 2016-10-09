@@ -55,6 +55,8 @@ func Setup(clic *cli.Context) {
 
 func table(l []share.GogenList) {
 	t := tablewriter.NewWriter(os.Stdout)
+	t.SetColWidth(132)
+	t.SetAutoWrapText(false)
 	t.SetHeader([]string{"Gogen", "Description"})
 	for _, li := range l {
 		t.Append([]string{li.Gogen, li.Description})
@@ -63,7 +65,7 @@ func table(l []share.GogenList) {
 }
 
 func main() {
-	if config.DefaultLoggingLevel == logging.DEBUG {
+	if config.ProfileOn {
 		defer profile.Start(profile.CPUProfile, profile.ProfilePath(".")).Stop()
 	}
 	rand.Seed(time.Now().UnixNano())
