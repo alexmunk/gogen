@@ -128,6 +128,18 @@ func main() {
 					Name:  "url",
 					Usage: "Override all endpoint URLs to just `url` url",
 				},
+				cli.StringFlag{
+					Name:  "begin, b",
+					Usage: "Set begin time, in relative time syntax (e.g. -60m for minus 60 mins, now for now, etc)",
+				},
+				cli.StringFlag{
+					Name:  "end, e",
+					Usage: "Set end time, in relative time syntax (e.g. -60m for minus 60 mins, now for now, etc)",
+				},
+				cli.BoolFlag{
+					Name:  "realtime, r",
+					Usage: "Set to real time, don't stop until killed",
+				},
 			},
 			Action: func(clic *cli.Context) error {
 				for i := 0; i < len(c.Samples); i++ {
@@ -158,6 +170,26 @@ func main() {
 					if clic.Int("interval") > 0 {
 						c.Log.Infof("Setting interval to %d for sample '%s'", clic.Int("interval"), c.Samples[i].Name)
 						c.Samples[i].Interval = clic.Int("interval")
+					}
+					if len(clic.String("begin")) > 0 {
+						c.Log.Infof("Setting begin to %s for sample '%s'", clic.String("begin"), c.Samples[i].Name)
+						c.Samples[i].Begin = clic.String("begin")
+					}
+					if len(clic.String("end")) > 0 {
+						c.Log.Infof("Setting end to %s for sample '%s'", clic.String("end"), c.Samples[i].Name)
+						c.Samples[i].End = clic.String("end")
+					}
+					if len(clic.String("begin")) > 0 || len(clic.String("end")) > 0 {
+						if clic.Int("endIntervals") == 0 {
+							c.Samples[i].EndIntervals = 0
+						}
+						config.ParseBeginEnd(c.Samples[i])
+					}
+					if clic.Bool("realtime") {
+						if clic.Int("endIntervals") == 0 {
+							c.Samples[i].EndIntervals = 0
+						}
+						c.Samples[i].Realtime = true
 					}
 				}
 				if len(clic.String("sample")) > 0 {

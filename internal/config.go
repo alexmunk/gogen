@@ -415,43 +415,23 @@ func (c *Config) validate(s *Sample) {
 			s.Field = defaultField
 		}
 
-		// Setup Begin & End
-		// If End is not set, then we're intended to always run in realtime
-		if s.Begin == "" && s.End == "" {
-			s.Realtime = true
-		}
+		ParseBeginEnd(s)
+
+		//
+		// Parse earliest and latest as relative times
+		//
 		// Cache a time so we can get a delta for parsed begin, end, earliest and latest
 		n := time.Now()
 		now := func() time.Time {
 			return n
 		}
-		var err error
-		if len(s.Begin) > 0 {
-			if s.BeginParsed, err = timeparser.TimeParserNow(s.Begin, now); err != nil {
-				c.Log.Errorf("Error parsing Begin for sample %s: %v", s.Name, err)
-			} else {
-				s.Current = s.BeginParsed
-				s.Realtime = false
-			}
-		}
-		if len(s.End) > 0 {
-			if s.EndParsed, err = timeparser.TimeParserNow(s.End, now); err != nil {
-				c.Log.Errorf("Error parsing End for sample %s: %v", s.Name, err)
-			}
-		}
-
-		//
-		// Parse earliest and latest as relative times
-		//
-
-		var p time.Time
-		if p, err = timeparser.TimeParserNow(s.Earliest, now); err != nil {
+		if p, err := timeparser.TimeParserNow(s.Earliest, now); err != nil {
 			c.Log.Errorf("Error parsing earliest time '%s' for sample '%s', using Now", s.Earliest, s.Name)
 			s.EarliestParsed = time.Duration(0)
 		} else {
 			s.EarliestParsed = n.Sub(p) * -1
 		}
-		if p, err = timeparser.TimeParserNow(s.Latest, now); err != nil {
+		if p, err := timeparser.TimeParserNow(s.Latest, now); err != nil {
 			c.Log.Errorf("Error parsing latest time '%s' for sample '%s', using Now", s.Latest, s.Name)
 			s.LatestParsed = time.Duration(0)
 		} else {
@@ -559,6 +539,38 @@ func (c *Config) validate(s *Sample) {
 			}
 		}
 	}
+}
+
+// ParseBeginEnd parses the Begin and End settings for a sample
+func ParseBeginEnd(s *Sample) {
+	// Setup Begin & End
+	// If End is not set, then we're intended to always run in realtime
+	if s.End == "" {
+		s.Realtime = true
+	}
+	if s.Begin != "" && s.EndIntervals > 0 {
+		s.Realtime = false
+	}
+	// Cache a time so we can get a delta for parsed begin, end, earliest and latest
+	n := time.Now()
+	now := func() time.Time {
+		return n
+	}
+	var err error
+	if len(s.Begin) > 0 {
+		if s.BeginParsed, err = timeparser.TimeParserNow(s.Begin, now); err != nil {
+			s.Log.Errorf("Error parsing Begin for sample %s: %v", s.Name, err)
+		} else {
+			s.Current = s.BeginParsed
+			s.Realtime = false
+		}
+	}
+	if len(s.End) > 0 {
+		if s.EndParsed, err = timeparser.TimeParserNow(s.End, now); err != nil {
+			s.Log.Errorf("Error parsing End for sample %s: %v", s.Name, err)
+		}
+	}
+	s.Log.Infof("Beginning generation at %s; Ending at %s; Realtime: %v", s.BeginParsed, s.EndParsed, s.Realtime)
 }
 
 func (c *Config) walkPath(fullPath string, acceptableExtensions map[string]bool, callback func(string) error) error {
