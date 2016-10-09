@@ -41,8 +41,8 @@ type GitHub struct {
 	c      *config.Config
 }
 
-// Share will create a public gist of "name.json" from our running config
-func (gh *GitHub) Share(name string) {
+// Push will create a public gist of "name.json" from our running config
+func (gh *GitHub) Push(name string) {
 	gist := new(github.Gist)
 	files := make(map[github.GistFilename]github.GistFile)
 

@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/coccyx/gogen/internal"
 	"github.com/coccyx/gogen/run"
 	"github.com/coccyx/gogen/share"
 	"github.com/ghodss/yaml"
+	"github.com/olekukonko/tablewriter"
 	logging "github.com/op/go-logging"
 	"github.com/pkg/profile"
 	"gopkg.in/urfave/cli.v1"
@@ -49,6 +51,15 @@ func Setup(clic *cli.Context) {
 	// c.Log.Debugf("Pretty Values %# v\n", pretty.Formatter(c))
 	// j, _ := json.MarshalIndent(c, "", "  ")
 	// c.Log.Debugf("JSON Config: %s\n", j)
+}
+
+func table(l []share.GogenList) {
+	t := tablewriter.NewWriter(os.Stdout)
+	t.SetHeader([]string{"Gogen", "Description"})
+	for _, li := range l {
+		t.Append([]string{li.Gogen, li.Description})
+	}
+	t.Render()
 }
 
 func main() {
@@ -190,6 +201,46 @@ func main() {
 				return nil
 			},
 		},
+		{
+			Name:  "list",
+			Usage: "List all published Gogens",
+			Action: func(clic *cli.Context) error {
+				fmt.Printf("Showing all Gogens:\n\n")
+				l := share.List()
+				table(l)
+				return nil
+			},
+		},
+		{
+			Name:  "search",
+			Usage: "Search for Gogens",
+			Action: func(clic *cli.Context) error {
+				var q string
+				for _, a := range clic.Args() {
+					q += a + " "
+				}
+				q = strings.TrimRight(q, " ")
+				fmt.Printf("Returning results for search: \"%s\"\n\n", q)
+				l := share.Search(q)
+				if len(l) > 0 {
+					table(l)
+				}
+				fmt.Println("   No results found.")
+				return nil
+			},
+		},
+		{
+			Name: "info",
+			Usage: "Get info on a specific Gogen",
+			Action: func(clic *cli.Context) error {
+				if len(clic.Args(0)) == 0 {
+					fmt.Errorf("Error: Must specify a Gogen")
+				}
+				g := share.Get(clic.Args(0))
+				// TODO Format the output
+				return nil
+			}
+		}
 	}
 	app.Before = func(clic *cli.Context) error {
 		Setup(clic)

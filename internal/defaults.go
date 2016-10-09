@@ -3,7 +3,7 @@ package config
 import logging "github.com/op/go-logging"
 
 // DefaultLoggingLevel sets the default logging level
-const DefaultLoggingLevel = logging.DEBUG
+const DefaultLoggingLevel = logging.ERROR
 
 // Default global values
 const defaultGeneratorWorkers = 1

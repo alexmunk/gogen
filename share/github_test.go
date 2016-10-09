@@ -28,8 +28,8 @@ func TestLogin(t *testing.T) {
 	assert.NotNil(t, gh, "NewGitHub() returned nil")
 }
 
-func TestShare(t *testing.T) {
-	gh.Share("test_config")
+func TestPush(t *testing.T) {
+	gh.Push("test_config")
 
 	l, _, _ := gh.client.Gists.List("", nil)
 	inList := false

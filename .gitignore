@@ -5,3 +5,5 @@ gogen
 test.out
 .vscode
 build.sh
+.githubtoken
+linecount.sh
