@@ -114,7 +114,7 @@ func main() {
 				},
 				cli.StringFlag{
 					Name:  "outputTemplate, ot",
-					Usage: "Use output template `(raw|csv|json)` for formatting output",
+					Usage: "Use output template `(raw|csv|json|splunkhec)` for formatting output",
 				},
 				cli.StringFlag{
 					Name:  "outputter, o",
@@ -142,6 +142,10 @@ func main() {
 				},
 			},
 			Action: func(clic *cli.Context) error {
+				if len(c.Samples) == 0 {
+					fmt.Printf("No samples configured, exiting\n")
+					os.Exit(1)
+				}
 				for i := 0; i < len(c.Samples); i++ {
 					if len(clic.String("outputTemplate")) > 0 {
 						c.Log.Infof("Setting outputTempalte to '%s'", clic.String("outputTemplate"))
@@ -313,6 +317,9 @@ Gogen API database pointing to the gist with a bit of metadata.app
 The [name] argument should be the name of the primary sample you are publishing.  The entry in the database will get its Name, Description and Notes
 from the sample referenced by [name]`,
 			Action: func(clic *cli.Context) error {
+				config.ResetConfig()
+				os.Setenv("GOGEN_EXPORT", "1")
+				_ = config.NewConfig()
 				if len(clic.Args()) == 0 {
 					fmt.Println("Error: Must specify a name to publish this config")
 					os.Exit(1)
