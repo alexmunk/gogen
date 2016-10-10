@@ -1,0 +1,55 @@
+---
+swagger: "2.0"
+info:
+  version: "2016-10-09T04:19:31Z"
+  title: "Gogen"
+host: "api.gogen.io"
+schemes:
+- "https"
+paths:
+  /v1/get/{proxy+}:
+    x-amazon-apigateway-any-method:
+      produces:
+      - "application/json"
+      parameters:
+      - name: "proxy"
+        in: "path"
+        required: true
+        type: "string"
+      responses: {}
+  /v1/list:
+    get:
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/Empty"
+  /v1/search:
+    get:
+      produces:
+      - "application/json"
+      parameters:
+      - name: "q"
+        in: "query"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/Empty"
+  /v1/upsert:
+    post:
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/Empty"
+definitions:
+  Empty:
+    type: "object"
+    title: "Empty Schema"
