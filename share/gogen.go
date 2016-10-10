@@ -118,7 +118,7 @@ func Get(q string) (g GogenInfo) {
 // Upsert calls /v1/upsert
 func Upsert(g GogenInfo) {
 	c := config.NewConfig()
-	gh := NewGitHub()
+	gh := NewGitHub(true)
 	client := &http.Client{}
 
 	b, err := json.Marshal(g)

@@ -24,7 +24,7 @@ import (
 func Push(name string) (string, string) {
 	var sample *config.Sample
 	c := config.NewConfig()
-	gh := NewGitHub()
+	gh := NewGitHub(true)
 	gu, _, err := gh.client.Users.Get("")
 
 	gogen := *gu.Login + "/" + name
@@ -229,9 +229,8 @@ func PullFile(gogen string, filename string) {
 func pull(gogen string) (gist *github.Gist) {
 	c := config.NewConfig()
 	g := Get(gogen)
-	client := &http.Client{}
-	gh := github.NewClient(client)
-	gist, _, err := gh.Gists.Get(g.GistID)
+	gh := NewGitHub(false)
+	gist, _, err := gh.client.Gists.Get(g.GistID)
 	if err != nil {
 		c.Log.Fatalf("Couldn't get gist: %s", err)
 	}

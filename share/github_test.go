@@ -24,7 +24,7 @@ func TestLogin(t *testing.T) {
 	os.Setenv("GOGEN_FULLCONFIG", filepath.Join(home, "examples", "weblog", "weblog.yml"))
 	os.Setenv("GOGEN_EXPORT", "1")
 	c = config.NewConfig()
-	gh = NewGitHub()
+	gh = NewGitHub(true)
 	assert.NotNil(t, gh, "NewGitHub() returned nil")
 }
 

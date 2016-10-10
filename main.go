@@ -245,7 +245,7 @@ func main() {
 			Name:  "login",
 			Usage: "Login to GitHub",
 			Action: func(clic *cli.Context) error {
-				_ = share.NewGitHub()
+				_ = share.NewGitHub(true)
 				return nil
 			},
 		},

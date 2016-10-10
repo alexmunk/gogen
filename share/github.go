@@ -112,7 +112,7 @@ findgist:
 }
 
 // NewGitHub returns a GitHub object, with a set auth token
-func NewGitHub() *GitHub {
+func NewGitHub(requireauth bool) *GitHub {
 	gh := new(GitHub)
 	gh.done = make(chan int)
 
@@ -134,7 +134,7 @@ func NewGitHub() *GitHub {
 		}
 		gh.token = string(buf)
 		c.Log.Debugf("Getting GitHub token '%s' from file", gh.token)
-	} else {
+	} else if requireauth {
 		if !os.IsNotExist(err) {
 			c.Log.Fatalf("Unexpected error accessing %s: %s", tokenFile, err)
 		}
@@ -150,11 +150,15 @@ func NewGitHub() *GitHub {
 			c.Log.Fatalf("Error writing token to file %s: %s", tokenFile, err)
 		}
 	}
-	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: gh.token},
-	)
-	tc := oauth2.NewClient(oauth2.NoContext, ts)
-	gh.client = github.NewClient(tc)
+	if len(gh.token) > 0 {
+		ts := oauth2.StaticTokenSource(
+			&oauth2.Token{AccessToken: gh.token},
+		)
+		tc := oauth2.NewClient(oauth2.NoContext, ts)
+		gh.client = github.NewClient(tc)
+	} else {
+		gh.client = github.NewClient(nil)
+	}
 	return gh
 }
 
