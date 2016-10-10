@@ -7,6 +7,7 @@ go:
 - 1.7
 before_script:
 - printf "$GITHUB_OAUTH_TOKEN" > .githubtoken
+- go get github.com/mattn/goveralls
 - go get github.com/LawrenceWoodman/roveralls
 script:
 - go test -v ./...
