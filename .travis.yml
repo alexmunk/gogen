@@ -6,7 +6,7 @@ os:
 go:
 - 1.7
 before_script:
-- echo $GITHUB_OAUTH_TOKEN > .githubtoken
+- printf "$GITHUB_OAUTH_TOKEN" > .githubtoken
 script:
 - go test -v ./...
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]];   then go build -ldflags "-X github.com/coccyx/gogen/share.gitHubClientID=$GITHUB_OAUTH_CLIENT_ID -X github.com/coccyx/gogen/share.gitHubClientSecret=$GITHUB_OAUTH_CLIENT_SECRET" -o build/osx/gogen  ; fi
