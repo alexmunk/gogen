@@ -4,6 +4,7 @@
     * Rating should support lua based raters as well
 * Implement replay generator
 * Integrate LUA interpret for custom generators and raters
+* Add caching of GitHub API calls
 * Implement checkpointing state
     * Create channels back to each imer thread
     * Outputters should acknowledge output and that should increment state counters
