@@ -91,31 +91,84 @@ func TestGenReplacement(t *testing.T) {
 	token = s.Tokens[11]
 	replacement, _ = token.GenReplacement(&choice, now(), now(), randgen)
 	assert.Equal(t, "2001-10-20 12:00:00,000", replacement)
+}
 
-	// choice = -1
-	// token = s.Tokens[]
+func TestLuaReplacement(t *testing.T) {
+	os.Setenv("GOGEN_HOME", "..")
+	os.Setenv("GOGEN_ALWAYS_REFRESH", "1")
+	home := ".."
+	os.Setenv("GOGEN_SAMPLES_DIR", filepath.Join(home, "tests", "tokens", "lua.yml"))
 
-	// Try to call Exec first, should error
-	// temp, err := Exec("test", row)
-	// assert.EqualError(t, err, "Exec called for template 'test' but not found in cache")
+	loc, _ := time.LoadLocation("Local")
+	source := rand.NewSource(0)
+	randgen := rand.New(source)
 
-	// // Create a new test template
-	// err = New("test", "{{ ._raw }}")
-	// temp, err = Exec("test", row)
-	// assert.Equal(t, "foo", temp)
+	n := time.Date(2001, 10, 20, 12, 0, 0, 100000, loc)
+	now := func() time.Time {
+		return n
+	}
 
-	// // More complicated
-	// err = New("test2", "index={{ .index}} host={{ .host }} _raw={{ ._raw }}")
-	// temp, err = Exec("test2", row)
-	// assert.Equal(t, "index=fooindex host=barhost _raw=foo", temp)
+	c := NewConfig()
+	s := c.FindSampleByName("lua")
+	token := s.Tokens[0]
 
-	// // JSON
-	// err = New("test3", "{{ json . | printf \"%s\" }}")
-	// temp, err = Exec("test3", row)
-	// assert.Equal(t, `{"_raw":"foo","host":"barhost","index":"fooindex"}`, temp)
+	choice := -1
+	replacement, _ := token.GenReplacement(&choice, now(), now(), randgen)
+	assert.Equal(t, "foo", replacement)
 
-	// // Multiple variables, one replacement
-	// err = New("test4", "{{ ._raw }}{{ .foo }}")
-	// temp, err = Exec("test4", row)
-	// fmt.Printf("Test4: %s", temp)
+	token = s.Tokens[1]
+	choice = -1
+	replacement, _ = token.GenReplacement(&choice, now(), now(), randgen)
+	assert.Equal(t, "3", replacement)
+
+	token = s.Tokens[2]
+	choice = -1
+	replacement, _ = token.GenReplacement(&choice, now(), now(), randgen)
+	assert.Equal(t, "0.945", replacement)
+
+	token = s.Tokens[3]
+	choice = -1
+	replacement, _ = token.GenReplacement(&choice, now(), now(), randgen)
+	assert.Equal(t, "NvofsbSj4", replacement)
+
+	token = s.Tokens[4]
+	choice = -1
+	replacement, _ = token.GenReplacement(&choice, now(), now(), randgen)
+	assert.Equal(t, "4C345", replacement)
+}
+
+func BenchmarkGoStatic(b *testing.B)      { benchmarkToken("tokens", 0, b) }
+func BenchmarkGoRandInt(b *testing.B)     { benchmarkToken("tokens", 1, b) }
+func BenchmarkGoRandFloat(b *testing.B)   { benchmarkToken("tokens", 2, b) }
+func BenchmarkGoRandString(b *testing.B)  { benchmarkToken("tokens", 3, b) }
+func BenchmarkGoRandHex(b *testing.B)     { benchmarkToken("tokens", 4, b) }
+func BenchmarkLuaStatic(b *testing.B)     { benchmarkToken("lua", 0, b) }
+func BenchmarkLuaRandInt(b *testing.B)    { benchmarkToken("lua", 1, b) }
+func BenchmarkLuaRandFloat(b *testing.B)  { benchmarkToken("lua", 2, b) }
+func BenchmarkLuaRandString(b *testing.B) { benchmarkToken("lua", 3, b) }
+func BenchmarkLuaRandHex(b *testing.B)    { benchmarkToken("lua", 4, b) }
+
+func benchmarkToken(conf string, i int, b *testing.B) {
+	os.Setenv("GOGEN_HOME", "..")
+	os.Setenv("GOGEN_ALWAYS_REFRESH", "1")
+	home := ".."
+	os.Setenv("GOGEN_SAMPLES_DIR", filepath.Join(home, "tests", "tokens", conf+".yml"))
+
+	loc, _ := time.LoadLocation("Local")
+	source := rand.NewSource(0)
+	randgen := rand.New(source)
+
+	n := time.Date(2001, 10, 20, 12, 0, 0, 100000, loc)
+	now := func() time.Time {
+		return n
+	}
+
+	c := NewConfig()
+	s := c.FindSampleByName(conf)
+
+	for n := 0; n < b.N; n++ {
+		token := s.Tokens[i]
+		choice := -1
+		_, _ = token.GenReplacement(&choice, now(), now(), randgen)
+	}
 }

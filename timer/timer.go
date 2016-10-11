@@ -65,8 +65,4 @@ func (t *Timer) genWork() {
 	item := &config.GenQueueItem{S: t.S, Count: t.S.Count, Earliest: earliest, Latest: latest, OQ: t.OQ}
 	t.S.Log.Debugf("Placing item in queue for sample '%s': %#v", t.S.Name, item)
 	t.GQ <- item
-	// select {
-	// case t.GQ <- item:
-	// default:
-	// }
 }

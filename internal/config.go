@@ -16,6 +16,7 @@ import (
 	"github.com/coccyx/timeparser"
 	"github.com/ghodss/yaml"
 	"github.com/op/go-logging"
+	lua "github.com/yuin/gopher-lua"
 )
 
 // Config is a struct representing a Singleton which contains a copy of the running config
@@ -449,6 +450,8 @@ func (c *Config) validate(s *Sample) {
 			}
 			// c.Log.Debugf("Resolving token '%s' for sample '%s'", s.Tokens[i].Name, s.Name)
 			for j := 0; j < len(c.Samples); j++ {
+				s.Tokens[i].Parent = s
+				s.Tokens[i].luaState = new(lua.LTable)
 				if s.Tokens[i].SampleString == c.Samples[j].Name {
 					c.Log.Debugf("Resolving sample '%s' for token '%s'", c.Samples[j].Name, s.Tokens[i].Name)
 					s.Tokens[i].Sample = c.Samples[j]
