@@ -17,7 +17,16 @@ tokens:
       choice: Change
     - weight: 1
       choice: Delete
-  # - name: integerid-template # References existing default token
+  - name: integerid
+    format: template
+    type: script
+    script: >
+      if state["id"] == nil then
+        state["id"] = 0
+      else
+        state["id"] = state["id"] + 1
+      end
+      return state["id"]
   - name: guid-template
     format: template
     token: $guid$

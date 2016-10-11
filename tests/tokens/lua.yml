@@ -1,0 +1,49 @@
+name: lua
+tokens:
+  - name: lua_static
+    type: script
+    script: >
+        return "foo"
+  - name: lua_random_int
+    type: script
+    script: >
+        math.randomseed(0)
+        local lower = 0
+        local upper = 10
+        return math.random(lower, upper)
+  - name: lua_random_float
+    type: script
+    script: >
+        math.randomseed(0)
+        function round(num, idp)
+            local mult = 10^(idp or 0)
+            if num >= 0 then return math.floor(num * mult + 0.5) / mult
+            else return math.ceil(num * mult - 0.5) / mult end
+        end
+        return round(math.random(), 3)
+  - name: lua_random_string
+    type: script
+    script: >
+        math.randomseed(0)
+        local randstring = "ABCDEFGHJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwyz0123456789"
+        local length = 10
+        
+        ret = ""
+        for i = 1, length do
+            randchar = math.random(1, 62)
+            ret = ret..string.sub(randstring, randchar, randchar)
+        end
+        return ret
+  - name: lua_random_hex
+    type: script
+    script: >
+        math.randomseed(0)
+        local randstring = "ABCDEF0123456789"
+        local length = 5
+        
+        ret = ""
+        for i = 1, length do
+            randchar = math.random(1, 16)
+            ret = ret..string.sub(randstring, randchar, randchar)
+        end
+        return ret

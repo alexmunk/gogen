@@ -12,6 +12,7 @@ import (
 	strftime "github.com/cactus/gostrftime"
 	logging "github.com/op/go-logging"
 	"github.com/satori/go.uuid"
+	lua "github.com/yuin/gopher-lua"
 )
 
 const randStringLetters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -84,6 +85,7 @@ type Token struct {
 	Replacement    string              `json:"replacement,omitempty"`
 	Group          int                 `json:"group,omitempty"`
 	Sample         *Sample             `json:"-"`
+	Parent         *Sample             `json:"-"`
 	SampleString   string              `json:"sample,omitempty"`
 	Field          string              `json:"field,omitempty"`
 	SrcField       string              `json:"srcField,omitempty"`
@@ -94,6 +96,10 @@ type Token struct {
 	WeightedChoice []WeightedChoice    `json:"weightedChoice,omitempty"`
 	FieldChoice    []map[string]string `json:"fieldChoice,omitempty"`
 	Choice         []string            `json:"choice,omitempty"`
+	Script         string              `json:"script,omitempty"`
+
+	L        *lua.LState `json:"-"`
+	luaState *lua.LTable
 }
 
 // WeightedChoice is a simple data structure for allowing a list of items with a Choice to pick and a Weight for that choice
@@ -235,6 +241,14 @@ func (t Token) GenReplacement(choice *int, et time.Time, lt time.Time, randgen *
 			*choice = c
 		}
 		return t.FieldChoice[c][t.SrcField], nil
+	case "script":
+		L := lua.NewState()
+		defer L.Close()
+		L.SetGlobal("state", t.luaState)
+		if err := L.DoString(t.Script); err != nil {
+			t.Parent.Log.Errorf("Error executing script for token '%s' in sample '%s': %s", t.Name, t.Parent.Name, err)
+		}
+		return lua.LVAsString(L.Get(-1)), nil
 	}
 	return "", fmt.Errorf("GenReplacement called with invalid type for token '%s' with type '%s'", t.Name, t.Type)
 }
