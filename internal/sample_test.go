@@ -28,38 +28,23 @@ func TestGenReplacement(t *testing.T) {
 
 	c := NewConfig()
 	s := c.FindSampleByName("tokens")
-	token := s.Tokens[0]
+
+	testToken(0, "foo", s, t)
+	testToken(1, "4", s, t)
+	testToken(2, "0.274", s, t)
+	testToken(3, "mUNERA9rI2", s, t)
+	testToken(4, "4C345", s, t)
+	testToken(7, "3", s, t)
+	testToken(9, "159.144.163.226", s, t)
+	testToken(10, "a8f6:236d:b3ef:c41e:4808:d6ed:ecb0:4067", s, t)
+	testToken(11, "2001-10-20 12:00:00.000", s, t)
 
 	choice := -1
+	token := s.Tokens[5]
 	replacement, _ := token.GenReplacement(&choice, now(), now(), randgen)
-	assert.Equal(t, "foo", replacement)
-
-	choice = -1
-	token = s.Tokens[1]
+	assert.Equal(t, "a", replacement)
 	replacement, _ = token.GenReplacement(&choice, now(), now(), randgen)
-	assert.Equal(t, "4", replacement)
-
-	choice = -1
-	token = s.Tokens[2]
-	replacement, _ = token.GenReplacement(&choice, now(), now(), randgen)
-	assert.Equal(t, "0.514", replacement)
-
-	choice = -1
-	token = s.Tokens[3]
-	replacement, _ = token.GenReplacement(&choice, now(), now(), randgen)
-	assert.Equal(t, "NERA9rI2cv", replacement)
-
-	choice = -1
-	token = s.Tokens[4]
-	replacement, _ = token.GenReplacement(&choice, now(), now(), randgen)
-	assert.Equal(t, "56289", replacement)
-
-	choice = -1
-	token = s.Tokens[5]
-	replacement, _ = token.GenReplacement(&choice, now(), now(), randgen)
-	assert.Equal(t, "c", replacement)
-	replacement, _ = token.GenReplacement(&choice, now(), now(), randgen)
-	assert.Equal(t, "c", replacement)
+	assert.Equal(t, "a", replacement)
 
 	token = s.Tokens[6]
 	choices := make(map[int]int)
@@ -68,29 +53,27 @@ func TestGenReplacement(t *testing.T) {
 		_, _ = token.GenReplacement(&choice, now(), now(), randgen)
 		choices[choice] = choices[choice] + 1
 	}
-	if choices[0] != 312 || choices[1] != 572 || choices[2] != 116 {
+	if choices[0] != 316 || choices[1] != 569 || choices[2] != 115 {
 		t.Fatalf("Choice distribution is off: %#v\n", choices)
 	}
-
-	token = s.Tokens[7]
-	replacement, _ = token.GenReplacement(&choice, now(), now(), randgen)
-	assert.Equal(t, "7", replacement)
 
 	token = s.Tokens[8]
 	replacement, _ = token.GenReplacement(&choice, now(), now(), randgen)
 	fmt.Printf("UUID: %s\n", replacement)
+}
 
-	token = s.Tokens[9]
-	replacement, _ = token.GenReplacement(&choice, now(), now(), randgen)
-	assert.Equal(t, "184.226.113.189", replacement)
-
-	token = s.Tokens[10]
-	replacement, _ = token.GenReplacement(&choice, now(), now(), randgen)
-	assert.Equal(t, "c9bb:42d4:abc1:7cea:9f7f:bbb2:caf4:a3ef", replacement)
-
-	token = s.Tokens[11]
-	replacement, _ = token.GenReplacement(&choice, now(), now(), randgen)
-	assert.Equal(t, "2001-10-20 12:00:00,000", replacement)
+func testToken(i int, value string, s *Sample, t *testing.T) {
+	loc, _ := time.LoadLocation("Local")
+	source := rand.NewSource(0)
+	randgen := rand.New(source)
+	n := time.Date(2001, 10, 20, 12, 0, 0, 100000, loc)
+	now := func() time.Time {
+		return n
+	}
+	choice := -1
+	token := s.Tokens[i]
+	replacement, _ := token.GenReplacement(&choice, now(), now(), randgen)
+	assert.Equal(t, value, replacement)
 }
 
 func TestLuaReplacement(t *testing.T) {
@@ -99,42 +82,14 @@ func TestLuaReplacement(t *testing.T) {
 	home := ".."
 	os.Setenv("GOGEN_SAMPLES_DIR", filepath.Join(home, "tests", "tokens", "lua.yml"))
 
-	loc, _ := time.LoadLocation("Local")
-	source := rand.NewSource(0)
-	randgen := rand.New(source)
-
-	n := time.Date(2001, 10, 20, 12, 0, 0, 100000, loc)
-	now := func() time.Time {
-		return n
-	}
-
 	c := NewConfig()
 	s := c.FindSampleByName("lua")
-	token := s.Tokens[0]
 
-	choice := -1
-	replacement, _ := token.GenReplacement(&choice, now(), now(), randgen)
-	assert.Equal(t, "foo", replacement)
-
-	token = s.Tokens[1]
-	choice = -1
-	replacement, _ = token.GenReplacement(&choice, now(), now(), randgen)
-	assert.Equal(t, "3", replacement)
-
-	token = s.Tokens[2]
-	choice = -1
-	replacement, _ = token.GenReplacement(&choice, now(), now(), randgen)
-	assert.Equal(t, "0.945", replacement)
-
-	token = s.Tokens[3]
-	choice = -1
-	replacement, _ = token.GenReplacement(&choice, now(), now(), randgen)
-	assert.Equal(t, "NvofsbSj4", replacement)
-
-	token = s.Tokens[4]
-	choice = -1
-	replacement, _ = token.GenReplacement(&choice, now(), now(), randgen)
-	assert.Equal(t, "4C345", replacement)
+	testToken(0, "foo", s, t)
+	testToken(1, "3", s, t)
+	testToken(2, "0.945", s, t)
+	testToken(3, "NvofsbSj4", s, t)
+	testToken(4, "4C345", s, t)
 }
 
 func BenchmarkGoStatic(b *testing.B)      { benchmarkToken("tokens", 0, b) }

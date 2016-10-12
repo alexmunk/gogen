@@ -88,15 +88,26 @@ func Start(oq chan *config.OutQueueItem, oqs chan int, num int) {
 		if len(item.Events) > 0 {
 			go func() {
 				defer item.IO.W.Close()
-				// We'll crash on empty events, but don't do that!
-				getLine("header", item.S, item.Events[0], item.IO.W)
-				// item.S.Log.Debugf("Out Queue Item %#v", item)
-				var last int
-				for i, line := range item.Events {
-					getLine("row", item.S, line, item.IO.W)
-					last = i
+				switch item.S.Output.OutputTemplate {
+				case "raw":
+					for _, line := range item.Events {
+						_, err := item.IO.W.Write([]byte(line["_raw"]))
+						_, err = item.IO.W.Write([]byte("\n"))
+						if err != nil {
+							item.S.Log.Errorf("Error writing to IO Buffer: %s", err)
+						}
+					}
+				default:
+					// We'll crash on empty events, but don't do that!
+					getLine("header", item.S, item.Events[0], item.IO.W)
+					// item.S.Log.Debugf("Out Queue Item %#v", item)
+					var last int
+					for i, line := range item.Events {
+						getLine("row", item.S, line, item.IO.W)
+						last = i
+					}
+					getLine("footer", item.S, item.Events[last], item.IO.W)
 				}
-				getLine("footer", item.S, item.Events[last], item.IO.W)
 			}()
 			err := out.Send(item)
 			if err != nil {
@@ -115,7 +126,8 @@ func getLine(templatename string, s *config.Sample, line map[string]string, w io
 			return err
 		}
 		// item.S.Log.Debugf("Outputting line %s", linestr)
-		_, err = w.Write([]byte(linestr + "\n"))
+		_, err = w.Write([]byte(linestr))
+		_, err = w.Write([]byte("\n"))
 		if err != nil {
 			s.Log.Errorf("Error sending event for sample '%s' to outputter '%s': %s", s.Name, s.Output.Outputter, err)
 		}

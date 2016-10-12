@@ -77,6 +77,7 @@ func table(l []share.GogenList) {
 func main() {
 	if config.ProfileOn {
 		defer profile.Start(profile.CPUProfile, profile.ProfilePath(".")).Stop()
+		// defer profile.Start(profile.MemProfile, profile.ProfilePath(".")).Stop()
 	}
 	rand.Seed(time.Now().UnixNano())
 
@@ -272,8 +273,9 @@ func main() {
 				l := share.Search(q)
 				if len(l) > 0 {
 					table(l)
+				} else {
+					fmt.Println("   No results found.")
 				}
-				fmt.Println("   No results found.")
 				return nil
 			},
 		},

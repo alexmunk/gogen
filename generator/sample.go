@@ -13,10 +13,10 @@ func (foo sample) Gen(item *config.GenQueueItem) error {
 	if item.Count == -1 {
 		item.Count = len(s.Lines)
 	}
-	s.Log.Debugf("Gen Queue Item %#v", item)
+	// s.Log.Debugf("Gen Queue Item %#v", item)
 	// outstr := []map[string]string{{"_raw": fmt.Sprintf("%#v", item)}}
 
-	s.Log.Debugf("Generating sample '%s' with count %d, et: '%s', lt: '%s'", s.Name, item.Count, item.Earliest, item.Latest)
+	// s.Log.Debugf("Generating sample '%s' with count %d, et: '%s', lt: '%s'", s.Name, item.Count, item.Earliest, item.Latest)
 	// startTime := time.Now()
 
 	slen := len(s.Lines)
@@ -29,7 +29,7 @@ func (foo sample) Gen(item *config.GenQueueItem) error {
 		if s.Events == nil || len(s.Events) != item.Count {
 			events = make([]map[string]string, 0, item.Count)
 			if s.RandomizeEvents {
-				s.Log.Debugf("Random filling events for sample '%s' with %d events", s.Name, item.Count)
+				// s.Log.Debugf("Random filling events for sample '%s' with %d events", s.Name, item.Count)
 
 				for i := 0; i < item.Count; i++ {
 					events = append(events, copyevent(s.Lines[item.Rand.Intn(slen)]))
@@ -41,7 +41,7 @@ func (foo sample) Gen(item *config.GenQueueItem) error {
 					}
 				} else {
 					iters := int(math.Ceil(float64(item.S.Count) / float64(slen)))
-					s.Log.Debugf("Sequentially filling events for sample '%s' of size %d with %d events over %d iterations", s.Name, slen, item.Count, iters)
+					// s.Log.Debugf("Sequentially filling events for sample '%s' of size %d with %d events over %d iterations", s.Name, slen, item.Count, iters)
 					for i := 0; i < iters; i++ {
 						var count int
 						// start := i * slen
@@ -76,7 +76,7 @@ func (foo sample) Gen(item *config.GenQueueItem) error {
 						choice = new(int)
 						*choice = -1
 					}
-					s.Log.Debugf("Replacing token '%s':'%s' with choice %d in fieldval: %s", token.Name, token.Token, *choice, fieldval)
+					// s.Log.Debugf("Replacing token '%s':'%s' with choice %d in fieldval: %s", token.Name, token.Token, *choice, fieldval)
 					if err := token.Replace(&fieldval, choice, item.Earliest, item.Latest, item.Rand); err == nil {
 						events[i][token.Field] = fieldval
 					} else {

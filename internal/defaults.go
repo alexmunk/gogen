@@ -6,7 +6,7 @@ import logging "github.com/op/go-logging"
 const DefaultLoggingLevel = logging.ERROR
 
 // ProfileOn determines whether we should run a CPU profiler for perf optimization
-const ProfileOn = false
+const ProfileOn = true
 
 // Default global values
 const defaultGeneratorWorkers = 1
@@ -19,7 +19,7 @@ const defaultOutputTemplate = "raw"
 const defaultGenerator = "sample"
 const defaultEarliest = "now"
 const defaultLatest = "now"
-const defaultRandomizeEvents = true
+const defaultRandomizeEvents = false
 const defaultField = "_raw"
 
 // Default file output values
