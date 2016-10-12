@@ -15,6 +15,10 @@ func TestLogLevel(t *testing.T) {
 	assert.Equal(t, logging.ERROR, DefaultLoggingLevel)
 }
 
+func TestProfileOff(t *testing.T) {
+	assert.Equal(t, false, ProfileOn)
+}
+
 func TestSingleton(t *testing.T) {
 	os.Setenv("GOGEN_HOME", "..")
 	c := NewConfig()
