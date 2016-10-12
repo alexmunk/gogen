@@ -84,7 +84,7 @@ func TestFlatten(t *testing.T) {
 	// if diff := math.Abs(float64(0.2 - s.RandomizeCount)); diff > 0.000001 {
 	// 	t.Fatalf("RandomizeCount not equal")
 	// }
-	assert.Equal(t, true, s.RandomizeEvents)
+	assert.Equal(t, false, s.RandomizeEvents)
 	assert.Equal(t, 1, s.EndIntervals)
 }
 
