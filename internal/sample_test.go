@@ -127,3 +127,32 @@ func benchmarkToken(conf string, i int, b *testing.B) {
 		_, _ = token.GenReplacement(&choice, now(), now(), randgen)
 	}
 }
+
+func BenchmarkReplacement(b *testing.B) {
+	os.Setenv("GOGEN_HOME", "..")
+	os.Setenv("GOGEN_ALWAYS_REFRESH", "1")
+	home := ".."
+	os.Setenv("GOGEN_SAMPLES_DIR", filepath.Join(home, "tests", "tokens", "token-static.yml"))
+
+	loc, _ := time.LoadLocation("Local")
+	source := rand.NewSource(0)
+	randgen := rand.New(source)
+
+	n := time.Date(2001, 10, 20, 12, 0, 0, 100000, loc)
+	now := func() time.Time {
+		return n
+	}
+
+	c := NewConfig()
+	s := c.FindSampleByName("token-static")
+	t := s.Tokens[0]
+
+	event := "$static$"
+	choice := -1
+
+	for n := 0; n < b.N; n++ {
+		_ = t.Replace(&event, &choice, now(), now(), randgen)
+		event = "$static$"
+		choice = -1
+	}
+}

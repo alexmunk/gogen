@@ -63,7 +63,7 @@ func (foo sample) Gen(item *config.GenQueueItem) error {
 			copy(events, s.Events)
 		}
 
-		s.Log.Debugf("Events: %#v", events)
+		// s.Log.Debugf("Events: %#v", events)
 
 		for i := 0; i < item.Count; i++ {
 			choices := make(map[int]*int)

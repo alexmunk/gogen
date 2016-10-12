@@ -124,10 +124,7 @@ func (t Token) Replace(event *string, choice *int, et time.Time, lt time.Time, r
 			if err != nil {
 				return err
 			}
-			part1 := e[:pos]
-			part2 := e[pos+len(t.Token):]
-			temps := part1 + replacement + part2
-			*event = temps
+			*event = e[:pos] + replacement + e[pos+len(t.Token):]
 		} else {
 			return fmt.Errorf("Token '%s' not found in field '%s' of event '%s'", t.Token, t.Field, *event)
 		}
@@ -142,10 +139,7 @@ func (t Token) Replace(event *string, choice *int, et time.Time, lt time.Time, r
 			if err != nil {
 				return err
 			}
-			part1 := e[:match[2]]
-			part2 := e[match[3]:]
-			temps := part1 + replacement + part2
-			*event = temps
+			*event = e[:match[2]] + replacement + e[match[3]:]
 		} else {
 			return fmt.Errorf("Token '%s' not found in field '%s' of event '%s'", t.Token, t.Field, *event)
 		}
