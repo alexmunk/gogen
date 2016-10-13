@@ -41,10 +41,7 @@ func copybytelist(src [][][]byte) (dst [][][]byte) {
 	dst = make([][][]byte, len(src))
 	for i := range src {
 		dst[i] = make([][]byte, len(src[i]))
-		for j := range src[i] {
-			dst[i][j] = make([]byte, len(src[i][j]))
-			copy(dst[i][j], src[i][j])
-		}
+		copy(dst[i], src[i])
 	}
 	return dst
 }
