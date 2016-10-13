@@ -91,8 +91,8 @@ func Start(oq chan *config.OutQueueItem, oqs chan int, num int) {
 				switch item.S.Output.OutputTemplate {
 				case "raw":
 					for _, line := range item.Events {
-						_, err := item.IO.W.Write([]byte(line["_raw"]))
-						_, err = item.IO.W.Write([]byte("\n"))
+						_, err := io.WriteString(item.IO.W, line["_raw"])
+						_, err = io.WriteString(item.IO.W, "\n")
 						if err != nil {
 							item.S.Log.Errorf("Error writing to IO Buffer: %s", err)
 						}

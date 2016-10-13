@@ -152,7 +152,7 @@ func (t Token) Replace(event *string, choice *int, et time.Time, lt time.Time, r
 func (t Token) GenReplacement(choice *int, et time.Time, lt time.Time, randgen *rand.Rand) (string, error) {
 	c := *choice
 	switch t.Type {
-	case "timestamp":
+	case "timestamp", "gotimestamp":
 		td := lt.Sub(et)
 
 		var tdr int
@@ -161,7 +161,12 @@ func (t Token) GenReplacement(choice *int, et time.Time, lt time.Time, randgen *
 		}
 		rd := time.Duration(tdr)
 		replacementTime := lt.Add(rd * -1)
-		return strftime.Format(t.Replacement, replacementTime), nil
+		switch t.Type {
+		case "timestamp":
+			return strftime.Format(t.Replacement, replacementTime), nil
+		case "gotimestamp":
+			return replacementTime.Format(t.Replacement), nil
+		}
 	case "static":
 		return t.Replacement, nil
 	case "random":

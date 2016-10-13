@@ -38,6 +38,7 @@ func TestGenReplacement(t *testing.T) {
 	testToken(9, "159.144.163.226", s, t)
 	testToken(10, "a8f6:236d:b3ef:c41e:4808:d6ed:ecb0:4067", s, t)
 	testToken(11, "2001-10-20 12:00:00.000", s, t)
+	testToken(12, "2001-10-20 12:00:00.000", s, t)
 
 	choice := -1
 	token := s.Tokens[5]

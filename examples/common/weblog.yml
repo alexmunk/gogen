@@ -12,8 +12,8 @@ tokens:
   - name: ts-dmyhmsms-template
     format: template
     token: $ts$
-    type: timestamp
-    replacement: "%d/%b/%Y %H:%M:%S:%L"
+    type: gotimestamp
+    replacement: "02/Jan/2006 03:04:05"
   - name: host
     format: template
     type: fieldChoice
