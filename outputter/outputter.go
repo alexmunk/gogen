@@ -92,14 +92,22 @@ func Start(oq chan *config.OutQueueItem, oqs chan int, num int) {
 				switch item.S.Output.OutputTemplate {
 				case "raw":
 					for _, line := range item.Events {
-						tempbytes, err := io.WriteString(item.IO.W, line["_raw"])
-						if err != nil {
-							item.S.Log.Errorf("Error writing to IO Buffer: %s", err)
+						var tempbytes int
+						var err error
+						if item.S.Output.Outputter != "devnull" {
+							tempbytes, err = io.WriteString(item.IO.W, line["_raw"])
+							if err != nil {
+								item.S.Log.Errorf("Error writing to IO Buffer: %s", err)
+							}
+						} else {
+							tempbytes = len(line["_raw"])
 						}
 						bytes += int64(tempbytes) + 1
-						_, err = io.WriteString(item.IO.W, "\n")
-						if err != nil {
-							item.S.Log.Errorf("Error writing to IO Buffer: %s", err)
+						if item.S.Output.Outputter != "devnull" {
+							_, err = io.WriteString(item.IO.W, "\n")
+							if err != nil {
+								item.S.Log.Errorf("Error writing to IO Buffer: %s", err)
+							}
 						}
 					}
 				default:
