@@ -13,9 +13,7 @@ func (foo buf) Send(item *config.OutQueueItem) error {
 	if c.Buf.Len() > 0 {
 		_, _ = c.Buf.WriteString("\n")
 	}
-	bytes, err := io.Copy(&c.Buf, item.IO.R)
-
-	Account(int64(len(item.Events)), bytes)
+	_, err := io.Copy(&c.Buf, item.IO.R)
 	return err
 }
 

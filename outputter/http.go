@@ -32,7 +32,6 @@ func (h *httpout) Send(item *config.OutQueueItem) error {
 		return err
 	}
 
-	Account(int64(len(item.Events)), bytes)
 	h.sent += bytes
 	if h.sent > int64(item.S.Output.BufferBytes) {
 		err := h.buf.Flush()

@@ -45,7 +45,6 @@ func (f *file) Send(item *config.OutQueueItem) error {
 	defer f.mutex.Unlock()
 	bytes, err := io.Copy(f.file, item.IO.R)
 
-	Account(int64(len(item.Events)), bytes)
 	f.fileSize += bytes
 	if f.fileSize >= item.S.Output.MaxBytes {
 		item.S.Log.Infof("Reached %d bytes which exceeds MaxBytes for sample '%s', rotating files", f.fileSize, item.S.Name)

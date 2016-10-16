@@ -87,11 +87,16 @@ func Start(oq chan *config.OutQueueItem, oqs chan int, num int) {
 		out = setup(generator, item, num)
 		if len(item.Events) > 0 {
 			go func() {
+				var bytes int64
 				defer item.IO.W.Close()
 				switch item.S.Output.OutputTemplate {
 				case "raw":
 					for _, line := range item.Events {
-						_, err := io.WriteString(item.IO.W, line["_raw"])
+						tempbytes, err := io.WriteString(item.IO.W, line["_raw"])
+						if err != nil {
+							item.S.Log.Errorf("Error writing to IO Buffer: %s", err)
+						}
+						bytes += int64(tempbytes) + 1
 						_, err = io.WriteString(item.IO.W, "\n")
 						if err != nil {
 							item.S.Log.Errorf("Error writing to IO Buffer: %s", err)
@@ -108,6 +113,7 @@ func Start(oq chan *config.OutQueueItem, oqs chan int, num int) {
 					}
 					getLine("footer", item.S, item.Events[last], item.IO.W)
 				}
+				Account(int64(len(item.Events)), bytes)
 			}()
 			err := out.Send(item)
 			if err != nil {

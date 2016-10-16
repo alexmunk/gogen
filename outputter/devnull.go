@@ -10,9 +10,7 @@ import (
 type devnull struct{}
 
 func (foo devnull) Send(item *config.OutQueueItem) error {
-	bytes, err := io.Copy(ioutil.Discard, item.IO.R)
-
-	Account(int64(len(item.Events)), bytes)
+	_, err := io.Copy(ioutil.Discard, item.IO.R)
 	return err
 }
 
