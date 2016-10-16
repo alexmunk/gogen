@@ -1,16 +1,22 @@
 package generator
 
 import (
+	"bytes"
 	"math"
+	"sync"
 
 	"github.com/coccyx/gogen/internal"
-	"github.com/oxtoacart/bpool"
 )
 
-var bp *bpool.BufferPool
+var bp sync.Pool
 
 func init() {
-	bp = bpool.NewBufferPool(100)
+	bp = sync.Pool{
+		New: func() interface{} {
+			bb := bytes.NewBuffer([]byte{})
+			return bb
+		},
+	}
 }
 
 type sample struct{}
@@ -84,13 +90,10 @@ func getBrokenEvent(item *config.GenQueueItem, i int) map[string]string {
 	ret := make(map[string]string, len(s.BrokenLines[i]))
 	choices := make(map[int]*int)
 	for k, v := range s.BrokenLines[i] {
-		// tokens := make([]string, len(v))
-		// var event string
-		event := bp.Get()
+		event := bp.Get().(*bytes.Buffer)
+		event.Reset()
 		for _, st := range v {
 			if st.T == nil {
-				// tokens = append(tokens, st.S)
-				// event += st.S
 				event.WriteString(st.S)
 			} else {
 				var choice *int
@@ -104,8 +107,6 @@ func getBrokenEvent(item *config.GenQueueItem, i int) map[string]string {
 				if err != nil {
 					s.Log.Errorf("Error generating replacement for token '%s' in sample '%s'", st.T.Name, s.Name)
 				}
-				// tokens = append(tokens, replacement)
-				// event += replacement
 				event.WriteString(replacement)
 				if st.T.Group > 0 {
 					choices[st.T.Group] = choice

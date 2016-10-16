@@ -1,6 +1,7 @@
 package outputter
 
 import (
+	"encoding/json"
 	"io"
 	"math/rand"
 	"time"
@@ -90,14 +91,26 @@ func Start(oq chan *config.OutQueueItem, oqs chan int, num int) {
 				var bytes int64
 				defer item.IO.W.Close()
 				switch item.S.Output.OutputTemplate {
-				case "raw":
+				case "raw", "json":
 					for _, line := range item.Events {
 						var tempbytes int
 						var err error
 						if item.S.Output.Outputter != "devnull" {
-							tempbytes, err = io.WriteString(item.IO.W, line["_raw"])
-							if err != nil {
-								item.S.Log.Errorf("Error writing to IO Buffer: %s", err)
+							switch item.S.Output.OutputTemplate {
+							case "raw":
+								tempbytes, err = io.WriteString(item.IO.W, line["_raw"])
+								if err != nil {
+									item.S.Log.Errorf("Error writing to IO Buffer: %s", err)
+								}
+							case "json":
+								jb, err := json.Marshal(line)
+								if err != nil {
+									item.S.Log.Errorf("Error marshaling json: %s", err)
+								}
+								tempbytes, err = item.IO.W.Write(jb)
+								if err != nil {
+									item.S.Log.Errorf("Error writing to IO Buffer: %s", err)
+								}
 							}
 						} else {
 							tempbytes = len(line["_raw"])
@@ -112,14 +125,14 @@ func Start(oq chan *config.OutQueueItem, oqs chan int, num int) {
 					}
 				default:
 					// We'll crash on empty events, but don't do that!
-					getLine("header", item.S, item.Events[0], item.IO.W)
+					bytes += int64(getLine("header", item.S, item.Events[0], item.IO.W))
 					// item.S.Log.Debugf("Out Queue Item %#v", item)
 					var last int
 					for i, line := range item.Events {
-						getLine("row", item.S, line, item.IO.W)
+						bytes += int64(getLine("row", item.S, line, item.IO.W))
 						last = i
 					}
-					getLine("footer", item.S, item.Events[last], item.IO.W)
+					bytes += int64(getLine("footer", item.S, item.Events[last], item.IO.W))
 				}
 				Account(int64(len(item.Events)), bytes)
 			}()
@@ -132,21 +145,20 @@ func Start(oq chan *config.OutQueueItem, oqs chan int, num int) {
 	}
 }
 
-func getLine(templatename string, s *config.Sample, line map[string]string, w io.Writer) error {
+func getLine(templatename string, s *config.Sample, line map[string]string, w io.Writer) (bytes int) {
 	if template.Exists(s.Output.OutputTemplate + "_" + templatename) {
 		linestr, err := template.Exec(s.Output.OutputTemplate+"_"+templatename, line)
 		if err != nil {
 			s.Log.Errorf("Error from sample '%s' in template execution: %v", s.Name, err)
-			return err
 		}
 		// item.S.Log.Debugf("Outputting line %s", linestr)
-		_, err = w.Write([]byte(linestr))
+		bytes, err = w.Write([]byte(linestr))
 		_, err = w.Write([]byte("\n"))
 		if err != nil {
 			s.Log.Errorf("Error sending event for sample '%s' to outputter '%s': %s", s.Name, s.Output.Outputter, err)
 		}
 	}
-	return nil
+	return bytes
 }
 
 func setup(generator *rand.Rand, item *config.OutQueueItem, num int) config.Outputter {

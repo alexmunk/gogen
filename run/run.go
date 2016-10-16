@@ -12,7 +12,7 @@ import (
 // ROT reads out data every ROTInterval seconds
 func ROT(c *config.Config, gq chan *config.GenQueueItem, oq chan *config.OutQueueItem) {
 	for {
-		timer := time.NewTimer(time.Duration(c.Global.ROTInterval) * time.Second)
+		timer := time.NewTimer(time.Duration(c.Global.ROTInterval) * time.Second * 5)
 		<-timer.C
 		c.Log.Infof("Generator Queue: %d Output Queue: %d", len(gq), len(oq))
 	}
