@@ -1,1 +1,3 @@
 name: flatten
+lines:
+- "_raw": foo

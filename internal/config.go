@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"sort"
 	"sync"
 	"time"
 
@@ -389,6 +390,10 @@ func (c *Config) validate(s *Sample) {
 		if len(s.Name) == 0 {
 			s.Disabled = true
 			s.realSample = false
+		} else if len(s.Lines) == 0 {
+			s.Disabled = true
+			s.realSample = false
+			c.Log.Errorf("Disabling sample '%s', no lines in sample", s.Name)
 		} else {
 			s.realSample = true
 		}
@@ -537,6 +542,109 @@ func (c *Config) validate(s *Sample) {
 						s.Log.Errorf("Source field '%s' does not exist for token '%s' in row '%#v' in sample '%s', disabling Sample", t.SrcField, t.Name, choice, s.Name)
 						s.Disabled = true
 						break
+					}
+				}
+			}
+		}
+
+		if !s.Disabled {
+			s.SinglePass = true
+
+			var tlines []map[string]tokenspos
+
+		outer:
+			for _, l := range s.Lines {
+				tp := make(map[string]tokenspos)
+				for j, t := range s.Tokens {
+					// tokenpos 0 first char, 1 last char, 2 token #
+					var pos tokenpos
+					var err error
+					pos1, pos2, err := t.GetReplacementOffsets(l[t.Field])
+					if err != nil {
+						s.Log.Infof("Error getting replacements for token '%s' in event '%s', disabling SinglePass: %s", t.Token, l[t.Field], err)
+						s.SinglePass = false
+						break outer
+					}
+					if pos1 < 0 || pos2 < 0 {
+						s.Log.Infof("Token '%s' not found in event '%s', disabling SinglePass", t.Name, l)
+						s.SinglePass = false
+						break outer
+					}
+					pos.Pos1 = pos1
+					pos.Pos2 = pos2
+					pos.Token = j
+					tp[t.Field] = append(tp[t.Field], pos)
+				}
+
+				for _, v := range tp {
+					sort.Sort(v)
+
+					lastpos := 0
+					lasttoken := ""
+					maxpos := 0
+					for _, pos := range v {
+						// Does the beginning of this token overlap with the end of the last?
+						if lastpos > pos.Pos1 {
+							s.Log.Infof("Token '%s' extends beyond beginning of token '%s', disabling SinglePass", lasttoken, s.Tokens[pos.Token].Name)
+							s.SinglePass = false
+							break outer
+						}
+						// Does the beginning of this token happen before the max we've seen a token before?
+						if maxpos > pos.Pos1 {
+							s.Log.Infof("Some former token extends beyond the beginning of token '%s', disabling SinglePass", s.Tokens[pos.Token].Name)
+							s.SinglePass = false
+							break outer
+						}
+						if pos.Pos2 > maxpos {
+							maxpos = pos.Pos2
+						}
+						lastpos = pos.Pos2
+						lasttoken = s.Tokens[pos.Token].Name
+					}
+				}
+				tlines = append(tlines, tp)
+			}
+
+			if s.SinglePass {
+
+				// Now loop through each line and each field, breaking it up according to the positions of the tokens
+				for i, line := range s.Lines {
+					if len(tlines) >= i && len(tlines) > 0 {
+						bline := make(map[string][]StringOrToken)
+						for field := range line {
+							var bfield []StringOrToken
+							// Field doesn't exist because no tokens hit that field
+							if _, ok := tlines[i][field]; !ok {
+								bf := StringOrToken{T: nil, S: line[field]}
+								bfield = append(bfield, bf)
+							} else {
+								lastpos := 0
+								// Here, we need to iterate through all the tokens and add StringOrToken for each match
+								// Make sure we check for a token a pos 0, we'll put a token first
+								for _, tp := range tlines[i][field] {
+									if tp.Pos1 == 0 {
+										bf := StringOrToken{T: &s.Tokens[tp.Token], S: ""}
+										bfield = append(bfield, bf)
+										lastpos = tp.Pos2
+									} else {
+										// Add string from end of last token to the beginning of this one
+										bf := StringOrToken{T: nil, S: s.Lines[i][field][lastpos:tp.Pos1]}
+										bfield = append(bfield, bf)
+										// Add this token
+										bf = StringOrToken{T: &s.Tokens[tp.Token], S: ""}
+										bfield = append(bfield, bf)
+										lastpos = tp.Pos2
+									}
+								}
+								// Add the last string if the last token didn't cover to the end of the string
+								if lastpos < len(s.Lines[i][field]) {
+									bf := StringOrToken{T: nil, S: s.Lines[i][field][lastpos:]}
+									bfield = append(bfield, bf)
+								}
+							}
+							bline[field] = bfield
+						}
+						s.BrokenLines = append(s.BrokenLines, bline)
 					}
 				}
 			}

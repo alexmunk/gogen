@@ -1,0 +1,24 @@
+name: wide-regex
+tokens:
+  - name: regex1
+    type: static
+    replacement: bar
+    format: regex
+    token: (foo)
+  - name: regex2
+    type: static
+    replacement: bar
+    format: regex
+    token: (replaceme)
+  - name: wide-regex
+    type: static
+    replacement: bar
+    format: regex
+    token: "(replaceme baz)"
+  - name: regex2
+    type: static
+    replacement: foo
+    format: regex
+    token: "(baz)"
+lines:
+- "_raw": foo replaceme baz

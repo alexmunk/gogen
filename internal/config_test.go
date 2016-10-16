@@ -116,11 +116,37 @@ func TestValidate(t *testing.T) {
 		"validate-fieldchoice-badfield",
 		"validate-badrandom",
 		"validate-earliest-latest",
+		"validate-nolines",
 	}
 	for _, v := range checks {
 		s = FindSampleInFile(home, v)
 		assert.Nil(t, s, "%s not nil", v)
 	}
+}
+
+func TestSinglePass(t *testing.T) {
+	// Setup environment
+	os.Setenv("GOGEN_HOME", "..")
+	os.Setenv("GOGEN_ALWAYS_REFRESH", "1")
+	home := filepath.Join("..", "tests", "singlepass")
+	rand.Seed(0)
+
+	checks := []string{
+		"missed-regex",
+		"overlapping-regex",
+		"wide-regex",
+	}
+	for _, v := range checks {
+		s := FindSampleInFile(home, v)
+		assert.False(t, s.SinglePass)
+	}
+
+	s := FindSampleInFile(home, "test1")
+	assert.True(t, s.SinglePass)
+	assert.Len(t, s.BrokenLines[0]["otherfield"], 1)
+	assert.Len(t, s.BrokenLines[0]["_raw"], 6)
+	assert.Len(t, s.BrokenLines[1]["transtype"], 2)
+	assert.Len(t, s.BrokenLines[1]["_raw"], 6)
 }
 
 func FindSampleInFile(home string, name string) *Sample {

@@ -1,0 +1,7 @@
+name: validate-nolines
+tokens:
+  - name: static
+    type: static
+    replacement: foo
+    format: template
+    token: $static$

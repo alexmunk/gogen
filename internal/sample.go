@@ -41,20 +41,21 @@ type Sample struct {
 	Lines           []map[string]string `json:"lines,omitempty"`
 	Field           string              `json:"field,omitempty"`
 	FromSample      string              `json:"fromSample,omitempty"`
+	SinglePass      bool                `json:"singlepass,omitempty"`
 
 	// Internal use variables
-	Log            *logging.Logger     `json:"-"`
-	Gen            Generator           `json:"-"`
-	Out            Outputter           `json:"-"`
-	Output         *Output             `json:"-"`
-	EarliestParsed time.Duration       `json:"-"`
-	LatestParsed   time.Duration       `json:"-"`
-	BeginParsed    time.Time           `json:"-"`
-	EndParsed      time.Time           `json:"-"`
-	Current        time.Time           `json:"-"` // If we are backfilling or generating for a specified time window, what time is it?
-	Realtime       bool                `json:"-"` // Are we done doing batch backfill or specified time window?
-	Events         []map[string]string `json:"-"`
-	realSample     bool                // Used to represent samples which aren't just used to store lines from CSV or raw
+	Log            *logging.Logger              `json:"-"`
+	Gen            Generator                    `json:"-"`
+	Out            Outputter                    `json:"-"`
+	Output         *Output                      `json:"-"`
+	EarliestParsed time.Duration                `json:"-"`
+	LatestParsed   time.Duration                `json:"-"`
+	BeginParsed    time.Time                    `json:"-"`
+	EndParsed      time.Time                    `json:"-"`
+	Current        time.Time                    `json:"-"` // If we are backfilling or generating for a specified time window, what time is it?
+	Realtime       bool                         `json:"-"` // Are we done doing batch backfill or specified time window?
+	BrokenLines    []map[string][]StringOrToken `json:"-"`
+	realSample     bool                         // Used to represent samples which aren't just used to store lines from CSV or raw
 }
 
 // Clock allows for implementers to keep track of their own view
@@ -108,6 +109,23 @@ type WeightedChoice struct {
 	Choice string `json:"choice"`
 }
 
+type tokenpos struct {
+	Pos1  int
+	Pos2  int
+	Token int
+}
+
+type tokenspos []tokenpos
+
+func (tp tokenspos) Len() int           { return len(tp) }
+func (tp tokenspos) Less(i, j int) bool { return tp[i].Pos1 < tp[j].Pos2 }
+func (tp tokenspos) Swap(i, j int)      { tp[i], tp[j] = tp[j], tp[i] }
+
+type StringOrToken struct {
+	S string
+	T *Token
+}
+
 // Replace replaces any instances of this token in the string pointed to by event.  Since time is native is Gogen, we can pass in
 // earliest and latest time ranges to generate the event between.  Lastly, some times we want to span a selected choice over multiple
 // tokens.  Passing in a pointer to choice allows the replacement to choose a preselected row in FieldChoice or Choice.
@@ -115,36 +133,36 @@ func (t Token) Replace(event *string, choice *int, et time.Time, lt time.Time, r
 	// s := t.Sample
 	e := *event
 
+	if pos1, pos2, err := t.GetReplacementOffsets(*event); err != nil {
+		return err
+	} else {
+		replacement, err := t.GenReplacement(choice, et, lt, randgen)
+		if err != nil {
+			return err
+		}
+		*event = e[:pos1] + replacement + e[pos2:]
+		return nil
+	}
+}
+
+// GetReplacementOffsets returns the beginning and end of a token inside an event string
+func (t Token) GetReplacementOffsets(event string) (int, int, error) {
 	switch t.Format {
-	// TODO Replacing template tokens one by one is inefficient, but test to see how inefficient before optimizing
-	// TODO Simplify... replacement is slicing up string whether regex or template, unify the code between execution paths
 	case "template":
-		if pos := strings.Index(e, t.Token); pos >= 0 {
-			replacement, err := t.GenReplacement(choice, et, lt, randgen)
-			if err != nil {
-				return err
-			}
-			*event = e[:pos] + replacement + e[pos+len(t.Token):]
-		} else {
-			return fmt.Errorf("Token '%s' not found in field '%s' of event '%s'", t.Token, t.Field, *event)
+		if pos := strings.Index(event, t.Token); pos >= 0 {
+			return pos, pos + len(t.Token), nil
 		}
 	case "regex":
 		re, err := regexp.Compile(t.Token)
 		if err != nil {
-			return err
+			return -1, -1, err
 		}
-		match := re.FindStringSubmatchIndex(e)
+		match := re.FindStringSubmatchIndex(event)
 		if match != nil && len(match) >= 4 {
-			replacement, err := t.GenReplacement(choice, et, lt, randgen)
-			if err != nil {
-				return err
-			}
-			*event = e[:match[2]] + replacement + e[match[3]:]
-		} else {
-			return fmt.Errorf("Token '%s' not found in field '%s' of event '%s'", t.Token, t.Field, *event)
+			return match[2], match[3], nil
 		}
 	}
-	return nil
+	return -1, -1, fmt.Errorf("Token '%s' not found in field '%s' of event '%s'", t.Token, t.Field, event)
 }
 
 // GenReplacement generates a replacement value for the token.  choice allows the user to specify

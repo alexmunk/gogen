@@ -1,0 +1,14 @@
+name: missed-regex
+tokens:
+  - name: regex1
+    type: static
+    replacement: foo
+    format: regex
+    token: "^foo (\\w+)"
+  - name: regex2
+    type: static
+    replacement: bar
+    format: regex
+    token: "^foo foo (\\w+)"
+lines:
+- "_raw": foo replaceme baz

@@ -47,3 +47,5 @@ tokens:
             ret = ret..string.sub(randstring, randchar, randchar)
         end
         return ret
+lines:
+- "_raw": foo
