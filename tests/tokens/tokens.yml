@@ -64,7 +64,7 @@ tokens:
     replacement: ipv6
   - name: timestamp
     type: timestamp
-    replacement: "%Y-%m-%d %H:%M:%S%L"
+    replacement: "%Y-%m-%d %H:%M:%S.%L"
   - name: gotimestamp
     type: gotimestamp
     replacement: "2006-01-02 03:04:05.000"

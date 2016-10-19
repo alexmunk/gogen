@@ -58,7 +58,7 @@ func TestHTTPOutput(t *testing.T) {
 	c := NewConfig()
 
 	headers := map[string]string{"Authorization": "Splunk 00112233-4455-6677-8899-AABBCCDDEEFF"}
-	endpoints := []string{"http://requestb.in/18yarph1"}
+	endpoints := []string{"http://requestb.in/1hi5xoa1"}
 	de := reflect.DeepEqual(headers, c.Global.Output.Headers)
 	assert.True(t, de, "Headers do not match: %#v vs %#v", headers, c.Global.Output.Headers)
 	de = reflect.DeepEqual(endpoints, c.Global.Output.Endpoints)
