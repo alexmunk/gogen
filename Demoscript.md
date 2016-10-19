@@ -1,6 +1,8 @@
 cd /tmp
 wget https://api.gogen.io/osx/gogen
+chmod 755 ./gogen
 ./gogen -c coccyx/weblog
+./gogen search weblog
 ./gogen pull -d coccyx/weblog .
 less samples/weblog.json
 ./gogen info coccyx/weblog

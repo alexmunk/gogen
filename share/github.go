@@ -13,6 +13,7 @@ import (
 	"github.com/skratchdot/open-golang/open"
 
 	config "github.com/coccyx/gogen/internal"
+	log "github.com/coccyx/gogen/logger"
 	"github.com/google/go-github/github"
 	"golang.org/x/oauth2"
 	githuboauth "golang.org/x/oauth2/github"
@@ -52,7 +53,7 @@ func (gh *GitHub) Push(name string) *github.Gist {
 	var outbs *string
 	var err error
 	if outb, err = json.MarshalIndent(gh.c, "", "  "); err != nil {
-		gh.c.Log.Fatalf("Cannot Marshal c.Global, err: %s", err)
+		log.Fatalf("Cannot Marshal c.Global, err: %s", err)
 	}
 	outbs = new(string)
 	*outbs = string(outb)
@@ -68,17 +69,17 @@ func (gh *GitHub) Push(name string) *github.Gist {
 	foundgist = gh.findgist(name)
 
 	if foundgist != nil {
-		gh.c.Log.Debugf("Found gist, updating")
+		log.Debugf("Found gist, updating")
 		updatedgist, _, err := gh.client.Gists.Edit(*foundgist.ID, gist)
 		if err != nil {
-			gh.c.Log.Fatalf("Error updating gist %# v: %s", pretty.Formatter(gist), err)
+			log.Fatalf("Error updating gist %# v: %s", pretty.Formatter(gist), err)
 		}
 		return updatedgist
 	}
-	gh.c.Log.Debugf("Gist not found, creating")
+	log.Debugf("Gist not found, creating")
 	newgist, _, err := gh.client.Gists.Create(gist)
 	if err != nil {
-		gh.c.Log.Fatalf("Error creating gist %# v: %s", pretty.Formatter(gist), err)
+		log.Fatalf("Error creating gist %# v: %s", pretty.Formatter(gist), err)
 	}
 	return newgist
 }
@@ -88,7 +89,7 @@ func (gh *GitHub) Pull(name string) *github.Gist {
 	var gist *github.Gist
 	gist = gh.findgist(name)
 	if gist == nil {
-		gh.c.Log.Fatalf("Error finding gist %s", name+".json")
+		log.Fatalf("Error finding gist %s", name+".json")
 	}
 	return gist
 }
@@ -96,12 +97,12 @@ func (gh *GitHub) Pull(name string) *github.Gist {
 func (gh *GitHub) findgist(name string) (foundgist *github.Gist) {
 	gists, _, err := gh.client.Gists.List("", nil)
 	if err != nil {
-		gh.c.Log.Fatalf("Cannot pull Gists list: %s", err)
+		log.Fatalf("Cannot pull Gists list: %s", err)
 	}
 findgist:
 	for _, testgist := range gists {
 		for _, gistfile := range testgist.Files {
-			gh.c.Log.Debugf("Testing %s if match %s", *gistfile.Filename, name+".json")
+			log.Debugf("Testing %s if match %s", *gistfile.Filename, name+".json")
 			if *gistfile.Filename == name+".json" {
 				foundgist = testgist
 				break findgist
@@ -130,24 +131,24 @@ func NewGitHub(requireauth bool) *GitHub {
 	if err == nil {
 		buf, err := ioutil.ReadFile(tokenFile)
 		if err != nil {
-			c.Log.Fatalf("Error reading from file %s: %s", tokenFile, err)
+			log.Fatalf("Error reading from file %s: %s", tokenFile, err)
 		}
 		gh.token = string(buf)
-		c.Log.Debugf("Getting GitHub token '%s' from file", gh.token)
+		log.Debugf("Getting GitHub token '%s' from file", gh.token)
 	} else if requireauth {
 		if !os.IsNotExist(err) {
-			c.Log.Fatalf("Unexpected error accessing %s: %s", tokenFile, err)
+			log.Fatalf("Unexpected error accessing %s: %s", tokenFile, err)
 		}
 		http.HandleFunc("/GitHubLogin", gh.handleGitHubLogin)
 		open.Run("http://localhost:46436/GitHubLogin")
 		http.HandleFunc("/GitHubCallback", gh.handleGitHubCallback)
 		go http.ListenAndServe(":46436", nil)
 		<-gh.done
-		c.Log.Debugf("Getting GitHub token '%s' from oauth", gh.token)
+		log.Debugf("Getting GitHub token '%s' from oauth", gh.token)
 
 		err = ioutil.WriteFile(tokenFile, []byte(gh.token), 400)
 		if err != nil {
-			c.Log.Fatalf("Error writing token to file %s: %s", tokenFile, err)
+			log.Fatalf("Error writing token to file %s: %s", tokenFile, err)
 		}
 	}
 	if len(gh.token) > 0 {
@@ -168,10 +169,9 @@ func (gh *GitHub) handleGitHubLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func (gh *GitHub) handleGitHubCallback(w http.ResponseWriter, r *http.Request) {
-	c := config.NewConfig()
 	state := r.FormValue("state")
 	if state != oauthStateString {
-		c.Log.Errorf("invalid oauth state, expected '%s', got '%s'\n", oauthStateString, state)
+		log.Errorf("invalid oauth state, expected '%s', got '%s'\n", oauthStateString, state)
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
@@ -179,7 +179,7 @@ func (gh *GitHub) handleGitHubCallback(w http.ResponseWriter, r *http.Request) {
 	code := r.FormValue("code")
 	token, err := oauthConf.Exchange(oauth2.NoContext, code)
 	if err != nil {
-		c.Log.Errorf("Code exchange failed with '%s'\n", err)
+		log.Errorf("Code exchange failed with '%s'\n", err)
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
 	}

@@ -13,10 +13,10 @@ import (
 	"sync"
 	"time"
 
+	log "github.com/coccyx/gogen/logger"
 	"github.com/coccyx/gogen/template"
 	"github.com/coccyx/timeparser"
 	"github.com/ghodss/yaml"
-	"github.com/op/go-logging"
 	lua "github.com/yuin/gopher-lua"
 )
 
@@ -29,9 +29,8 @@ type Config struct {
 	initialized bool
 
 	// Exported but internal use variables
-	Log      *logging.Logger `json:"-"`
-	Timezone *time.Location  `json:"-"`
-	Buf      bytes.Buffer    `json:"-"`
+	Timezone *time.Location `json:"-"`
+	Buf      bytes.Buffer   `json:"-"`
 }
 
 // Global represents global configuration options which apply to all of gogen
@@ -61,11 +60,8 @@ var instance *Config
 var once sync.Once
 
 func getConfig() *Config {
-	// once.Do(func() {
-	// 	instance = &Config{Log: logging.MustGetLogger("gogen"), initialized: false}
-	// })
 	if instance == nil {
-		instance = &Config{Log: logging.MustGetLogger("gogen"), initialized: false}
+		instance = &Config{initialized: false}
 	}
 	return instance
 }
@@ -90,42 +86,41 @@ func NewConfig() *Config {
 			return c
 		}
 	} else {
-		c = &Config{Log: logging.MustGetLogger("gogen"), initialized: false}
-		c.Log.Debugf("Always refresh on, using fresh config")
+		c = &Config{initialized: false}
+		log.Debugf("Always refresh on, using fresh config")
 	}
 
-	c.SetLoggingLevel(DefaultLoggingLevel)
 	// Setup timezone
 	c.Timezone, _ = time.LoadLocation("Local")
 
 	home := os.Getenv("GOGEN_HOME")
 	if len(home) == 0 {
-		c.Log.Debug("GOGEN_HOME not set, setting to '.'")
+		log.Debug("GOGEN_HOME not set, setting to '.'")
 		home = "."
 		os.Setenv("GOGEN_HOME", home)
 	}
-	c.Log.Debugf("Home: %v\n", home)
+	log.Debugf("Home: %v\n", home)
 
 	samplesDir := os.Getenv("GOGEN_SAMPLES_DIR")
 	if len(samplesDir) == 0 {
 		samplesDir = filepath.Join(home, "config", "samples")
-		c.Log.Debugf("GOGEN_SAMPLES_DIR not set, setting to '%s'", samplesDir)
+		log.Debugf("GOGEN_SAMPLES_DIR not set, setting to '%s'", samplesDir)
 	}
 
 	fullConfig := os.Getenv("GOGEN_FULLCONFIG")
 	if len(fullConfig) > 0 {
 		if fullConfig[0:4] == "http" {
-			c.Log.Infof("Fetching config from '%s'", fullConfig)
+			log.Infof("Fetching config from '%s'", fullConfig)
 			if err := c.parseWebConfig(&c, fullConfig); err != nil {
-				c.Log.Panic(err)
+				log.Panic(err)
 			}
 		} else {
 			_, err := os.Stat(fullConfig)
 			if err != nil {
-				c.Log.Fatalf("Cannot stat file %s", fullConfig)
+				log.Fatalf("Cannot stat file %s", fullConfig)
 			}
 			if err := c.parseFileConfig(&c, fullConfig); err != nil {
-				c.Log.Panic(err)
+				log.Panic(err)
 			}
 			if filepath.Dir(fullConfig) != "." {
 				c.Global.SamplesDir = append(c.Global.SamplesDir, filepath.Dir(fullConfig))
@@ -138,14 +133,10 @@ func NewConfig() *Config {
 		globalFile := os.Getenv("GOGEN_GLOBAL")
 		if len(globalFile) > 0 {
 			if err := c.parseFileConfig(&c.Global, globalFile); err != nil {
-				c.Log.Panic(err)
+				log.Panic(err)
 			}
 		}
 	}
-	if c.Global.Debug {
-		c.SetLoggingLevel(logging.DEBUG)
-	}
-
 	// Don't set defaults if we're exporting
 	if os.Getenv("GOGEN_EXPORT") != "1" {
 		//
@@ -210,7 +201,7 @@ func NewConfig() *Config {
 			t := new(Template)
 
 			if err := c.parseFileConfig(&t, innerPath); err != nil {
-				c.Log.Errorf("Error parsing config %s: %s", innerPath, err)
+				log.Errorf("Error parsing config %s: %s", innerPath, err)
 				return err
 			}
 
@@ -227,7 +218,7 @@ func NewConfig() *Config {
 
 	// Configuration allows for finding additional samples directories and reading them
 	for _, sd := range c.Global.SamplesDir {
-		c.Log.Debugf("Reading samplesDir from Global SamplesDir: %s", sd)
+		log.Debugf("Reading samplesDir from Global SamplesDir: %s", sd)
 		c.readSamplesDir(sd)
 	}
 
@@ -236,7 +227,7 @@ func NewConfig() *Config {
 		if len(c.Samples[i].FromSample) > 0 {
 			for j := 0; j < len(c.Samples); j++ {
 				if c.Samples[j].Name == c.Samples[i].FromSample {
-					c.Log.Debugf("Copying sample '%s' to sample '%s' because fromSample set", c.Samples[j].Name, c.Samples[i].Name)
+					log.Debugf("Copying sample '%s' to sample '%s' because fromSample set", c.Samples[j].Name, c.Samples[i].Name)
 					tempname := c.Samples[i].Name
 					tempcount := c.Samples[i].Count
 					tempinterval := c.Samples[i].Interval
@@ -287,19 +278,6 @@ func NewConfig() *Config {
 	return c
 }
 
-// SetLoggingLevel sets the logging level for everyone
-func (c *Config) SetLoggingLevel(level logging.Level) {
-	backend := logging.NewLogBackend(os.Stderr, "", 0)
-	format := logging.MustStringFormatter(
-		`%{color:bold}%{time} %{shortfunc} %{color:%{level:.1s}%{color:reset} %{message}`,
-	)
-	backendFormatter := logging.NewBackendFormatter(backend, format)
-	backendLeveled := logging.AddModuleLevel(backendFormatter)
-	backendLeveled.SetLevel(level, "")
-
-	logging.SetBackend(backendLeveled)
-}
-
 func (c *Config) readSamplesDir(samplesDir string) {
 	// Read all flat file samples
 	acceptableExtensions := map[string]bool{".sample": true}
@@ -310,7 +288,7 @@ func (c *Config) readSamplesDir(samplesDir string) {
 
 		file, err := os.Open(innerPath)
 		if err != nil {
-			c.Log.Errorf("Error reading sample file '%s': %s", innerPath, err)
+			log.Errorf("Error reading sample file '%s': %s", innerPath, err)
 			return nil
 		}
 		defer file.Close()
@@ -338,18 +316,18 @@ func (c *Config) readSamplesDir(samplesDir string) {
 
 		file, err := os.Open(innerPath)
 		if err != nil {
-			c.Log.Errorf("Error reading sample file '%s': %s", innerPath, err)
+			log.Errorf("Error reading sample file '%s': %s", innerPath, err)
 			return nil
 		}
 		defer file.Close()
 
 		reader := csv.NewReader(file)
 		if fields, err = reader.Read(); err != nil {
-			c.Log.Errorf("Error parsing header row of sample file '%s' as csv: %s", innerPath, err)
+			log.Errorf("Error parsing header row of sample file '%s' as csv: %s", innerPath, err)
 			return nil
 		}
 		if rows, err = reader.ReadAll(); err != nil {
-			c.Log.Errorf("Error parsing sample file '%s' as csv: %s", innerPath, err)
+			log.Errorf("Error parsing sample file '%s' as csv: %s", innerPath, err)
 			return nil
 		}
 		for _, row := range rows {
@@ -368,7 +346,7 @@ func (c *Config) readSamplesDir(samplesDir string) {
 	c.walkPath(samplesDir, acceptableExtensions, func(innerPath string) error {
 		s := Sample{}
 		if err := c.parseFileConfig(&s, innerPath); err != nil {
-			c.Log.Errorf("Error parsing config %s: %s", innerPath, err)
+			log.Errorf("Error parsing config %s: %s", innerPath, err)
 			return nil
 		}
 		s.realSample = true
@@ -393,13 +371,10 @@ func (c *Config) validate(s *Sample) {
 		} else if len(s.Lines) == 0 {
 			s.Disabled = true
 			s.realSample = false
-			c.Log.Errorf("Disabling sample '%s', no lines in sample", s.Name)
+			log.Errorf("Disabling sample '%s', no lines in sample", s.Name)
 		} else {
 			s.realSample = true
 		}
-
-		// Give us a logger we can use elsewhere
-		s.Log = c.Log
 
 		// Put the output into the sample for convenience
 		s.Output = &c.Global.Output
@@ -432,19 +407,19 @@ func (c *Config) validate(s *Sample) {
 			return n
 		}
 		if p, err := timeparser.TimeParserNow(s.Earliest, now); err != nil {
-			c.Log.Errorf("Error parsing earliest time '%s' for sample '%s', using Now", s.Earliest, s.Name)
+			log.Errorf("Error parsing earliest time '%s' for sample '%s', using Now", s.Earliest, s.Name)
 			s.EarliestParsed = time.Duration(0)
 		} else {
 			s.EarliestParsed = n.Sub(p) * -1
 		}
 		if p, err := timeparser.TimeParserNow(s.Latest, now); err != nil {
-			c.Log.Errorf("Error parsing latest time '%s' for sample '%s', using Now", s.Latest, s.Name)
+			log.Errorf("Error parsing latest time '%s' for sample '%s', using Now", s.Latest, s.Name)
 			s.LatestParsed = time.Duration(0)
 		} else {
 			s.LatestParsed = n.Sub(p) * -1
 		}
 
-		// c.Log.Debugf("Resolving '%s'", s.Name)
+		// log.Debugf("Resolving '%s'", s.Name)
 		for i := 0; i < len(s.Tokens); i++ {
 			if s.Tokens[i].Field == "" {
 				s.Tokens[i].Field = s.Field
@@ -453,12 +428,12 @@ func (c *Config) validate(s *Sample) {
 			if s.Tokens[i].Format == "template" && s.Tokens[i].Token == "" {
 				s.Tokens[i].Token = "$" + s.Tokens[i].Name + "$"
 			}
-			// c.Log.Debugf("Resolving token '%s' for sample '%s'", s.Tokens[i].Name, s.Name)
+			// log.Debugf("Resolving token '%s' for sample '%s'", s.Tokens[i].Name, s.Name)
 			for j := 0; j < len(c.Samples); j++ {
 				s.Tokens[i].Parent = s
 				s.Tokens[i].luaState = new(lua.LTable)
 				if s.Tokens[i].SampleString == c.Samples[j].Name {
-					c.Log.Debugf("Resolving sample '%s' for token '%s'", c.Samples[j].Name, s.Tokens[i].Name)
+					log.Debugf("Resolving sample '%s' for token '%s'", c.Samples[j].Name, s.Tokens[i].Name)
 					s.Tokens[i].Sample = c.Samples[j]
 					// See if a field exists other than _raw, if so, FieldChoice
 					otherfield := false
@@ -491,13 +466,13 @@ func (c *Config) validate(s *Sample) {
 
 		// Begin Validation logic
 		if s.EarliestParsed > s.LatestParsed {
-			s.Log.Errorf("Earliest time cannot be greater than latest for sample '%s', disabling Sample", s.Name)
+			log.Errorf("Earliest time cannot be greater than latest for sample '%s', disabling Sample", s.Name)
 			s.Disabled = true
 			return
 		}
 		// If no interval is set, generate one time and exit
 		if s.Interval == 0 {
-			s.Log.Infof("No interval set for sample '%s', setting endIntervals to 1", s.Name)
+			log.Infof("No interval set for sample '%s', setting endIntervals to 1", s.Name)
 			s.EndIntervals = 1
 		}
 		for _, t := range s.Tokens {
@@ -505,41 +480,41 @@ func (c *Config) validate(s *Sample) {
 			case "random", "rated":
 				if t.Replacement == "int" || t.Replacement == "float" {
 					if t.Lower > t.Upper {
-						s.Log.Errorf("Lower cannot be greater than Upper for token '%s' in sample '%s', disabling Sample", t.Name, s.Name)
+						log.Errorf("Lower cannot be greater than Upper for token '%s' in sample '%s', disabling Sample", t.Name, s.Name)
 						s.Disabled = true
 					} else if t.Upper == 0 {
-						s.Log.Errorf("Upper cannot be zero for token '%s' in sample '%s', disabling Sample", t.Name, s.Name)
+						log.Errorf("Upper cannot be zero for token '%s' in sample '%s', disabling Sample", t.Name, s.Name)
 						s.Disabled = true
 					}
 				} else if t.Replacement == "string" || t.Replacement == "hex" {
 					if t.Length == 0 {
-						s.Log.Errorf("Length cannot be zero for token '%s' in sample '%s', disabling Sample", t.Name, s.Name)
+						log.Errorf("Length cannot be zero for token '%s' in sample '%s', disabling Sample", t.Name, s.Name)
 						s.Disabled = true
 					}
 				} else {
 					if t.Replacement != "guid" && t.Replacement != "ipv4" && t.Replacement != "ipv6" {
-						s.Log.Errorf("Replacement '%s' is invalid for token '%s' in sample '%s'", t.Replacement, t.Name, s.Name)
+						log.Errorf("Replacement '%s' is invalid for token '%s' in sample '%s'", t.Replacement, t.Name, s.Name)
 						s.Disabled = true
 					}
 				}
 			case "choice":
 				if len(t.Choice) == 0 || t.Choice == nil {
-					s.Log.Errorf("Zero choice items for token '%s' in sample '%s', disabling Sample", t.Name, s.Name)
+					log.Errorf("Zero choice items for token '%s' in sample '%s', disabling Sample", t.Name, s.Name)
 					s.Disabled = true
 				}
 			case "weightedChoice":
 				if len(t.WeightedChoice) == 0 || t.WeightedChoice == nil {
-					s.Log.Errorf("Zero choice items for token '%s' in sample '%s', disabling Sample", t.Name, s.Name)
+					log.Errorf("Zero choice items for token '%s' in sample '%s', disabling Sample", t.Name, s.Name)
 					s.Disabled = true
 				}
 			case "fieldChoice":
 				if len(t.FieldChoice) == 0 || t.FieldChoice == nil {
-					s.Log.Errorf("Zero choice items for token '%s' in sample '%s', disabling Sample", t.Name, s.Name)
+					log.Errorf("Zero choice items for token '%s' in sample '%s', disabling Sample", t.Name, s.Name)
 					s.Disabled = true
 				}
 				for _, choice := range t.FieldChoice {
 					if _, ok := choice[t.SrcField]; !ok {
-						s.Log.Errorf("Source field '%s' does not exist for token '%s' in row '%#v' in sample '%s', disabling Sample", t.SrcField, t.Name, choice, s.Name)
+						log.Errorf("Source field '%s' does not exist for token '%s' in row '%#v' in sample '%s', disabling Sample", t.SrcField, t.Name, choice, s.Name)
 						s.Disabled = true
 						break
 					}
@@ -561,12 +536,12 @@ func (c *Config) validate(s *Sample) {
 					var err error
 					pos1, pos2, err := t.GetReplacementOffsets(l[t.Field])
 					if err != nil {
-						s.Log.Infof("Error getting replacements for token '%s' in event '%s', disabling SinglePass: %s", t.Token, l[t.Field], err)
+						log.Infof("Error getting replacements for token '%s' in event '%s', disabling SinglePass", t.Token, l[t.Field])
 						s.SinglePass = false
 						break outer
 					}
 					if pos1 < 0 || pos2 < 0 {
-						s.Log.Infof("Token '%s' not found in event '%s', disabling SinglePass", t.Name, l)
+						log.Infof("Token '%s' not found in event '%s', disabling SinglePass", t.Name, l)
 						s.SinglePass = false
 						break outer
 					}
@@ -585,13 +560,13 @@ func (c *Config) validate(s *Sample) {
 					for _, pos := range v {
 						// Does the beginning of this token overlap with the end of the last?
 						if lastpos > pos.Pos1 {
-							s.Log.Infof("Token '%s' extends beyond beginning of token '%s', disabling SinglePass", lasttoken, s.Tokens[pos.Token].Name)
+							log.Infof("Token '%s' extends beyond beginning of token '%s', disabling SinglePass", lasttoken, s.Tokens[pos.Token].Name)
 							s.SinglePass = false
 							break outer
 						}
 						// Does the beginning of this token happen before the max we've seen a token before?
 						if maxpos > pos.Pos1 {
-							s.Log.Infof("Some former token extends beyond the beginning of token '%s', disabling SinglePass", s.Tokens[pos.Token].Name)
+							log.Infof("Some former token extends beyond the beginning of token '%s', disabling SinglePass", s.Tokens[pos.Token].Name)
 							s.SinglePass = false
 							break outer
 						}
@@ -670,7 +645,7 @@ func ParseBeginEnd(s *Sample) {
 	var err error
 	if len(s.Begin) > 0 {
 		if s.BeginParsed, err = timeparser.TimeParserNow(s.Begin, now); err != nil {
-			s.Log.Errorf("Error parsing Begin for sample %s: %v", s.Name, err)
+			log.Errorf("Error parsing Begin for sample %s: %v", s.Name, err)
 		} else {
 			s.Current = s.BeginParsed
 			s.Realtime = false
@@ -678,19 +653,19 @@ func ParseBeginEnd(s *Sample) {
 	}
 	if len(s.End) > 0 {
 		if s.EndParsed, err = timeparser.TimeParserNow(s.End, now); err != nil {
-			s.Log.Errorf("Error parsing End for sample %s: %v", s.Name, err)
+			log.Errorf("Error parsing End for sample %s: %v", s.Name, err)
 		}
 	}
-	s.Log.Infof("Beginning generation at %s; Ending at %s; Realtime: %v", s.BeginParsed, s.EndParsed, s.Realtime)
+	log.Infof("Beginning generation at %s; Ending at %s; Realtime: %v", s.BeginParsed, s.EndParsed, s.Realtime)
 }
 
 func (c *Config) walkPath(fullPath string, acceptableExtensions map[string]bool, callback func(string) error) error {
 	filepath.Walk(os.ExpandEnv(fullPath), func(path string, _ os.FileInfo, err error) error {
-		c.Log.Debugf("Walking, at %s", path)
+		log.Debugf("Walking, at %s", path)
 		if os.IsNotExist(err) {
 			return nil
 		} else if err != nil {
-			c.Log.Errorf("Error from WalkFunc: %s", err)
+			log.Errorf("Error from WalkFunc: %s", err)
 			return err
 		}
 		// Check if extension is acceptable before attempting to parse
@@ -704,7 +679,7 @@ func (c *Config) walkPath(fullPath string, acceptableExtensions map[string]bool,
 
 func (c *Config) parseFileConfig(out interface{}, path ...string) error {
 	fullPath := filepath.Join(path...)
-	c.Log.Debugf("Config Path: %v\n", fullPath)
+	log.Debugf("Config Path: %v\n", fullPath)
 	if _, err := os.Stat(fullPath); os.IsNotExist(err) {
 		return err
 	}
@@ -714,18 +689,22 @@ func (c *Config) parseFileConfig(out interface{}, path ...string) error {
 		return err
 	}
 
-	// c.Log.Debugf("Contents: %s", contents)
+	// log.Debugf("Contents: %s", contents)
 	switch filepath.Ext(fullPath) {
 	case ".yml", ".yaml":
 		if err := yaml.Unmarshal(contents, out); err != nil {
-			c.Log.Panicf("YAML parsing error in file '%s': %v", fullPath, err)
+			log.Panicf("YAML parsing error in file '%s': %v", fullPath, err)
 		}
 	case ".json":
 		if err := json.Unmarshal(contents, out); err != nil {
-			c.Log.Panicf("JSON parsing errorin file '%s': %v", fullPath, err)
+			if ute, ok := err.(*json.UnmarshalTypeError); ok {
+				log.Panicf("JSON parsing error in file '%s' at offset %d: %v", fullPath, ute.Offset, ute)
+			} else {
+				log.Panicf("JSON parsing error in file '%s': %v", fullPath, err)
+			}
 		}
 	}
-	// c.Log.Debugf("Out: %#v\n", out)
+	// log.Debugf("Out: %#v\n", out)
 	return nil
 }
 

@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	"github.com/coccyx/gogen/internal"
+	log "github.com/coccyx/gogen/logger"
 )
 
 var bp sync.Pool
@@ -26,10 +27,10 @@ func (foo sample) Gen(item *config.GenQueueItem) error {
 	if item.Count == -1 {
 		item.Count = len(s.Lines)
 	}
-	// s.Log.Debugf("Gen Queue Item %#v", item)
+	// log.Debugf("Gen Queue Item %#v", item)
 	// outstr := []map[string]string{{"_raw": fmt.Sprintf("%#v", item)}}
 
-	// s.Log.Debugf("Generating sample '%s' with count %d, et: '%s', lt: '%s', SinglePass: %v", s.Name, item.Count, item.Earliest, item.Latest, s.SinglePass)
+	// log.Debugf("Generating sample '%s' with count %d, et: '%s', lt: '%s', SinglePass: %v", s.Name, item.Count, item.Earliest, item.Latest, s.SinglePass)
 	// startTime := time.Now()
 
 	if s.SinglePass {
@@ -46,7 +47,7 @@ func genSinglePass(item *config.GenQueueItem) error {
 		events := make([]map[string]string, 0, item.Count)
 
 		if s.RandomizeEvents {
-			// s.Log.Debugf("Random filling events for sample '%s' with %d events", s.Name, item.Count)
+			// log.Debugf("Random filling events for sample '%s' with %d events", s.Name, item.Count)
 
 			for i := 0; i < item.Count; i++ {
 				events = append(events, getBrokenEvent(item, item.Rand.Intn(slen)))
@@ -55,13 +56,13 @@ func genSinglePass(item *config.GenQueueItem) error {
 		} else {
 			if item.Count <= slen {
 				for i := 0; i < item.Count; i++ {
-					// s.Log.Debugf("Count <= sample len, filling with sample '%s' for %d events", s.Name, item.Count)
+					// log.Debugf("Count <= sample len, filling with sample '%s' for %d events", s.Name, item.Count)
 					events = append(events, getBrokenEvent(item, i))
 					// events[i] = getBrokenEvent(item, i)
 				}
 			} else {
 				iters := int(math.Ceil(float64(item.S.Count) / float64(slen)))
-				// s.Log.Debugf("Sequentially filling events for sample '%s' of size %d with %d events over %d iterations", s.Name, slen, item.Count, iters)
+				// log.Debugf("Sequentially filling events for sample '%s' of size %d with %d events over %d iterations", s.Name, slen, item.Count, iters)
 				for i := 0; i < iters; i++ {
 					var count int
 					// start := i * slen
@@ -70,7 +71,7 @@ func genSinglePass(item *config.GenQueueItem) error {
 					} else {
 						count = slen
 					}
-					// s.Log.Debugf("Appending %d events from lines, length %d", count, slen)
+					// log.Debugf("Appending %d events from lines, length %d", count, slen)
 					// end := (i * slen) + count
 					for j := 0; j < count; j++ {
 						events = append(events, getBrokenEvent(item, j))
@@ -105,7 +106,7 @@ func getBrokenEvent(item *config.GenQueueItem, i int) map[string]string {
 				}
 				replacement, err := st.T.GenReplacement(choice, item.Earliest, item.Latest, item.Rand)
 				if err != nil {
-					s.Log.Errorf("Error generating replacement for token '%s' in sample '%s'", st.T.Name, s.Name)
+					log.Errorf("Error generating replacement for token '%s' in sample '%s'", st.T.Name, s.Name)
 				}
 				event.WriteString(replacement)
 				if st.T.Group > 0 {
@@ -127,7 +128,7 @@ func genMultiPass(item *config.GenQueueItem) error {
 		var events []map[string]string
 		events = make([]map[string]string, 0, item.Count)
 		if s.RandomizeEvents {
-			// s.Log.Debugf("Random filling events for sample '%s' with %d events", s.Name, item.Count)
+			// log.Debugf("Random filling events for sample '%s' with %d events", s.Name, item.Count)
 
 			for i := 0; i < item.Count; i++ {
 				events = append(events, copyevent(s.Lines[item.Rand.Intn(slen)]))
@@ -139,7 +140,7 @@ func genMultiPass(item *config.GenQueueItem) error {
 				}
 			} else {
 				iters := int(math.Ceil(float64(item.S.Count) / float64(slen)))
-				// s.Log.Debugf("Sequentially filling events for sample '%s' of size %d with %d events over %d iterations", s.Name, slen, item.Count, iters)
+				// log.Debugf("Sequentially filling events for sample '%s' of size %d with %d events over %d iterations", s.Name, slen, item.Count, iters)
 				for i := 0; i < iters; i++ {
 					var count int
 					// start := i * slen
@@ -148,7 +149,7 @@ func genMultiPass(item *config.GenQueueItem) error {
 					} else {
 						count = slen
 					}
-					// s.Log.Debugf("Appending %d events from lines, length %d", count, slen)
+					// log.Debugf("Appending %d events from lines, length %d", count, slen)
 					// end := (i * slen) + count
 					for j := 0; j < count; j++ {
 						events = append(events, copyevent(s.Lines[j]))
@@ -157,7 +158,7 @@ func genMultiPass(item *config.GenQueueItem) error {
 			}
 		}
 
-		// s.Log.Debugf("Events: %#v", events)
+		// log.Debugf("Events: %#v", events)
 
 		for i := 0; i < item.Count; i++ {
 			choices := make(map[int]*int)
@@ -170,17 +171,17 @@ func genMultiPass(item *config.GenQueueItem) error {
 						choice = new(int)
 						*choice = -1
 					}
-					// s.Log.Debugf("Replacing token '%s':'%s' with choice %d in fieldval: %s", token.Name, token.Token, *choice, fieldval)
+					// log.Debugf("Replacing token '%s':'%s' with choice %d in fieldval: %s", token.Name, token.Token, *choice, fieldval)
 					if err := token.Replace(&fieldval, choice, item.Earliest, item.Latest, item.Rand); err == nil {
 						events[i][token.Field] = fieldval
 					} else {
-						s.Log.Error(err)
+						log.Error(err)
 					}
 					if token.Group > 0 {
 						choices[token.Group] = choice
 					}
 				} else {
-					s.Log.Errorf("Field %s not found in event for sample %s", token.Field, s.Name)
+					log.Errorf("Field %s not found in event for sample %s", token.Field, s.Name)
 				}
 			}
 		}

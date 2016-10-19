@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/coccyx/gogen/internal"
+	log "github.com/coccyx/gogen/logger"
 )
 
 func Start(gq chan *config.GenQueueItem, gqs chan int) {
@@ -21,14 +22,14 @@ func Start(gq chan *config.GenQueueItem, gqs chan int) {
 		item.Rand = generator
 		// Check to see if our generator is not set
 		if item.S.Gen == nil {
-			item.S.Log.Infof("Setting sample '%s' to generator '%s'", item.S.Name, item.S.Generator)
+			log.Infof("Setting sample '%s' to generator '%s'", item.S.Name, item.S.Generator)
 			if item.S.Generator == "sample" {
 				s := new(sample)
 				item.S.Gen = s
 			}
 		}
-		item.S.Log.Debugf("Generating item %#v", item)
+		log.Debugf("Generating item %#v", item)
 		item.S.Gen.Gen(item)
-		item.S.Log.Debugf("Finished generating item %#v", item)
+		log.Debugf("Finished generating item %#v", item)
 	}
 }

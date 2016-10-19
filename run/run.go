@@ -5,6 +5,7 @@ import (
 
 	"github.com/coccyx/gogen/generator"
 	config "github.com/coccyx/gogen/internal"
+	log "github.com/coccyx/gogen/logger"
 	"github.com/coccyx/gogen/outputter"
 	"github.com/coccyx/gogen/timer"
 )
@@ -14,15 +15,15 @@ func ROT(c *config.Config, gq chan *config.GenQueueItem, oq chan *config.OutQueu
 	for {
 		timer := time.NewTimer(time.Duration(c.Global.ROTInterval) * time.Second * 5)
 		<-timer.C
-		c.Log.Infof("Generator Queue: %d Output Queue: %d", len(gq), len(oq))
+		log.Infof("Generator Queue: %d Output Queue: %d", len(gq), len(oq))
 	}
 }
 
 // Run runs the mainline of the program
 func Run(c *config.Config) {
-	c.Log.Info("Starting ReadOutThread")
+	log.Info("Starting ReadOutThread")
 	go outputter.ROT(c)
-	c.Log.Info("Starting Timers")
+	log.Info("Starting Timers")
 	timerdone := make(chan int)
 	gq := make(chan *config.GenQueueItem, config.MaxGenQueueLength)
 	gqs := make(chan int)
@@ -39,18 +40,18 @@ func Run(c *config.Config) {
 			timers++
 		}
 	}
-	c.Log.Infof("%d Timers started", timers)
+	log.Infof("%d Timers started", timers)
 
-	c.Log.Infof("Starting Generators")
+	log.Infof("Starting Generators")
 	for i := 0; i < c.Global.GeneratorWorkers; i++ {
-		c.Log.Infof("Starting Generator %d", i)
+		log.Infof("Starting Generator %d", i)
 		go generator.Start(gq, gqs)
 		gens++
 	}
 
-	c.Log.Infof("Starting Outputters")
+	log.Infof("Starting Outputters")
 	for i := 0; i < c.Global.OutputWorkers; i++ {
-		c.Log.Infof("Starting Outputter %d", i)
+		log.Infof("Starting Outputter %d", i)
 		go outputter.Start(oq, oqs, i)
 		outs++
 	}
@@ -65,7 +66,7 @@ Loop1:
 		select {
 		case <-timerdone:
 			timers--
-			c.Log.Debugf("Timer done, timers left %d", timers)
+			log.Debugf("Timer done, timers left %d", timers)
 			if timers == 0 {
 				break Loop1
 			}
@@ -73,7 +74,7 @@ Loop1:
 	}
 
 	// Close our channels to signal to the workers to shut down when the queue is clear
-	c.Log.Infof("Timers all done, closing generating queue")
+	log.Infof("Timers all done, closing generating queue")
 	close(gq)
 
 	// Check for all the workers to signal back they're done
@@ -82,7 +83,7 @@ Loop2:
 		select {
 		case <-gqs:
 			gens--
-			c.Log.Debugf("Gen done, gens left %d", gens)
+			log.Debugf("Gen done, gens left %d", gens)
 			if gens == 0 {
 				break Loop2
 			}
@@ -96,7 +97,7 @@ Loop3:
 		select {
 		case <-oqs:
 			outs--
-			c.Log.Debugf("Out done, outs left %d", outs)
+			log.Debugf("Out done, outs left %d", outs)
 			if outs == 0 {
 				break Loop3
 			}
@@ -106,7 +107,7 @@ Loop3:
 	// for _, s := range c.Samples {
 	// 	err := s.Out.Close()
 	// 	if err != nil {
-	// 		c.Log.Errorf("Error closing output for sample '%s': %s", s.Name, err)
+	// 		log.Errorf("Error closing output for sample '%s': %s", s.Name, err)
 	// 	}
 	// }
 

@@ -16,6 +16,7 @@ import (
 
 	"github.com/coccyx/gogen/generator"
 	config "github.com/coccyx/gogen/internal"
+	log "github.com/coccyx/gogen/logger"
 	"github.com/coccyx/gogen/outputter"
 	"github.com/google/go-github/github"
 )
@@ -30,7 +31,7 @@ func Push(name string) (string, string) {
 	gogen := *gu.Login + "/" + name
 
 	if err != nil {
-		c.Log.Fatalf("Error getting user in push: %s", err)
+		log.Fatalf("Error getting user in push: %s", err)
 	}
 
 	source := rand.NewSource(time.Now().UnixNano())
@@ -41,10 +42,10 @@ func Push(name string) (string, string) {
 			sample = s
 
 			if s.Description == "" {
-				c.Log.Fatalf("Description not set for sample '%s'", s.Name)
+				log.Fatalf("Description not set for sample '%s'", s.Name)
 			}
 
-			c.Log.Debugf("Generating for Push() sample '%s'", s.Name)
+			log.Debugf("Generating for Push() sample '%s'", s.Name)
 			origOutputter := s.Output.Outputter
 			origOutputTemplate := s.Output.OutputTemplate
 			s.Output.Outputter = "buf"
@@ -68,7 +69,7 @@ func Push(name string) (string, string) {
 			s.Output.Outputter = origOutputter
 			s.Output.OutputTemplate = origOutputTemplate
 
-			c.Log.Debugf("Buffer: %s", c.Buf.String())
+			log.Debugf("Buffer: %s", c.Buf.String())
 			break
 		}
 	}
@@ -94,7 +95,6 @@ func Pull(gogen string, dir string, deconstruct bool) {
 	} else {
 		name = gogen
 	}
-	c := config.NewConfig()
 	gist := pull(gogen)
 	for _, file := range gist.Files {
 		filename := filepath.Join(dir, *file.Filename)
@@ -103,11 +103,11 @@ func Pull(gogen string, dir string, deconstruct bool) {
 		f, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE, 0644)
 		defer f.Close()
 		if err != nil {
-			c.Log.Fatalf("Couldn't open file %s: %s", filename, err)
+			log.Fatalf("Couldn't open file %s: %s", filename, err)
 		}
 		_, err = io.Copy(f, resp.Body)
 		if err != nil {
-			c.Log.Fatalf("Error writing to file %s: %s", filename, err)
+			log.Fatalf("Error writing to file %s: %s", filename, err)
 		}
 		if deconstruct {
 			samplesDir := filepath.Join(dir, "samples")
@@ -115,7 +115,7 @@ func Pull(gogen string, dir string, deconstruct bool) {
 			err := os.Mkdir(samplesDir, 0755)
 			err = os.Mkdir(templatesDir, 0755)
 			if err != nil && !os.IsExist(err) {
-				c.Log.Fatalf("Error creating directories %s or %s", samplesDir, templatesDir)
+				log.Fatalf("Error creating directories %s or %s", samplesDir, templatesDir)
 			}
 
 			config.ResetConfig()
@@ -130,13 +130,13 @@ func Pull(gogen string, dir string, deconstruct bool) {
 						if fname[len(fname)-6:] == "sample" {
 							f, err := os.OpenFile(filepath.Join(samplesDir, fname), os.O_WRONLY|os.O_CREATE, 0644)
 							if err != nil {
-								c.Log.Fatalf("Unable to open file %s: %s", filepath.Join(samplesDir, fname), err)
+								log.Fatalf("Unable to open file %s: %s", filepath.Join(samplesDir, fname), err)
 							}
 							defer f.Close()
 							for _, v := range t.Choice {
 								_, err := fmt.Fprintf(f, "%s\n", v)
 								if err != nil {
-									c.Log.Fatalf("Error writing to file %s: %s", filepath.Join(samplesDir, fname), err)
+									log.Fatalf("Error writing to file %s: %s", filepath.Join(samplesDir, fname), err)
 								}
 							}
 							c.Samples[x].Tokens[y].Choice = []string{}
@@ -144,7 +144,7 @@ func Pull(gogen string, dir string, deconstruct bool) {
 							if len(s.Lines) > 0 {
 								f, err := os.OpenFile(filepath.Join(samplesDir, fname), os.O_WRONLY|os.O_CREATE, 0644)
 								if err != nil {
-									c.Log.Fatalf("Unable to open file %s: %s", filepath.Join(samplesDir, fname), err)
+									log.Fatalf("Unable to open file %s: %s", filepath.Join(samplesDir, fname), err)
 								}
 								defer f.Close()
 								w := csv.NewWriter(f)
@@ -174,11 +174,11 @@ func Pull(gogen string, dir string, deconstruct bool) {
 						var outb []byte
 						var err error
 						if outb, err = json.MarshalIndent(s, "", "  "); err != nil {
-							c.Log.Fatalf("Cannot Marshal sample '%s', err: %s", s.Name, err)
+							log.Fatalf("Cannot Marshal sample '%s', err: %s", s.Name, err)
 						}
 						err = ioutil.WriteFile(filepath.Join(samplesDir, name+".json"), outb, 0644)
 						if err != nil {
-							c.Log.Fatalf("Cannot write file %s: %s", filepath.Join(samplesDir, name+".json"), err)
+							log.Fatalf("Cannot write file %s: %s", filepath.Join(samplesDir, name+".json"), err)
 						}
 					}
 				}
@@ -188,17 +188,17 @@ func Pull(gogen string, dir string, deconstruct bool) {
 				var outb []byte
 				var err error
 				if outb, err = json.MarshalIndent(t, "", "  "); err != nil {
-					c.Log.Fatalf("Cannot Marshal template '%s', err: %s", t.Name, err)
+					log.Fatalf("Cannot Marshal template '%s', err: %s", t.Name, err)
 				}
 				err = ioutil.WriteFile(filepath.Join(templatesDir, t.Name+".json"), outb, 0644)
 				if err != nil {
-					c.Log.Fatalf("Error writing file %s", filepath.Join(templatesDir, t.Name+".json"))
+					log.Fatalf("Error writing file %s", filepath.Join(templatesDir, t.Name+".json"))
 				}
 			}
 
 			err = os.Remove(filename)
 			if err != nil {
-				c.Log.Debugf("Error removing original config file during deconstruction: %s", filename)
+				log.Debugf("Error removing original config file during deconstruction: %s", filename)
 			}
 		}
 		break
@@ -207,32 +207,30 @@ func Pull(gogen string, dir string, deconstruct bool) {
 
 // PullFile pulls a config from the Gogen API + GitHub gist and writes it to a single file
 func PullFile(gogen string, filename string) {
-	c := config.NewConfig()
 	gist := pull(gogen)
 	for _, file := range gist.Files {
-		c.Log.Debugf("Writing config at file '%s' for gogen '%s'", filename, gogen)
+		log.Debugf("Writing config at file '%s' for gogen '%s'", filename, gogen)
 		client := &http.Client{}
 		resp, err := client.Get(*file.RawURL)
 		f, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE, 0644)
 		defer f.Close()
 		if err != nil {
-			c.Log.Fatalf("Couldn't open file %s: %s", filename, err)
+			log.Fatalf("Couldn't open file %s: %s", filename, err)
 		}
 		_, err = io.Copy(f, resp.Body)
 		if err != nil {
-			c.Log.Fatalf("Error writing to file %s: %s", filename, err)
+			log.Fatalf("Error writing to file %s: %s", filename, err)
 		}
 		break
 	}
 }
 
 func pull(gogen string) (gist *github.Gist) {
-	c := config.NewConfig()
 	g := Get(gogen)
 	gh := NewGitHub(false)
 	gist, _, err := gh.client.Gists.Get(g.GistID)
 	if err != nil {
-		c.Log.Fatalf("Couldn't get gist: %s", err)
+		log.Fatalf("Couldn't get gist: %s", err)
 	}
 	return gist
 }

@@ -9,11 +9,11 @@ import (
 	"time"
 
 	"github.com/coccyx/gogen/internal"
+	log "github.com/coccyx/gogen/logger"
 	"github.com/coccyx/gogen/run"
 	"github.com/coccyx/gogen/share"
 	"github.com/ghodss/yaml"
 	"github.com/olekukonko/tablewriter"
-	logging "github.com/op/go-logging"
 	"github.com/pkg/profile"
 	"gopkg.in/urfave/cli.v1"
 )
@@ -37,30 +37,31 @@ func Setup(clic *cli.Context) {
 	} else if len(clic.String("samplesDir")) > 0 {
 		os.Setenv("GOGEN_SAMPLES_DIR", clic.String("samplesDir"))
 	}
-	c = config.NewConfig()
 
 	if clic.Bool("debug") {
-		c.SetLoggingLevel(logging.DEBUG)
+		log.SetDebug(true)
 	} else if clic.Bool("info") {
-		c.SetLoggingLevel(logging.INFO)
+		log.SetInfo()
 	}
 
+	c = config.NewConfig()
+
 	if clic.Int("generators") > 0 {
-		c.Log.Infof("Setting generators to %d", clic.Int("generators"))
+		log.Infof("Setting generators to %d", clic.Int("generators"))
 		c.Global.GeneratorWorkers = clic.Int("generators")
 	}
 	if clic.Int("outputters") > 0 {
-		c.Log.Infof("Setting generators to %d", clic.Int("outputters"))
+		log.Infof("Setting generators to %d", clic.Int("outputters"))
 		c.Global.OutputWorkers = clic.Int("outputters")
 	}
 
-	// c.Log.Debugf("Global: %#v", c.Global)
-	// c.Log.Debugf("Default Tokens: %#v", c.DefaultTokens)
-	// c.Log.Debugf("Default Sample: %#v", c.DefaultSample)
-	// c.Log.Debugf("Samples: %#v", c.Samples)
-	// c.Log.Debugf("Pretty Values %# v\n", pretty.Formatter(c))
+	// log.Debugf("Global: %#v", c.Global)
+	// log.Debugf("Default Tokens: %#v", c.DefaultTokens)
+	// log.Debugf("Default Sample: %#v", c.DefaultSample)
+	// log.Debugf("Samples: %#v", c.Samples)
+	// log.Debugf("Pretty Values %# v\n", pretty.Formatter(c))
 	// j, _ := json.MarshalIndent(c, "", "  ")
-	// c.Log.Debugf("JSON Config: %s\n", j)
+	// log.Debugf("JSON Config: %s\n", j)
 }
 
 func table(l []share.GogenList) {
@@ -130,6 +131,10 @@ func main() {
 					Usage: "Override all endpoint URLs to just `url` url",
 				},
 				cli.StringFlag{
+					Name:  "splunkHECToken",
+					Usage: "Set Authorization: Splunk <token> HTTP header for Splunk's HTTP Event Collector",
+				},
+				cli.StringFlag{
 					Name:  "begin, b",
 					Usage: "Set begin time, in relative time syntax (e.g. -60m for minus 60 mins, now for now, etc)",
 				},
@@ -149,39 +154,46 @@ func main() {
 				}
 				for i := 0; i < len(c.Samples); i++ {
 					if len(clic.String("outputTemplate")) > 0 {
-						c.Log.Infof("Setting outputTempalte to '%s'", clic.String("outputTemplate"))
+						log.Infof("Setting outputTempalte to '%s'", clic.String("outputTemplate"))
 						c.Samples[i].Output.OutputTemplate = clic.String("outputTemplate")
 					}
 					if clic.Int("endIntervals") > 0 {
-						c.Log.Infof("Setting endIntervals to %d", clic.Int("endIntervals"))
+						log.Infof("Setting endIntervals to %d", clic.Int("endIntervals"))
 						c.Samples[i].EndIntervals = clic.Int("endIntervals")
 					}
 					if len(clic.String("outputter")) > 0 {
-						c.Log.Infof("Setting outputter to '%s'", clic.String("outputter"))
+						log.Infof("Setting outputter to '%s'", clic.String("outputter"))
 						c.Samples[i].Output.Outputter = clic.String("outputter")
 					}
 					if len(clic.String("filename")) > 0 {
-						c.Log.Infof("Setting filename to '%s'")
+						log.Infof("Setting filename to '%s'")
 						c.Samples[i].Output.FileName = clic.String("filename")
 					}
 					if len(clic.String("url")) > 0 {
-						c.Log.Infof("Setting all endpoint urls to '%s'")
+						log.Infof("Setting all endpoint urls to '%s'", clic.String("url"))
 						c.Samples[i].Output.Endpoints = []string{clic.String("url")}
 					}
+					if len(clic.String("splunkHECToken")) > 0 {
+						log.Infof("Setting HTTP Header to 'Authorization: Splunk %s'", clic.String("splunkHECToken"))
+						if c.Samples[i].Output.Headers == nil {
+							c.Samples[i].Output.Headers = make(map[string]string)
+						}
+						c.Samples[i].Output.Headers["Authorization"] = "Splunk " + clic.String("splunkHECToken")
+					}
 					if clic.Int("count") > 0 {
-						c.Log.Infof("Setting count to %d for sample '%s'", clic.Int("count"), c.Samples[i].Name)
+						log.Infof("Setting count to %d for sample '%s'", clic.Int("count"), c.Samples[i].Name)
 						c.Samples[i].Count = clic.Int("count")
 					}
 					if clic.Int("interval") > 0 {
-						c.Log.Infof("Setting interval to %d for sample '%s'", clic.Int("interval"), c.Samples[i].Name)
+						log.Infof("Setting interval to %d for sample '%s'", clic.Int("interval"), c.Samples[i].Name)
 						c.Samples[i].Interval = clic.Int("interval")
 					}
 					if len(clic.String("begin")) > 0 {
-						c.Log.Infof("Setting begin to %s for sample '%s'", clic.String("begin"), c.Samples[i].Name)
+						log.Infof("Setting begin to %s for sample '%s'", clic.String("begin"), c.Samples[i].Name)
 						c.Samples[i].Begin = clic.String("begin")
 					}
 					if len(clic.String("end")) > 0 {
-						c.Log.Infof("Setting end to %s for sample '%s'", clic.String("end"), c.Samples[i].Name)
+						log.Infof("Setting end to %s for sample '%s'", clic.String("end"), c.Samples[i].Name)
 						c.Samples[i].End = clic.String("end")
 					}
 					if len(clic.String("begin")) > 0 || len(clic.String("end")) > 0 {
@@ -198,7 +210,7 @@ func main() {
 					}
 				}
 				if len(clic.String("sample")) > 0 {
-					c.Log.Infof("Generating only for sample '%s'", clic.String("sample"))
+					log.Infof("Generating only for sample '%s'", clic.String("sample"))
 					matched := false
 					for i := 0; i < len(c.Samples); i++ {
 						if c.Samples[i].Name == clic.String("sample") {
@@ -208,7 +220,7 @@ func main() {
 						}
 					}
 					if !matched {
-						c.Log.Errorf("No sample matched for '%s'", clic.String("sample"))
+						log.Errorf("No sample matched for '%s'", clic.String("sample"))
 						os.Exit(1)
 					}
 				}
@@ -230,11 +242,11 @@ func main() {
 				var err error
 				if clic.String("format") == "yaml" {
 					if outb, err = yaml.Marshal(c); err != nil {
-						c.Log.Panicf("YAML output error: %v", err)
+						log.Panicf("YAML output error: %v", err)
 					}
 				} else {
 					if outb, err = json.MarshalIndent(c, "", "  "); err != nil {
-						c.Log.Panicf("JSON output error: %v", err)
+						log.Panicf("JSON output error: %v", err)
 					}
 				}
 				out := string(outb)

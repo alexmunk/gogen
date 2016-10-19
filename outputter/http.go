@@ -4,10 +4,12 @@ import (
 	"bufio"
 	"crypto/tls"
 	"io"
+	"io/ioutil"
 	"math/rand"
 	"net/http"
 
 	config "github.com/coccyx/gogen/internal"
+	log "github.com/coccyx/gogen/logger"
 )
 
 type httpout struct {
@@ -79,9 +81,12 @@ func (h *httpout) newPost(item *config.OutQueueItem) {
 	h.done = make(chan int)
 	go func() {
 		h.resp, err = client.Do(req)
-		h.done <- 1
 		if err != nil {
-			item.S.Log.Errorf("Error making request from sample '%s' to endpoint '%s': %s", item.S.Name, endpoint, err)
+			log.Errorf("Error making request from sample '%s' to endpoint '%s', status '%d': %s", item.S.Name, endpoint, h.resp.StatusCode, err)
+		} else if h.resp.StatusCode != 200 {
+			body, _ := ioutil.ReadAll(h.resp.Body)
+			log.Errorf("Error making request from sample '%s' to endpoint '%s', status '%d': %s", item.S.Name, endpoint, h.resp.StatusCode, body)
 		}
+		h.done <- 1
 	}()
 }

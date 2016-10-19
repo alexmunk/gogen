@@ -1,6 +1,7 @@
 # Todo
 
 * Add support for environment variables to configure command line options
+* Add global flag to print out environment variables to be used with shell $()
 * Implement rating for event counts and rated fields
     * Rating should support lua based raters as well
 * Implement replay generator
@@ -17,8 +18,3 @@
     * Each timer thread should write current state after ack
     * This can also be used for performance counters
 * Implement a transliterator to convert configs from Eventgen to Gogen
-
-
-
-Test cases for SinglePass
-* Multiple rows that look completely different

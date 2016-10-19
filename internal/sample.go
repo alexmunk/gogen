@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
-	strftime "github.com/jehiah/go-strftime"
-	logging "github.com/op/go-logging"
+	strftime "github.com/cactus/gostrftime"
+	log "github.com/coccyx/gogen/logger"
 	"github.com/satori/go.uuid"
 	lua "github.com/yuin/gopher-lua"
 )
@@ -44,7 +44,6 @@ type Sample struct {
 	SinglePass      bool                `json:"singlepass,omitempty"`
 
 	// Internal use variables
-	Log            *logging.Logger              `json:"-"`
 	Gen            Generator                    `json:"-"`
 	Out            Outputter                    `json:"-"`
 	Output         *Output                      `json:"-"`
@@ -134,7 +133,7 @@ func (t Token) Replace(event *string, choice *int, et time.Time, lt time.Time, r
 	e := *event
 
 	if pos1, pos2, err := t.GetReplacementOffsets(*event); err != nil {
-		return err
+		return nil
 	} else {
 		replacement, err := t.GenReplacement(choice, et, lt, randgen)
 		if err != nil {
@@ -162,7 +161,7 @@ func (t Token) GetReplacementOffsets(event string) (int, int, error) {
 			return match[2], match[3], nil
 		}
 	}
-	return -1, -1, fmt.Errorf("Token '%s' not found in field '%s' of event '%s'", t.Token, t.Field, event)
+	return -1, -1, fmt.Errorf("Token '%s' not found in field '%s': '%s'", t.Token, t.Field, event)
 }
 
 // GenReplacement generates a replacement value for the token.  choice allows the user to specify
@@ -263,7 +262,7 @@ func (t Token) GenReplacement(choice *int, et time.Time, lt time.Time, randgen *
 		defer L.Close()
 		L.SetGlobal("state", t.luaState)
 		if err := L.DoString(t.Script); err != nil {
-			t.Parent.Log.Errorf("Error executing script for token '%s' in sample '%s': %s", t.Name, t.Parent.Name, err)
+			log.Errorf("Error executing script for token '%s' in sample '%s': %s", t.Name, t.Parent.Name, err)
 		}
 		return lua.LVAsString(L.Get(-1)), nil
 	}

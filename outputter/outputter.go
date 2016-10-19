@@ -7,15 +7,14 @@ import (
 	"time"
 
 	config "github.com/coccyx/gogen/internal"
+	log "github.com/coccyx/gogen/logger"
 	"github.com/coccyx/gogen/template"
-	logging "github.com/op/go-logging"
 )
 
 var (
 	eventsWritten int64
 	bytesWritten  int64
 	lastTS        time.Time
-	log           *logging.Logger
 	rotchan       chan *config.OutputStats
 	gout          [config.MaxOutputThreads]config.Outputter
 )
@@ -23,8 +22,6 @@ var (
 // ROT starts the Read Out Thread which will log statistics about what's being output
 // ROT is intended to be started as a goroutine which will log output every c.
 func ROT(c *config.Config) {
-	log = c.Log
-
 	rotchan = make(chan *config.OutputStats)
 	go readStats()
 
@@ -78,7 +75,7 @@ func Start(oq chan *config.OutQueueItem, oqs chan int, num int) {
 		item, ok := <-oq
 		if !ok {
 			if lastS != nil {
-				lastS.Log.Infof("Closing output for sample '%s'", lastS.Name)
+				log.Infof("Closing output for sample '%s'", lastS.Name)
 				out.Close()
 				gout[num] = nil
 			}
@@ -100,16 +97,16 @@ func Start(oq chan *config.OutQueueItem, oqs chan int, num int) {
 							case "raw":
 								tempbytes, err = io.WriteString(item.IO.W, line["_raw"])
 								if err != nil {
-									item.S.Log.Errorf("Error writing to IO Buffer: %s", err)
+									log.Errorf("Error writing to IO Buffer: %s", err)
 								}
 							case "json":
 								jb, err := json.Marshal(line)
 								if err != nil {
-									item.S.Log.Errorf("Error marshaling json: %s", err)
+									log.Errorf("Error marshaling json: %s", err)
 								}
 								tempbytes, err = item.IO.W.Write(jb)
 								if err != nil {
-									item.S.Log.Errorf("Error writing to IO Buffer: %s", err)
+									log.Errorf("Error writing to IO Buffer: %s", err)
 								}
 							}
 						} else {
@@ -119,14 +116,14 @@ func Start(oq chan *config.OutQueueItem, oqs chan int, num int) {
 						if item.S.Output.Outputter != "devnull" {
 							_, err = io.WriteString(item.IO.W, "\n")
 							if err != nil {
-								item.S.Log.Errorf("Error writing to IO Buffer: %s", err)
+								log.Errorf("Error writing to IO Buffer: %s", err)
 							}
 						}
 					}
 				default:
 					// We'll crash on empty events, but don't do that!
 					bytes += int64(getLine("header", item.S, item.Events[0], item.IO.W))
-					// item.S.Log.Debugf("Out Queue Item %#v", item)
+					// log.Debugf("Out Queue Item %#v", item)
 					var last int
 					for i, line := range item.Events {
 						bytes += int64(getLine("row", item.S, line, item.IO.W))
@@ -138,7 +135,7 @@ func Start(oq chan *config.OutQueueItem, oqs chan int, num int) {
 			}()
 			err := out.Send(item)
 			if err != nil {
-				item.S.Log.Errorf("Error with Send(): %s", err)
+				log.Errorf("Error with Send(): %s", err)
 			}
 		}
 		lastS = item.S
@@ -149,13 +146,13 @@ func getLine(templatename string, s *config.Sample, line map[string]string, w io
 	if template.Exists(s.Output.OutputTemplate + "_" + templatename) {
 		linestr, err := template.Exec(s.Output.OutputTemplate+"_"+templatename, line)
 		if err != nil {
-			s.Log.Errorf("Error from sample '%s' in template execution: %v", s.Name, err)
+			log.Errorf("Error from sample '%s' in template execution: %v", s.Name, err)
 		}
-		// item.S.Log.Debugf("Outputting line %s", linestr)
+		// log.Debugf("Outputting line %s", linestr)
 		bytes, err = w.Write([]byte(linestr))
 		_, err = w.Write([]byte("\n"))
 		if err != nil {
-			s.Log.Errorf("Error sending event for sample '%s' to outputter '%s': %s", s.Name, s.Output.Outputter, err)
+			log.Errorf("Error sending event for sample '%s' to outputter '%s': %s", s.Name, s.Output.Outputter, err)
 		}
 	}
 	return bytes
@@ -166,7 +163,7 @@ func setup(generator *rand.Rand, item *config.OutQueueItem, num int) config.Outp
 	item.IO = config.NewOutputIO()
 
 	if gout[num] == nil {
-		item.S.Log.Infof("Setting sample '%s' to outputter '%s'", item.S.Name, item.S.Output.Outputter)
+		log.Infof("Setting sample '%s' to outputter '%s'", item.S.Name, item.S.Output.Outputter)
 		switch item.S.Output.Outputter {
 		case "stdout":
 			gout[num] = new(stdout)
@@ -184,13 +181,3 @@ func setup(generator *rand.Rand, item *config.OutQueueItem, num int) config.Outp
 	}
 	return gout[num]
 }
-
-// // Writer implements io.Writer, but allows for Teeing the data for the ReadOutThread
-// type Writer interface {
-// 	io.Writer
-// }
-
-// // Write implements io.Writer, but allows for Teeing the data for the ReadOutThread
-// func (writer Writer) Write(p []byte) (n int, err error) {
-
-// }
