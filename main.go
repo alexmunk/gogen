@@ -92,6 +92,10 @@ func Setup(clic *cli.Context) {
 			}
 			c.Samples[i].Output.Headers["Authorization"] = "Splunk " + clic.String("splunkHECToken")
 		}
+		if len(clic.String("outputTemplate")) > 0 {
+			log.Infof("Setting outputTempalte to '%s'", clic.String("outputTemplate"))
+			c.Samples[i].Output.OutputTemplate = clic.String("outputTemplate")
+		}
 	}
 
 	// log.Debugf("Global: %#v", c.Global)
@@ -172,10 +176,6 @@ func main() {
 					os.Exit(1)
 				}
 				for i := 0; i < len(c.Samples); i++ {
-					if len(clic.String("outputTemplate")) > 0 {
-						log.Infof("Setting outputTempalte to '%s'", clic.String("outputTemplate"))
-						c.Samples[i].Output.OutputTemplate = clic.String("outputTemplate")
-					}
 					if clic.Int("endIntervals") > 0 {
 						log.Infof("Setting endIntervals to %d", clic.Int("endIntervals"))
 						c.Samples[i].EndIntervals = clic.Int("endIntervals")

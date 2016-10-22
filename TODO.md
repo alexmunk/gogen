@@ -1,7 +1,6 @@
 # Todo
 
-* Add support for environment variables to configure command line options
-* Add global flag to print out environment variables to be used with shell $()
+* Unit test coverage 90%
 * Implement rating for event counts and rated fields
     * Rating should support lua based raters as well
 * Implement replay generator
@@ -17,4 +16,8 @@
     * Outputters should acknowledge output and that should increment state counters
     * Each timer thread should write current state after ack
     * This can also be used for performance counters
-* Implement a transliterator to convert configs from Eventgen to Gogen
+
+
+Bugs:
+
+http output not working
