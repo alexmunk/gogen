@@ -19,9 +19,32 @@ import (
 )
 
 var c *config.Config
+var envVarMap map[string]string
+
+func init() {
+	envVarMap = map[string]string{
+		"info":           "GOGEN_INFO",
+		"debug":          "GOGEN_DEBUG",
+		"generators":     "GOGEN_GENERATORS",
+		"outputters":     "GOGEN_OUTPUTTERS",
+		"outputTemplate": "GOGEN_OUTPUTTEMPLATE",
+		"outputter":      "GOGEN_OUT",
+		"filename":       "GOGEN_FILENAME",
+		"url":            "GOGEN_URL",
+		"splunkHECToken": "GOGEN_HEC_TOKEN",
+		"samplesDir":     "GOGEN_SAMPLES_DIR",
+		"config":         "GOGEN_CONFIG",
+	}
+}
 
 // Setup the running environment
 func Setup(clic *cli.Context) {
+	if clic.Bool("debug") {
+		log.SetDebug(true)
+	} else if clic.Bool("info") {
+		log.SetInfo()
+	}
+
 	if len(clic.String("config")) > 0 {
 		cstr := clic.String("config")
 		if cstr[0:4] == "http" || cstr[len(cstr)-3:] == "yml" || cstr[len(cstr)-4:] == "yaml" || cstr[len(cstr)-4:] == "json" {
@@ -38,12 +61,6 @@ func Setup(clic *cli.Context) {
 		os.Setenv("GOGEN_SAMPLES_DIR", clic.String("samplesDir"))
 	}
 
-	if clic.Bool("debug") {
-		log.SetDebug(true)
-	} else if clic.Bool("info") {
-		log.SetInfo()
-	}
-
 	c = config.NewConfig()
 
 	if clic.Int("generators") > 0 {
@@ -53,6 +70,28 @@ func Setup(clic *cli.Context) {
 	if clic.Int("outputters") > 0 {
 		log.Infof("Setting generators to %d", clic.Int("outputters"))
 		c.Global.OutputWorkers = clic.Int("outputters")
+	}
+
+	for i := 0; i < len(c.Samples); i++ {
+		if len(clic.String("outputter")) > 0 {
+			log.Infof("Setting outputter to '%s'", clic.String("outputter"))
+			c.Samples[i].Output.Outputter = clic.String("outputter")
+		}
+		if len(clic.String("filename")) > 0 {
+			log.Infof("Setting filename to '%s'")
+			c.Samples[i].Output.FileName = clic.String("filename")
+		}
+		if len(clic.String("url")) > 0 {
+			log.Infof("Setting all endpoint urls to '%s'", clic.String("url"))
+			c.Samples[i].Output.Endpoints = []string{clic.String("url")}
+		}
+		if len(clic.String("splunkHECToken")) > 0 {
+			log.Infof("Setting HTTP Header to 'Authorization: Splunk %s'", clic.String("splunkHECToken"))
+			if c.Samples[i].Output.Headers == nil {
+				c.Samples[i].Output.Headers = make(map[string]string)
+			}
+			c.Samples[i].Output.Headers["Authorization"] = "Splunk " + clic.String("splunkHECToken")
+		}
 	}
 
 	// log.Debugf("Global: %#v", c.Global)
@@ -115,26 +154,6 @@ func main() {
 					Usage: "Only run from `number` intervals",
 				},
 				cli.StringFlag{
-					Name:  "outputTemplate, ot",
-					Usage: "Use output template `(raw|csv|json|splunkhec)` for formatting output",
-				},
-				cli.StringFlag{
-					Name:  "outputter, o",
-					Usage: "Use outputter `(stdout|devnull|file|http) for output",
-				},
-				cli.StringFlag{
-					Name:  "filename, f",
-					Usage: "Set `filename`, only usable with file output",
-				},
-				cli.StringFlag{
-					Name:  "url",
-					Usage: "Override all endpoint URLs to just `url` url",
-				},
-				cli.StringFlag{
-					Name:  "splunkHECToken",
-					Usage: "Set Authorization: Splunk <token> HTTP header for Splunk's HTTP Event Collector",
-				},
-				cli.StringFlag{
 					Name:  "begin, b",
 					Usage: "Set begin time, in relative time syntax (e.g. -60m for minus 60 mins, now for now, etc)",
 				},
@@ -160,25 +179,6 @@ func main() {
 					if clic.Int("endIntervals") > 0 {
 						log.Infof("Setting endIntervals to %d", clic.Int("endIntervals"))
 						c.Samples[i].EndIntervals = clic.Int("endIntervals")
-					}
-					if len(clic.String("outputter")) > 0 {
-						log.Infof("Setting outputter to '%s'", clic.String("outputter"))
-						c.Samples[i].Output.Outputter = clic.String("outputter")
-					}
-					if len(clic.String("filename")) > 0 {
-						log.Infof("Setting filename to '%s'")
-						c.Samples[i].Output.FileName = clic.String("filename")
-					}
-					if len(clic.String("url")) > 0 {
-						log.Infof("Setting all endpoint urls to '%s'", clic.String("url"))
-						c.Samples[i].Output.Endpoints = []string{clic.String("url")}
-					}
-					if len(clic.String("splunkHECToken")) > 0 {
-						log.Infof("Setting HTTP Header to 'Authorization: Splunk %s'", clic.String("splunkHECToken"))
-						if c.Samples[i].Output.Headers == nil {
-							c.Samples[i].Output.Headers = make(map[string]string)
-						}
-						c.Samples[i].Output.Headers["Authorization"] = "Splunk " + clic.String("splunkHECToken")
 					}
 					if clic.Int("count") > 0 {
 						log.Infof("Setting count to %d for sample '%s'", clic.Int("count"), c.Samples[i].Name)
@@ -362,6 +362,34 @@ from the sample referenced by [name]`,
 				return nil
 			},
 		},
+		{
+			Name:  "env",
+			Usage: "Outputs environment variables based on command line options to pass to eval $(gogen <foo> env)",
+			Action: func(clic *cli.Context) error {
+				var out string
+				for _, flag := range clic.GlobalFlagNames() {
+					if clic.GlobalIsSet(flag) {
+						out = fmt.Sprintf("%sexport %s=%s\n", out, envVarMap[flag], clic.GlobalString(flag))
+					}
+				}
+				fmt.Printf(out)
+				return nil
+			},
+		},
+		{
+			Name:  "unsetenv",
+			Usage: "Outputs unset commands for environment variabels to clear config",
+			Action: func(clic *cli.Context) error {
+				var out string
+				for _, v := range envVarMap {
+					if len(os.Getenv(v)) > 0 {
+						out = fmt.Sprintf("%sunset %s\n", out, v)
+					}
+				}
+				fmt.Print(out)
+				return nil
+			},
+		},
 	}
 	app.Before = func(clic *cli.Context) error {
 		Setup(clic)
@@ -373,28 +401,59 @@ from the sample referenced by [name]`,
 	}
 	app.Flags = []cli.Flag{
 		cli.BoolFlag{
-			Name:  "info, v",
-			Usage: "Sets info level logging",
+			Name:   "info, v",
+			Usage:  "Sets info level logging",
+			EnvVar: "GOGEN_INFO",
 		},
 		cli.BoolFlag{
-			Name:  "debug, vv",
-			Usage: "Sets debug level logging",
+			Name:   "debug, vv",
+			Usage:  "Sets debug level logging",
+			EnvVar: "GOGEN_DEBUG",
 		},
 		cli.IntFlag{
-			Name:  "generators, g",
-			Usage: "Sets number of generator `threads`",
+			Name:   "generators, g",
+			Usage:  "Sets number of generator `threads`",
+			EnvVar: "GOGEN_GENERATORS",
 		},
 		cli.IntFlag{
-			Name:  "outputters, o",
-			Usage: "Sets number of outputter `threads`",
+			Name:   "outputters, o",
+			Usage:  "Sets number of outputter `threads`",
+			EnvVar: "GOGEN_OUTPUTTERS",
 		},
 		cli.StringFlag{
-			Name:  "samplesDir, sd",
-			Usage: "Sets `directory` to search for sample files, default 'config/samples'",
+			Name:   "outputTemplate, ot",
+			Usage:  "Use output template `(raw|csv|json|splunkhec)` for formatting output",
+			EnvVar: "GOGEN_OUTPUTTEMPLATE",
 		},
 		cli.StringFlag{
-			Name:  "config, c",
-			Usage: "`Path` or URL to a full config",
+			Name:   "outputter, out",
+			Usage:  "Use outputter `(stdout|devnull|file|http) for output",
+			EnvVar: "GOGEN_OUT",
+		},
+		cli.StringFlag{
+			Name:   "filename, f",
+			Usage:  "Set `filename`, only usable with file output",
+			EnvVar: "GOGEN_FILENAME",
+		},
+		cli.StringFlag{
+			Name:   "url",
+			Usage:  "Override all endpoint URLs to just `url` url",
+			EnvVar: "GOGEN_URL",
+		},
+		cli.StringFlag{
+			Name:   "splunkHECToken",
+			Usage:  "Set Authorization: Splunk <token> HTTP header for Splunk's HTTP Event Collector",
+			EnvVar: "GOGEN_HEC_TOKEN",
+		},
+		cli.StringFlag{
+			Name:   "samplesDir, sd",
+			Usage:  "Sets `directory` to search for sample files, default 'config/samples'",
+			EnvVar: "GOGEN_SAMPLES_DIR",
+		},
+		cli.StringFlag{
+			Name:   "config, c",
+			Usage:  "`Path` or URL to a full config",
+			EnvVar: "GOGEN_CONFIG",
 		},
 	}
 	app.Run(os.Args)
