@@ -68,5 +68,7 @@ tokens:
   - name: gotimestamp
     type: gotimestamp
     replacement: "2006-01-02 03:04:05.000"
+  - name: epochtimestamp
+    type: epochtimestamp
 lines:
 - "_raw": foo

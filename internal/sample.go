@@ -26,7 +26,7 @@ type Sample struct {
 	Notes           string              `json:"notes,omitempty"`
 	Disabled        bool                `json:"disabled"`
 	Generator       string              `json:"generator,omitempty"`
-	Rater           string              `json:"rater,omitempty"`
+	RaterString     string              `json:"rater,omitempty"`
 	Interval        int                 `json:"interval,omitempty"`
 	Delay           int                 `json:"delay,omitempty"`
 	Count           int                 `json:"count,omitempty"`
@@ -46,6 +46,7 @@ type Sample struct {
 	// Internal use variables
 	Gen            Generator                    `json:"-"`
 	Out            Outputter                    `json:"-"`
+	Rater          Rater                        `json:"-"`
 	Output         *Output                      `json:"-"`
 	EarliestParsed time.Duration                `json:"-"`
 	LatestParsed   time.Duration                `json:"-"`
@@ -128,7 +129,7 @@ type StringOrToken struct {
 // Replace replaces any instances of this token in the string pointed to by event.  Since time is native is Gogen, we can pass in
 // earliest and latest time ranges to generate the event between.  Lastly, some times we want to span a selected choice over multiple
 // tokens.  Passing in a pointer to choice allows the replacement to choose a preselected row in FieldChoice or Choice.
-func (t Token) Replace(event *string, choice *int, et time.Time, lt time.Time, randgen *rand.Rand) error {
+func (t Token) Replace(event *string, choice *int64, et time.Time, lt time.Time, randgen *rand.Rand) error {
 	// s := t.Sample
 	e := *event
 
@@ -166,23 +167,31 @@ func (t Token) GetReplacementOffsets(event string) (int, int, error) {
 
 // GenReplacement generates a replacement value for the token.  choice allows the user to specify
 // a specific value to choose in the array.  This is useful for saving picks amongst tokens.
-func (t Token) GenReplacement(choice *int, et time.Time, lt time.Time, randgen *rand.Rand) (string, error) {
+func (t Token) GenReplacement(choice *int64, et time.Time, lt time.Time, randgen *rand.Rand) (string, error) {
 	c := *choice
 	switch t.Type {
-	case "timestamp", "gotimestamp":
-		td := lt.Sub(et)
+	case "timestamp", "gotimestamp", "epochtimestamp":
+		var replacementTime time.Time
+		if c == -1 {
+			td := lt.Sub(et)
 
-		var tdr int
-		if int(td) > 0 {
-			tdr = randgen.Intn(int(td))
+			var tdr int
+			if int(td) > 0 {
+				tdr = randgen.Intn(int(td))
+			}
+			rd := time.Duration(tdr)
+			replacementTime = lt.Add(rd * -1)
+			*choice = replacementTime.UnixNano()
+		} else {
+			replacementTime = time.Unix(0, c)
 		}
-		rd := time.Duration(tdr)
-		replacementTime := lt.Add(rd * -1)
 		switch t.Type {
 		case "timestamp":
 			return strftime.Format(t.Replacement, replacementTime), nil
 		case "gotimestamp":
 			return replacementTime.Format(t.Replacement), nil
+		case "epochtimestamp":
+			return strconv.FormatInt(replacementTime.Unix(), 10), nil
 		}
 	case "static":
 		return t.Replacement, nil
@@ -229,7 +238,7 @@ func (t Token) GenReplacement(choice *int, et time.Time, lt time.Time, randgen *
 		}
 	case "choice":
 		if c == -1 {
-			c = randgen.Intn(len(t.Choice))
+			c = int64(randgen.Intn(len(t.Choice)))
 			*choice = c
 		}
 		return t.Choice[c], nil
@@ -246,14 +255,14 @@ func (t Token) GenReplacement(choice *int, et time.Time, lt time.Time, randgen *
 		r := randgen.Float64() * float64(runningTotal)
 		for j, total := range totals {
 			if r < float64(total) {
-				*choice = j
+				*choice = int64(j)
 				break
 			}
 		}
 		return t.WeightedChoice[*choice].Choice, nil
 	case "fieldChoice":
 		if c == -1 {
-			c = randgen.Intn(len(t.FieldChoice))
+			c = int64(randgen.Intn(len(t.FieldChoice)))
 			*choice = c
 		}
 		return t.FieldChoice[c][t.SrcField], nil

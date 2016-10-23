@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"sync"
 	"time"
 
@@ -23,9 +24,10 @@ import (
 // Config is a struct representing a Singleton which contains a copy of the running config
 // across all processes.  Should mirror the structure of $GOGEN_HOME/configs/default/global.yml
 type Config struct {
-	Global      Global      `json:"global"`
-	Samples     []*Sample   `json:"samples"`
-	Templates   []*Template `json:"templates"`
+	Global      Global         `json:"global"`
+	Samples     []*Sample      `json:"samples"`
+	Templates   []*Template    `json:"templates"`
+	Raters      []*RaterConfig `json:"raters"`
 	initialized bool
 
 	// Exported but internal use variables
@@ -122,9 +124,10 @@ func NewConfig() *Config {
 			if err := c.parseFileConfig(&c, fullConfig); err != nil {
 				log.Panic(err)
 			}
-			if filepath.Dir(fullConfig) != "." {
-				c.Global.SamplesDir = append(c.Global.SamplesDir, filepath.Dir(fullConfig))
-			}
+			// This seems like it might cause a regression, just commenting for now instead of removing
+			// if filepath.Dir(fullConfig) != "." {
+			// 	c.Global.SamplesDir = append(c.Global.SamplesDir, filepath.Dir(fullConfig))
+			// }
 		}
 		for i := 0; i < len(c.Samples); i++ {
 			c.Samples[i].realSample = true
@@ -213,6 +216,21 @@ func NewConfig() *Config {
 			return nil
 		})
 
+		// Read all raters in $GOGEN_HOME/config/raters
+		fullPath = filepath.Join(home, "config", "raters")
+		acceptableExtensions = map[string]bool{".yml": true, ".yaml": true, ".json": true}
+		c.walkPath(fullPath, acceptableExtensions, func(innerPath string) error {
+			var r RaterConfig
+
+			if err := c.parseFileConfig(&r, innerPath); err != nil {
+				log.Errorf("Error parsing config %s: %s", innerPath, err)
+				return err
+			}
+
+			c.Raters = append(c.Raters, &r)
+			return nil
+		})
+
 		c.readSamplesDir(samplesDir)
 	}
 
@@ -257,6 +275,19 @@ func NewConfig() *Config {
 					break
 				}
 			}
+		}
+	}
+
+	// Raters brought in from config will be typed wrong, validate and fixes
+	for i := 0; i < len(c.Raters); i++ {
+		c.validateRater(c.Raters[i])
+	}
+
+	// Due to data structure differences, we append default raters later in the startup process
+	if os.Getenv("GOGEN_EXPORT") != "1" {
+		raters := []*RaterConfig{defaultRaterConfig, defaultConfigRaterConfig}
+		for _, r := range raters {
+			c.Raters = append(c.Raters, r)
 		}
 	}
 
@@ -395,6 +426,9 @@ func (c *Config) validate(s *Sample) {
 		if s.Field == "" {
 			s.Field = defaultField
 		}
+		if s.RaterString == "" {
+			s.RaterString = defaultRater
+		}
 
 		ParseBeginEnd(s)
 
@@ -460,6 +494,41 @@ func (c *Config) validate(s *Sample) {
 						s.Tokens[i].Choice = temp
 					}
 					break
+				}
+			}
+		}
+
+		if os.Getenv("GOGEN_EXPORT") != "1" {
+			// If there's no _time token, add it to make sure we have a timestamp field in every event
+			timetoken := false
+			for _, t := range s.Tokens {
+				if t.Name == "_time" {
+					timetoken = true
+				}
+			}
+			for _, l := range s.Lines {
+				if _, ok := l["_time"]; ok {
+					timetoken = true
+				}
+			}
+			if !timetoken {
+				for i := 0; i < len(s.Lines); i++ {
+					s.Lines[i]["_time"] = "$_time$"
+				}
+				tt := Token{
+					Name:   "_time",
+					Type:   "epochtimestamp",
+					Format: "template",
+					Field:  "_time",
+					Token:  "$_time$",
+					Group:  999999,
+				}
+				s.Tokens = append(s.Tokens, tt)
+			}
+			// Fixup existing timestamp tokens to all use the same static group, 999999
+			for i := 0; i < len(s.Tokens); i++ {
+				if s.Tokens[i].Type == "timestamp" || s.Tokens[i].Type == "gotimestamp" || s.Tokens[i].Type == "epochtimestamp" {
+					s.Tokens[i].Group = 999999
 				}
 			}
 		}
@@ -625,6 +694,50 @@ func (c *Config) validate(s *Sample) {
 			}
 		}
 	}
+}
+
+// Returns a copy of the rater with the Options properly cast
+func (c *Config) validateRater(r *RaterConfig) {
+	configRaterKeys := map[string]bool{
+		"HourOfDay":    true,
+		"MinuteOfHour": true,
+		"DayOfWeek":    true,
+	}
+
+	opt := make(map[string]interface{})
+	for k, v := range r.Options {
+		var newvset interface{}
+		if configRaterKeys[k] {
+			newv := make(map[int]float64)
+			vcast := v.(map[string]interface{})
+			for k2, v2 := range vcast {
+				k2int, err := strconv.Atoi(k2)
+				if err != nil {
+					log.Fatalf("Rater key '%s' for rater '%s' in '%s' is not an integer value", k2, r.Name, k)
+				}
+				v2float, ok := v2.(float64)
+				if !ok {
+					log.Fatalf("Rater value '%#v' of key '%s' for rater '%s' in '%s' is not an integer value", v2, k2, r.Name, k)
+				}
+				newv[k2int] = v2float
+			}
+			newvset = newv
+		} else {
+			newvset = v
+		}
+		opt[k] = newvset
+	}
+	r.Options = opt
+}
+
+// FindRater returns a RaterConfig matched by the passed name
+func (c *Config) FindRater(name string) *RaterConfig {
+	for _, findr := range c.Raters {
+		if findr.Name == name {
+			return findr
+		}
+	}
+	return nil
 }
 
 // ParseBeginEnd parses the Begin and End settings for a sample

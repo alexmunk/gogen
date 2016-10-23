@@ -1053,9 +1053,11 @@ if __name__ == '__main__':
     if c.fileMaxBytes != None:
         export['global']['output']['maxBytes'] = c.fileMaxBytes
     export['samples'] = []
+    export['raters'] = []
 
 
     for s in c.samples:
+        localexport = copy.deepcopy(export)
         news = { }
         news['name'] = s.name
         news['begin'] = s.backfill
@@ -1066,6 +1068,19 @@ if __name__ == '__main__':
         news['randomizeCount'] = s.randomizeCount
         news['randomizeEvents'] = s.randomizeEvents
         news['lines'] = []
+        if s.hourOfDayRate != None or s.minuteOfHourRate != None or s.dayOfWeekRate != None:
+            news['rater'] = s.name
+            rater = { }
+            rater['name'] = s.name
+            rater['type'] = 'config'
+            rater['options'] = { }   
+            if s.hourOfDayRate != None:
+                rater['options']['HourOfDay'] = s.hourOfDayRate
+            if s.minuteOfHourRate != None:
+                rater['options']['MinuteOfHour'] = s.minuteOfHourRate
+            if s.dayOfWeekRate != None:
+                rater['options']['DayOfWeek'] = s.dayOfWeekRate
+            localexport['raters'].append(rater)
         for l in s.sampleDict:
             newline = { }
             for k, v in l.items():
@@ -1158,13 +1173,14 @@ if __name__ == '__main__':
                 token['replacement'] = s.tokens[i].replacement
                     
             news['tokens'].append(token)
-        if s.fileName != None and 'fileName' not in export['global']['output']:
-            export['global']['output']['fileName'] = s.fileName
-        if s.fileBackupFiles != None and 'fileBackupFiles' not in export['global']['output']:
-            export['global']['output']['backupFiles'] = s.fileBackupFiles
-        if s.fileMaxBytes != None and 'fileMaxBytes' not in export['global']['output']:
-            export['global']['output']['maxBytes'] = s.fileMaxBytes
-        export['samples'].append(news)
-        
+        if s.fileName != None and 'fileName' not in localexport['global']['output']:
+            localexport['global']['output']['fileName'] = s.fileName
+        if s.fileBackupFiles != None and 'fileBackupFiles' not in localexport['global']['output']:
+            localexport['global']['output']['backupFiles'] = s.fileBackupFiles
+        if s.fileMaxBytes != None and 'fileMaxBytes' not in localexport['global']['output']:
+            localexport['global']['output']['maxBytes'] = s.fileMaxBytes
+        localexport['samples'].append(news)
 
-    print json.dumps(export, indent=2)
+        f = open(s.name+'.json', 'w')
+        f.write(json.dumps(localexport, indent=2))
+        f.close()

@@ -89,7 +89,7 @@ func genSinglePass(item *config.GenQueueItem) error {
 func getBrokenEvent(item *config.GenQueueItem, i int) map[string]string {
 	s := item.S
 	ret := make(map[string]string, len(s.BrokenLines[i]))
-	choices := make(map[int]*int)
+	choices := make(map[int]*int64)
 	for k, v := range s.BrokenLines[i] {
 		event := bp.Get().(*bytes.Buffer)
 		event.Reset()
@@ -97,11 +97,11 @@ func getBrokenEvent(item *config.GenQueueItem, i int) map[string]string {
 			if st.T == nil {
 				event.WriteString(st.S)
 			} else {
-				var choice *int
+				var choice *int64
 				if choices[st.T.Group] != nil {
 					choice = choices[st.T.Group]
 				} else {
-					choice = new(int)
+					choice = new(int64)
 					*choice = -1
 				}
 				replacement, err := st.T.GenReplacement(choice, item.Earliest, item.Latest, item.Rand)
@@ -161,14 +161,14 @@ func genMultiPass(item *config.GenQueueItem) error {
 		// log.Debugf("Events: %#v", events)
 
 		for i := 0; i < item.Count; i++ {
-			choices := make(map[int]*int)
+			choices := make(map[int]*int64)
 			for _, token := range s.Tokens {
 				if fieldval, ok := events[i][token.Field]; ok {
-					var choice *int
+					var choice *int64
 					if choices[token.Group] != nil {
 						choice = choices[token.Group]
 					} else {
-						choice = new(int)
+						choice = new(int64)
 						*choice = -1
 					}
 					// log.Debugf("Replacing token '%s':'%s' with choice %d in fieldval: %s", token.Name, token.Token, *choice, fieldval)

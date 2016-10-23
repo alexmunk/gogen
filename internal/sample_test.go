@@ -15,6 +15,7 @@ func TestGenReplacement(t *testing.T) {
 	// Setup environment
 	os.Setenv("GOGEN_HOME", "..")
 	os.Setenv("GOGEN_ALWAYS_REFRESH", "1")
+	os.Setenv("GOGEN_FULLCONFIG", "")
 	home := ".."
 	os.Setenv("GOGEN_SAMPLES_DIR", filepath.Join(home, "tests", "tokens", "tokens.yml"))
 	loc, _ := time.LoadLocation("Local")
@@ -39,8 +40,9 @@ func TestGenReplacement(t *testing.T) {
 	testToken(10, "a8f6:236d:b3ef:c41e:4808:d6ed:ecb0:4067", s, t)
 	testToken(11, "2001-10-20 12:00:00.000", s, t)
 	testToken(12, "2001-10-20 12:00:00.000", s, t)
+	testToken(13, "1003604400", s, t)
 
-	choice := -1
+	choice := int64(-1)
 	token := s.Tokens[5]
 	replacement, _ := token.GenReplacement(&choice, now(), now(), randgen)
 	assert.Equal(t, "a", replacement)
@@ -52,7 +54,7 @@ func TestGenReplacement(t *testing.T) {
 	for i := 0; i < 1000; i++ {
 		choice = -1
 		_, _ = token.GenReplacement(&choice, now(), now(), randgen)
-		choices[choice] = choices[choice] + 1
+		choices[int(choice)] = choices[int(choice)] + 1
 	}
 	if choices[0] != 316 || choices[1] != 569 || choices[2] != 115 {
 		t.Fatalf("Choice distribution is off: %#v\n", choices)
@@ -71,7 +73,7 @@ func testToken(i int, value string, s *Sample, t *testing.T) {
 	now := func() time.Time {
 		return n
 	}
-	choice := -1
+	choice := int64(-1)
 	token := s.Tokens[i]
 	replacement, _ := token.GenReplacement(&choice, now(), now(), randgen)
 	assert.Equal(t, value, replacement)
@@ -124,7 +126,7 @@ func benchmarkToken(conf string, i int, b *testing.B) {
 
 	for n := 0; n < b.N; n++ {
 		token := s.Tokens[i]
-		choice := -1
+		choice := int64(-1)
 		_, _ = token.GenReplacement(&choice, now(), now(), randgen)
 	}
 }
@@ -149,7 +151,7 @@ func BenchmarkReplacement(b *testing.B) {
 	t := s.Tokens[0]
 
 	event := "$static$"
-	choice := -1
+	choice := int64(-1)
 
 	for n := 0; n < b.N; n++ {
 		_ = t.Replace(&event, &choice, now(), now(), randgen)

@@ -7,13 +7,8 @@ import (
 	"reflect"
 	"testing"
 
-	logging "github.com/op/go-logging"
 	"github.com/stretchr/testify/assert"
 )
-
-func TestLogLevel(t *testing.T) {
-	assert.Equal(t, logging.ERROR, DefaultLoggingLevel)
-}
 
 func TestProfileOff(t *testing.T) {
 	assert.Equal(t, false, ProfileOn)

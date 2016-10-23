@@ -5,6 +5,7 @@ import (
 
 	config "github.com/coccyx/gogen/internal"
 	log "github.com/coccyx/gogen/logger"
+	rater "github.com/coccyx/gogen/rater"
 )
 
 // Timer will put work into the generator queue on an interval specified by the Sample.
@@ -60,10 +61,10 @@ func (t *Timer) NewTimer() {
 }
 
 func (t *Timer) genWork() {
-	// TODO Implement rating
 	earliest := t.S.Now().Add(t.S.EarliestParsed)
 	latest := t.S.Now().Add(t.S.LatestParsed)
-	item := &config.GenQueueItem{S: t.S, Count: t.S.Count, Earliest: earliest, Latest: latest, OQ: t.OQ}
+	count := rater.EventRate(t.S, t.S.Now(), t.S.Count)
+	item := &config.GenQueueItem{S: t.S, Count: count, Earliest: earliest, Latest: latest, OQ: t.OQ}
 	log.Debugf("Placing item in queue for sample '%s': %#v", t.S.Name, item)
 	t.GQ <- item
 }

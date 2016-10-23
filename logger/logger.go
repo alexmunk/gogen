@@ -11,6 +11,13 @@ import (
 	"strings"
 )
 
+// DefaultLogLevel sets the default log level
+var DefaultLogLevel logrus.Level
+
+func init() {
+	DefaultLogLevel = logrus.ErrorLevel
+}
+
 // Fields allows passing key value pairs to Logrus
 type Fields map[string]interface{}
 
@@ -45,7 +52,7 @@ func (hook ContextHook) Fire(entry *logrus.Entry) error {
 func init() {
 	logrus.SetFormatter(&prefixed.TextFormatter{TimestampFormat: "Jan 02 03:04:05.000"})
 	logrus.AddHook(ContextHook{})
-	logrus.SetLevel(logrus.ErrorLevel)
+	logrus.SetLevel(DefaultLogLevel)
 }
 
 // WithField adds a field to the logrus entry
