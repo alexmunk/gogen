@@ -37,7 +37,7 @@ func TestDefaultRaterEventRate(t *testing.T) {
 	s := c.FindSampleByName("defaultrater")
 	assert.Equal(t, "default", s.RaterString)
 	ret := EventRate(s, time.Now(), 1)
-	assert.IsType(t, DefaultRater{}, s.Rater)
+	assert.IsType(t, &DefaultRater{}, s.Rater)
 	assert.True(t, assert.ObjectsAreEqual(r, s.Rater.(*DefaultRater).c))
 	assert.Equal(t, 1, ret)
 }

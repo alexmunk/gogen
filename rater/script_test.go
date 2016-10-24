@@ -37,7 +37,7 @@ func TestScriptRaterEventRate(t *testing.T) {
 	s := c.FindSampleByName("double")
 	assert.Equal(t, "multiply", s.RaterString)
 	ret := EventRate(s, time.Now(), 1)
-	assert.IsType(t, ScriptRater{}, s.Rater)
+	assert.IsType(t, &ScriptRater{}, s.Rater)
 	assert.True(t, assert.ObjectsAreEqual(r, s.Rater.(*ScriptRater).c))
 	assert.Equal(t, 2, ret)
 }

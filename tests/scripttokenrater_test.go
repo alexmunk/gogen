@@ -20,5 +20,5 @@ func TestScriptRaterTokenRate(t *testing.T) {
 	c := config.NewConfig()
 	run.Run(c)
 
-	assert.Equal(t, "value=2\n", c.Buf.String())
+	assert.Equal(t, "value=2\nvalue=2\n", c.Buf.String())
 }

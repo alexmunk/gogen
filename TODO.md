@@ -1,8 +1,6 @@
 # Todo
 
 * Unit test coverage 90%
-* Implement rating for event counts and rated fields
-    * Rating should support lua based raters as well
 * Implement replay generator
 * Integrate LUA interpret for custom generators and raters
     * Add Sample as reflected global in Lua interpreter

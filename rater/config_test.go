@@ -62,7 +62,7 @@ func TestConfigRaterEventRate(t *testing.T) {
 		return n
 	}
 	ret := EventRate(s, now(), 1)
-	assert.IsType(t, ConfigRater{}, s.Rater)
+	assert.IsType(t, &ConfigRater{}, s.Rater)
 	assert.True(t, assert.ObjectsAreEqual(r, s.Rater.(*ConfigRater).c))
 	assert.Equal(t, 2, ret)
 

@@ -14,9 +14,9 @@ func TestDefaultConfigRater(t *testing.T) {
 	os.Setenv("GOGEN_ALWAYS_REFRESH", "1")
 	home := ".."
 
-	c := config.NewConfig()
+	c := NewConfig()
 
-	var rater config.RaterConfig
+	var rater RaterConfig
 
 	fullPath := filepath.Join(home, "tests", "rater", "defaultconfigrater.yml")
 	if err := c.parseFileConfig(&rater, fullPath); err != nil {
