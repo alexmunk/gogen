@@ -8,3 +8,4 @@ build.sh
 .githubtoken
 linecount.sh
 gogen-api/getswagger.sh
+local/**

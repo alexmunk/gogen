@@ -18,7 +18,7 @@ func TestGenReplacement(t *testing.T) {
 	os.Setenv("GOGEN_FULLCONFIG", "")
 	home := ".."
 	os.Setenv("GOGEN_SAMPLES_DIR", filepath.Join(home, "tests", "tokens", "tokens.yml"))
-	loc, _ := time.LoadLocation("Local")
+	loc, _ := time.LoadLocation("UTC")
 	source := rand.NewSource(0)
 	randgen := rand.New(source)
 
@@ -40,7 +40,7 @@ func TestGenReplacement(t *testing.T) {
 	testToken(10, "a8f6:236d:b3ef:c41e:4808:d6ed:ecb0:4067", s, t)
 	testToken(11, "2001-10-20 12:00:00.000", s, t)
 	testToken(12, "2001-10-20 12:00:00.000", s, t)
-	testToken(13, "1003604400", s, t)
+	testToken(13, "1003579200", s, t)
 
 	choice := int64(-1)
 	token := s.Tokens[5]
@@ -66,7 +66,7 @@ func TestGenReplacement(t *testing.T) {
 }
 
 func testToken(i int, value string, s *Sample, t *testing.T) {
-	loc, _ := time.LoadLocation("Local")
+	loc, _ := time.LoadLocation("UTC")
 	source := rand.NewSource(0)
 	randgen := rand.New(source)
 	n := time.Date(2001, 10, 20, 12, 0, 0, 100000, loc)
