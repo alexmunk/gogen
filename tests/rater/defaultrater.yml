@@ -1,0 +1,5 @@
+samples:
+  - name: defaultrater
+    count: 1
+    lines:
+    - "_raw": foo

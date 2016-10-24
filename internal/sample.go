@@ -98,6 +98,8 @@ type Token struct {
 	FieldChoice    []map[string]string `json:"fieldChoice,omitempty"`
 	Choice         []string            `json:"choice,omitempty"`
 	Script         string              `json:"script,omitempty"`
+	RaterString    string              `json:"rater,omitempty"`
+	Rater          Rater               `json:"-"`
 
 	L        *lua.LState `json:"-"`
 	luaState *lua.LTable
@@ -129,14 +131,14 @@ type StringOrToken struct {
 // Replace replaces any instances of this token in the string pointed to by event.  Since time is native is Gogen, we can pass in
 // earliest and latest time ranges to generate the event between.  Lastly, some times we want to span a selected choice over multiple
 // tokens.  Passing in a pointer to choice allows the replacement to choose a preselected row in FieldChoice or Choice.
-func (t Token) Replace(event *string, choice *int64, et time.Time, lt time.Time, randgen *rand.Rand) error {
+func (t Token) Replace(event *string, choice *int64, et time.Time, lt time.Time, now time.Time, randgen *rand.Rand) error {
 	// s := t.Sample
 	e := *event
 
 	if pos1, pos2, err := t.GetReplacementOffsets(*event); err != nil {
 		return nil
 	} else {
-		replacement, err := t.GenReplacement(choice, et, lt, randgen)
+		replacement, err := t.GenReplacement(choice, et, lt, now, randgen)
 		if err != nil {
 			return err
 		}
@@ -167,7 +169,7 @@ func (t Token) GetReplacementOffsets(event string) (int, int, error) {
 
 // GenReplacement generates a replacement value for the token.  choice allows the user to specify
 // a specific value to choose in the array.  This is useful for saving picks amongst tokens.
-func (t Token) GenReplacement(choice *int64, et time.Time, lt time.Time, randgen *rand.Rand) (string, error) {
+func (t Token) GenReplacement(choice *int64, et time.Time, lt time.Time, now time.Time, randgen *rand.Rand) (string, error) {
 	c := *choice
 	switch t.Type {
 	case "timestamp", "gotimestamp", "epochtimestamp":
@@ -195,16 +197,38 @@ func (t Token) GenReplacement(choice *int64, et time.Time, lt time.Time, randgen
 		}
 	case "static":
 		return t.Replacement, nil
-	case "random":
+	case "random", "rated":
 		switch t.Replacement {
 		case "int":
-			offset := 0 - t.Lower
-			return strconv.Itoa(randgen.Intn(t.Upper-offset) + offset), nil
+			var ret int
+			if (t.Upper - t.Lower) > 0 {
+				ret = randgen.Intn(t.Upper-t.Lower) + t.Lower
+			} else if (t.Upper - t.Lower) <= 0 {
+				ret = t.Upper
+			}
+			if t.Type == "rated" {
+				rate := t.Rater.TokenRate(&t, now)
+				rated := float64(ret) * rate
+				if rated < 0 {
+					ret = int(rated - 0.5)
+				} else {
+					ret = int(rated + 0.5)
+				}
+			}
+			return strconv.Itoa(ret), nil
 		case "float":
 			lower := t.Lower * int(math.Pow10(t.Precision))
-			offset := 0 - lower
 			upper := t.Upper * int(math.Pow10(t.Precision))
-			f := float64(randgen.Intn(upper-offset)+offset) / math.Pow10(t.Precision)
+			var f float64
+			if (upper - lower) > 0 {
+				f = float64(randgen.Intn(upper-lower)+lower) / math.Pow10(t.Precision)
+			} else {
+				f = float64(upper) / math.Pow10(t.Precision)
+			}
+			if t.Type == "rated" {
+				rate := t.Rater.TokenRate(&t, now)
+				f = f * rate
+			}
 			return strconv.FormatFloat(f, 'f', t.Precision, 64), nil
 		case "string", "hex":
 			b := make([]byte, t.Length)

@@ -44,16 +44,16 @@ func TestGenReplacement(t *testing.T) {
 
 	choice := int64(-1)
 	token := s.Tokens[5]
-	replacement, _ := token.GenReplacement(&choice, now(), now(), randgen)
+	replacement, _ := token.GenReplacement(&choice, now(), now(), now(), randgen)
 	assert.Equal(t, "a", replacement)
-	replacement, _ = token.GenReplacement(&choice, now(), now(), randgen)
+	replacement, _ = token.GenReplacement(&choice, now(), now(), now(), randgen)
 	assert.Equal(t, "a", replacement)
 
 	token = s.Tokens[6]
 	choices := make(map[int]int)
 	for i := 0; i < 1000; i++ {
 		choice = -1
-		_, _ = token.GenReplacement(&choice, now(), now(), randgen)
+		_, _ = token.GenReplacement(&choice, now(), now(), now(), randgen)
 		choices[int(choice)] = choices[int(choice)] + 1
 	}
 	if choices[0] != 316 || choices[1] != 569 || choices[2] != 115 {
@@ -61,7 +61,7 @@ func TestGenReplacement(t *testing.T) {
 	}
 
 	token = s.Tokens[8]
-	replacement, _ = token.GenReplacement(&choice, now(), now(), randgen)
+	replacement, _ = token.GenReplacement(&choice, now(), now(), now(), randgen)
 	fmt.Printf("UUID: %s\n", replacement)
 }
 
@@ -75,7 +75,7 @@ func testToken(i int, value string, s *Sample, t *testing.T) {
 	}
 	choice := int64(-1)
 	token := s.Tokens[i]
-	replacement, _ := token.GenReplacement(&choice, now(), now(), randgen)
+	replacement, _ := token.GenReplacement(&choice, now(), now(), now(), randgen)
 	assert.Equal(t, value, replacement)
 }
 
@@ -127,7 +127,7 @@ func benchmarkToken(conf string, i int, b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		token := s.Tokens[i]
 		choice := int64(-1)
-		_, _ = token.GenReplacement(&choice, now(), now(), randgen)
+		_, _ = token.GenReplacement(&choice, now(), now(), now(), randgen)
 	}
 }
 
@@ -154,7 +154,7 @@ func BenchmarkReplacement(b *testing.B) {
 	choice := int64(-1)
 
 	for n := 0; n < b.N; n++ {
-		_ = t.Replace(&event, &choice, now(), now(), randgen)
+		_ = t.Replace(&event, &choice, now(), now(), now(), randgen)
 		event = "$static$"
 		choice = -1
 	}

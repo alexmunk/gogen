@@ -1,0 +1,39 @@
+samples:
+  - name: alwaysup
+    rater: alwaysup
+    interval: 1
+    count: 1
+    tokens:
+      - name: rated
+        format: template
+        type: rated
+        replacement: float
+        rater: alwaysup
+        lower: 1.0
+        upper: 1.0
+        precision: 2
+      - name: id
+        format: template
+        type: script
+        script: >
+            if state["id"] == nil then
+                state["id"] = 1
+            else
+                state["id"] = state["id"] + 1
+            end
+            return state["id"]
+    lines:
+    - "_raw": id=$id$ value=$rated$
+raters:
+  - name: alwaysup
+    type: script
+    # Goes up by multiplier on every iteration
+    script: >
+        if state["count"] == nil then
+            state["count"] = 1.0
+        else
+            state["count"] = state["count"] * options["multiplier"]
+        end
+        return state["count"]
+    options:
+        multiplier: 1.01

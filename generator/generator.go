@@ -27,6 +27,7 @@ func Start(gq chan *config.GenQueueItem, gqs chan int) {
 				s := new(sample)
 				item.S.Gen = s
 			}
+			PrimeRater(item.S)
 		}
 		log.Debugf("Generating item %#v", item)
 		item.S.Gen.Gen(item)

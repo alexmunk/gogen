@@ -455,6 +455,9 @@ func (c *Config) validate(s *Sample) {
 
 		// log.Debugf("Resolving '%s'", s.Name)
 		for i := 0; i < len(s.Tokens); i++ {
+			if s.Tokens[i].Type == "rated" && s.Tokens[i].RaterString == "" {
+				s.Tokens[i].RaterString = "default"
+			}
 			if s.Tokens[i].Field == "" {
 				s.Tokens[i].Field = s.Field
 			}

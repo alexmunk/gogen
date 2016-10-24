@@ -1,0 +1,25 @@
+global:
+  output:
+    outputter: buf
+samples:
+  - name: double
+    rater: multiply
+    count: 1
+    endIntervals: 1
+    tokens:
+    - name: multiply
+      format: template
+      type: rated
+      rater: multiply
+      replacement: int
+      upper: 1
+      lower: 1
+    lines:
+    - "_raw": value=$multiply$
+raters:
+  - name: multiply
+    type: script
+    script: >
+        return options["multiplier"]
+    options:
+        multiplier: 2
