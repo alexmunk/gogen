@@ -11,6 +11,7 @@ import (
 
 	strftime "github.com/cactus/gostrftime"
 	log "github.com/coccyx/gogen/logger"
+	"github.com/pbnjay/strptime"
 	"github.com/satori/go.uuid"
 	lua "github.com/yuin/gopher-lua"
 )
@@ -55,6 +56,7 @@ type Sample struct {
 	Current        time.Time                    `json:"-"` // If we are backfilling or generating for a specified time window, what time is it?
 	Realtime       bool                         `json:"-"` // Are we done doing batch backfill or specified time window?
 	BrokenLines    []map[string][]StringOrToken `json:"-"`
+	ReplayOffsets  []time.Duration              `json:"-"`
 	realSample     bool                         // Used to represent samples which aren't just used to store lines from CSV or raw
 }
 
@@ -300,4 +302,31 @@ func (t Token) GenReplacement(choice *int64, et time.Time, lt time.Time, now tim
 		return lua.LVAsString(L.Get(-1)), nil
 	}
 	return "", fmt.Errorf("GenReplacement called with invalid type for token '%s' with type '%s'", t.Name, t.Type)
+}
+
+// ParseTimestamp will return a time.Time based on the configured token's setup
+func (t Token) ParseTimestamp(eventts string) (time.Time, error) {
+	switch t.Type {
+	case "timestamp":
+		ts, err := strptime.Parse(eventts, t.Replacement)
+		if err != nil {
+			return time.Time{}, err
+		}
+		return ts, nil
+	case "gotimestamp":
+		ts, err := time.Parse(t.Replacement, eventts)
+		if err != nil {
+			return time.Time{}, err
+		}
+		return ts, nil
+	case "epochtimestamp":
+		tsi, err := strconv.ParseInt(eventts, 10, 64)
+		if err != nil {
+			return time.Time{}, err
+		}
+		ts := time.Unix(tsi, 0)
+		return ts, nil
+	default:
+		return time.Time{}, fmt.Errorf("Token not a timestamp token")
+	}
 }

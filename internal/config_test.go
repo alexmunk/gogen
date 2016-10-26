@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -142,6 +143,28 @@ func TestSinglePass(t *testing.T) {
 	assert.Len(t, s.BrokenLines[0]["_raw"], 6)
 	assert.Len(t, s.BrokenLines[1]["transtype"], 2)
 	assert.Len(t, s.BrokenLines[1]["_raw"], 6)
+}
+
+func TestReplay(t *testing.T) {
+	// Setup environment
+	os.Setenv("GOGEN_HOME", "..")
+	os.Setenv("GOGEN_ALWAYS_REFRESH", "1")
+	home := filepath.Join("..", "tests", "replay")
+	rand.Seed(0)
+
+	checks := []string{
+		"no-offsets-found",
+		"bad-strptime-timestamp",
+		"bad-go-timestamp",
+		"bad-epoch-timestamp",
+	}
+	for _, v := range checks {
+		s := FindSampleInFile(home, v)
+		assert.Nil(t, s)
+	}
+
+	s := FindSampleInFile(home, "replay5")
+	assert.Equal(t, []time.Duration{13187500000, (1 * time.Second), (5 * time.Second), (10 * time.Second), (20 * time.Second)}, s.ReplayOffsets)
 }
 
 func FindSampleInFile(home string, name string) *Sample {

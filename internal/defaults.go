@@ -1,7 +1,7 @@
 package config
 
 // ProfileOn determines whether we should run a CPU profiler for perf optimization
-const ProfileOn = false
+const ProfileOn = true
 
 // Default global values
 const defaultGeneratorWorkers = 1

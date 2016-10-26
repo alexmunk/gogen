@@ -95,6 +95,31 @@ func TestLuaReplacement(t *testing.T) {
 	testToken(4, "4C345", s, t)
 }
 
+func TestParseTimestamp(t *testing.T) {
+	// Setup environment
+	os.Setenv("GOGEN_HOME", "..")
+	os.Setenv("GOGEN_ALWAYS_REFRESH", "1")
+	os.Setenv("GOGEN_FULLCONFIG", "")
+	home := ".."
+	os.Setenv("GOGEN_SAMPLES_DIR", filepath.Join(home, "tests", "tokens", "tokens.yml"))
+	loc, _ := time.LoadLocation("UTC")
+
+	n := time.Date(2001, 10, 20, 12, 0, 0, 0, loc)
+
+	c := NewConfig()
+	s := c.FindSampleByName("tokens")
+
+	token := s.Tokens[11]
+	ts, _ := token.ParseTimestamp("2001-10-20 12:00:00.000")
+	assert.Equal(t, n, ts)
+	token = s.Tokens[12]
+	ts, _ = token.ParseTimestamp("2001-10-20 12:00:00.000")
+	assert.Equal(t, n, ts)
+	token = s.Tokens[13]
+	ts, _ = token.ParseTimestamp("1003579200")
+	assert.Equal(t, n.Local(), ts)
+}
+
 func BenchmarkGoStatic(b *testing.B)      { benchmarkToken("tokens", 0, b) }
 func BenchmarkGoRandInt(b *testing.B)     { benchmarkToken("tokens", 1, b) }
 func BenchmarkGoRandFloat(b *testing.B)   { benchmarkToken("tokens", 2, b) }

@@ -14,8 +14,3 @@
     * Outputters should acknowledge output and that should increment state counters
     * Each timer thread should write current state after ack
     * This can also be used for performance counters
-
-
-Bugs:
-
-http output not working

@@ -503,6 +503,7 @@ func (c *Config) validate(s *Sample) {
 
 		if os.Getenv("GOGEN_EXPORT") != "1" {
 			// If there's no _time token, add it to make sure we have a timestamp field in every event
+			// This is primarily used for Splunk's HTTP Event Collectot
 			timetoken := false
 			for _, t := range s.Tokens {
 				if t.Name == "_time" {
@@ -594,6 +595,8 @@ func (c *Config) validate(s *Sample) {
 			}
 		}
 
+		// Check if we are able to do singlepass on this sample by looping through all lines
+		// and ensuring we can match all the tokens on each line
 		if !s.Disabled {
 			s.SinglePass = true
 
@@ -623,6 +626,7 @@ func (c *Config) validate(s *Sample) {
 					tp[t.Field] = append(tp[t.Field], pos)
 				}
 
+				// Ensure we don't have any tokens overlapping one another for singlepass
 				for _, v := range tp {
 					sort.Sort(v)
 
@@ -694,6 +698,51 @@ func (c *Config) validate(s *Sample) {
 						s.BrokenLines = append(s.BrokenLines, bline)
 					}
 				}
+			}
+		}
+
+		if s.Generator == "replay" {
+			// For replay, loop through all events, attempt to find a timestamp in each row, store sleep times in a data structure
+			s.ReplayOffsets = make([]time.Duration, len(s.Lines))
+			var lastts time.Time
+			var avgOffset time.Duration
+		outer2:
+			for i := 0; i < len(s.Lines); i++ {
+			inner2:
+				for _, t := range s.Tokens {
+					if t.Type == "timestamp" || t.Type == "gotimestamp" || t.Type == "epochtimestamp" {
+						pos1, pos2, err := t.GetReplacementOffsets(s.Lines[i][t.Field])
+						if err != nil {
+							log.WithFields(log.Fields{
+								"token":  t.Name,
+								"sample": s.Name,
+								"err":    err,
+							}).Errorf("Error getting timestamp offsets, disabling sample")
+							s.Disabled = true
+							break outer2
+						}
+						ts, err := t.ParseTimestamp(s.Lines[i][t.Field][pos1:pos2])
+						if err != nil {
+							log.WithFields(log.Fields{
+								"token":  t.Name,
+								"sample": s.Name,
+								"err":    err,
+								"event":  s.Lines[0][t.Field],
+							}).Errorf("Error parsing timestamp, disabling sample")
+							s.Disabled = true
+							break outer2
+						}
+						if i == 0 {
+							s.ReplayOffsets[0] = time.Duration(0)
+						} else {
+							s.ReplayOffsets[i] = lastts.Sub(ts) * -1
+							avgOffset = (avgOffset + s.ReplayOffsets[i]) / 2
+						}
+						lastts = ts
+						break inner2
+					}
+				}
+				s.ReplayOffsets[0] = avgOffset
 			}
 		}
 	}
