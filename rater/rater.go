@@ -25,11 +25,7 @@ func EventRate(s *config.Sample, now time.Time, count int) (ret int) {
 }
 
 // TokenRate takes a token and returns the rated value
-func TokenRate(t *config.Token, now time.Time) float64 {
-	if t.Rater == nil {
-		t.Rater = GetRater(t.RaterString)
-		log.Infof("Setting rater to type %s, for token '%s'", reflect.TypeOf(t.Rater), t.Name)
-	}
+func TokenRate(t config.Token, now time.Time) float64 {
 	return t.Rater.GetRate(now)
 }
 

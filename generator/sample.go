@@ -10,6 +10,7 @@ import (
 )
 
 var bp sync.Pool
+var ep sync.Pool
 
 func init() {
 	bp = sync.Pool{
@@ -86,7 +87,7 @@ func genSinglePass(item *config.GenQueueItem) error {
 func getBrokenEvent(item *config.GenQueueItem, i int) map[string]string {
 	s := item.S
 	ret := make(map[string]string, len(s.BrokenLines[i]))
-	choices := make(map[int]*int64)
+	choices := make(map[int]int)
 	for k, v := range s.BrokenLines[i] {
 		event := bp.Get().(*bytes.Buffer)
 		event.Reset()
@@ -94,14 +95,13 @@ func getBrokenEvent(item *config.GenQueueItem, i int) map[string]string {
 			if st.T == nil {
 				event.WriteString(st.S)
 			} else {
-				var choice *int64
-				if choices[st.T.Group] != nil {
+				var choice int
+				if _, ok := choices[st.T.Group]; ok {
 					choice = choices[st.T.Group]
 				} else {
-					choice = new(int64)
-					*choice = -1
+					choice = -1
 				}
-				replacement, err := st.T.GenReplacement(choice, item.Earliest, item.Latest, item.S.Now(), item.Rand)
+				replacement, choice, err := st.T.GenReplacement(choice, item.Earliest, item.Latest, item.Now, item.Rand)
 				if err != nil {
 					log.Errorf("Error generating replacement for token '%s' in sample '%s'", st.T.Name, s.Name)
 				}
@@ -136,13 +136,13 @@ func genMultiPass(item *config.GenQueueItem) error {
 					events = append(events, copyevent(s.Lines[i]))
 				}
 			} else {
-				iters := int(math.Ceil(float64(item.S.Count) / float64(slen)))
+				iters := int(math.Ceil(float64(item.Count) / float64(slen)))
 				// log.Debugf("Sequentially filling events for sample '%s' of size %d with %d events over %d iterations", s.Name, slen, item.Count, iters)
 				for i := 0; i < iters; i++ {
 					var count int
 					// start := i * slen
 					if i == iters-1 {
-						count = (item.S.Count - (i * slen))
+						count = (item.Count - (i * slen))
 					} else {
 						count = slen
 					}
@@ -158,18 +158,18 @@ func genMultiPass(item *config.GenQueueItem) error {
 		// log.Debugf("Events: %#v", events)
 
 		for i := 0; i < item.Count; i++ {
-			choices := make(map[int]*int64)
+			choices := make(map[int]int)
 			for _, token := range s.Tokens {
 				if fieldval, ok := events[i][token.Field]; ok {
-					var choice *int64
-					if choices[token.Group] != nil {
+					var choice int
+					var err error
+					if _, ok := choices[token.Group]; ok {
 						choice = choices[token.Group]
 					} else {
-						choice = new(int64)
-						*choice = -1
+						choice = -1
 					}
 					// log.Debugf("Replacing token '%s':'%s' with choice %d in fieldval: %s", token.Name, token.Token, *choice, fieldval)
-					if err := token.Replace(&fieldval, choice, item.Earliest, item.Latest, item.S.Now(), item.Rand); err == nil {
+					if choice, err = token.Replace(&fieldval, choice, item.Earliest, item.Latest, item.Now, item.Rand); err == nil {
 						events[i][token.Field] = fieldval
 					} else {
 						log.Error(err)

@@ -42,26 +42,24 @@ func TestGenReplacement(t *testing.T) {
 	testToken(12, "2001-10-20 12:00:00.000", s, t)
 	testToken(13, "1003579200", s, t)
 
-	choice := int64(-1)
 	token := s.Tokens[5]
-	replacement, _ := token.GenReplacement(&choice, now(), now(), now(), randgen)
+	replacement, _, _ := token.GenReplacement(-1, now(), now(), now(), randgen)
 	assert.Equal(t, "a", replacement)
-	replacement, _ = token.GenReplacement(&choice, now(), now(), now(), randgen)
+	replacement, _, _ = token.GenReplacement(-1, now(), now(), now(), randgen)
 	assert.Equal(t, "a", replacement)
 
 	token = s.Tokens[6]
 	choices := make(map[int]int)
 	for i := 0; i < 1000; i++ {
-		choice = -1
-		_, _ = token.GenReplacement(&choice, now(), now(), now(), randgen)
-		choices[int(choice)] = choices[int(choice)] + 1
+		_, choice, _ := token.GenReplacement(-1, now(), now(), now(), randgen)
+		choices[choice] = choices[choice] + 1
 	}
-	if choices[0] != 316 || choices[1] != 569 || choices[2] != 115 {
+	if choices[0] != 315 || choices[1] != 570 || choices[2] != 115 {
 		t.Fatalf("Choice distribution is off: %#v\n", choices)
 	}
 
 	token = s.Tokens[8]
-	replacement, _ = token.GenReplacement(&choice, now(), now(), now(), randgen)
+	replacement, _, _ = token.GenReplacement(-1, now(), now(), now(), randgen)
 	fmt.Printf("UUID: %s\n", replacement)
 }
 
@@ -73,9 +71,8 @@ func testToken(i int, value string, s *Sample, t *testing.T) {
 	now := func() time.Time {
 		return n
 	}
-	choice := int64(-1)
 	token := s.Tokens[i]
-	replacement, _ := token.GenReplacement(&choice, now(), now(), now(), randgen)
+	replacement, _, _ := token.GenReplacement(-1, now(), now(), now(), randgen)
 	assert.Equal(t, value, replacement)
 }
 
@@ -126,8 +123,7 @@ func benchmarkToken(conf string, i int, b *testing.B) {
 
 	for n := 0; n < b.N; n++ {
 		token := s.Tokens[i]
-		choice := int64(-1)
-		_, _ = token.GenReplacement(&choice, now(), now(), now(), randgen)
+		_, _, _ = token.GenReplacement(-1, now(), now(), now(), randgen)
 	}
 }
 
@@ -151,11 +147,9 @@ func BenchmarkReplacement(b *testing.B) {
 	t := s.Tokens[0]
 
 	event := "$static$"
-	choice := int64(-1)
 
 	for n := 0; n < b.N; n++ {
-		_ = t.Replace(&event, &choice, now(), now(), now(), randgen)
+		_, _ = t.Replace(&event, -1, now(), now(), now(), randgen)
 		event = "$static$"
-		choice = -1
 	}
 }

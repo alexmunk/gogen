@@ -120,8 +120,8 @@ func table(l []share.GogenList) {
 
 func main() {
 	if config.ProfileOn {
-		defer profile.Start(profile.CPUProfile, profile.ProfilePath(".")).Stop()
-		// defer profile.Start(profile.MemProfile, profile.ProfilePath(".")).Stop()
+		// defer profile.Start(profile.CPUProfile, profile.ProfilePath(".")).Stop()
+		defer profile.Start(profile.MemProfile, profile.ProfilePath(".")).Stop()
 	}
 	rand.Seed(time.Now().UnixNano())
 

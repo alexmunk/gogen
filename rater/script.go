@@ -38,6 +38,6 @@ func (sr *ScriptRater) EventRate(s *config.Sample, now time.Time, count int) int
 }
 
 // TokenRate takes a token and returns the rated value
-func (sr *ScriptRater) TokenRate(t *config.Token, now time.Time) float64 {
+func (sr *ScriptRater) TokenRate(t config.Token, now time.Time) float64 {
 	return TokenRate(t, now)
 }

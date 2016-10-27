@@ -501,7 +501,7 @@ func (c *Config) validate(s *Sample) {
 			}
 		}
 
-		if os.Getenv("GOGEN_EXPORT") != "1" {
+		if os.Getenv("GOGEN_EXPORT") != "1" && c.Global.Output.OutputTemplate == "splunkhec" {
 			// If there's no _time token, add it to make sure we have a timestamp field in every event
 			timetoken := false
 			for _, t := range s.Tokens {
@@ -524,14 +524,14 @@ func (c *Config) validate(s *Sample) {
 					Format: "template",
 					Field:  "_time",
 					Token:  "$_time$",
-					Group:  999999,
+					Group:  -1,
 				}
 				s.Tokens = append(s.Tokens, tt)
 			}
 			// Fixup existing timestamp tokens to all use the same static group, 999999
 			for i := 0; i < len(s.Tokens); i++ {
 				if s.Tokens[i].Type == "timestamp" || s.Tokens[i].Type == "gotimestamp" || s.Tokens[i].Type == "epochtimestamp" {
-					s.Tokens[i].Group = 999999
+					s.Tokens[i].Group = -1
 				}
 			}
 		}

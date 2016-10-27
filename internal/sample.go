@@ -101,8 +101,10 @@ type Token struct {
 	RaterString    string              `json:"rater,omitempty"`
 	Rater          Rater               `json:"-"`
 
-	L        *lua.LState `json:"-"`
-	luaState *lua.LTable
+	L                          *lua.LState `json:"-"`
+	luaState                   *lua.LTable
+	weightedChoiceTotals       []int
+	weightedChoiceRunningTotal int
 }
 
 // WeightedChoice is a simple data structure for allowing a list of items with a Choice to pick and a Weight for that choice
@@ -131,19 +133,19 @@ type StringOrToken struct {
 // Replace replaces any instances of this token in the string pointed to by event.  Since time is native is Gogen, we can pass in
 // earliest and latest time ranges to generate the event between.  Lastly, some times we want to span a selected choice over multiple
 // tokens.  Passing in a pointer to choice allows the replacement to choose a preselected row in FieldChoice or Choice.
-func (t Token) Replace(event *string, choice *int64, et time.Time, lt time.Time, now time.Time, randgen *rand.Rand) error {
+func (t Token) Replace(event *string, choice int, et time.Time, lt time.Time, now time.Time, randgen *rand.Rand) (int, error) {
 	// s := t.Sample
 	e := *event
 
 	if pos1, pos2, err := t.GetReplacementOffsets(*event); err != nil {
-		return nil
+		return -1, nil
 	} else {
-		replacement, err := t.GenReplacement(choice, et, lt, now, randgen)
+		replacement, choice, err := t.GenReplacement(choice, et, lt, now, randgen)
 		if err != nil {
-			return err
+			return -1, err
 		}
 		*event = e[:pos1] + replacement + e[pos2:]
-		return nil
+		return choice, nil
 	}
 }
 
@@ -169,35 +171,28 @@ func (t Token) GetReplacementOffsets(event string) (int, int, error) {
 
 // GenReplacement generates a replacement value for the token.  choice allows the user to specify
 // a specific value to choose in the array.  This is useful for saving picks amongst tokens.
-func (t Token) GenReplacement(choice *int64, et time.Time, lt time.Time, now time.Time, randgen *rand.Rand) (string, error) {
-	c := *choice
+func (t Token) GenReplacement(choice int, et time.Time, lt time.Time, now time.Time, randgen *rand.Rand) (string, int, error) {
 	switch t.Type {
 	case "timestamp", "gotimestamp", "epochtimestamp":
-		var replacementTime time.Time
-		if c == -1 {
-			td := lt.Sub(et)
+		td := lt.Sub(et)
 
-			var tdr int
-			if int(td) > 0 {
-				tdr = randgen.Intn(int(td))
-			}
-			rd := time.Duration(tdr)
-			replacementTime = lt.Add(rd * -1)
-			*choice = replacementTime.UnixNano()
-		} else {
-			replacementTime = time.Unix(0, c)
+		var tdr int
+		if int(td) > 0 {
+			tdr = randgen.Intn(int(td))
 		}
+		rd := time.Duration(tdr)
+		replacementTime := lt.Add(rd * -1)
 		switch t.Type {
 		case "timestamp":
-			return strftime.Format(t.Replacement, replacementTime), nil
+			return strftime.Format(t.Replacement, replacementTime), -1, nil
 		case "gotimestamp":
-			return replacementTime.Format(t.Replacement), nil
+			return replacementTime.Format(t.Replacement), -1, nil
 		case "epochtimestamp":
-			return strconv.FormatInt(replacementTime.Unix(), 10), nil
+			return strconv.FormatInt(replacementTime.Unix(), 10), -1, nil
 		}
 	case "static":
-		return t.Replacement, nil
-	case "random", "rated":
+		return t.Replacement, -1, nil
+	case "rated":
 		switch t.Replacement {
 		case "int":
 			var ret int
@@ -206,16 +201,14 @@ func (t Token) GenReplacement(choice *int64, et time.Time, lt time.Time, now tim
 			} else if (t.Upper - t.Lower) <= 0 {
 				ret = t.Upper
 			}
-			if t.Type == "rated" {
-				rate := t.Rater.TokenRate(&t, now)
-				rated := float64(ret) * rate
-				if rated < 0 {
-					ret = int(rated - 0.5)
-				} else {
-					ret = int(rated + 0.5)
-				}
+			rate := t.Rater.TokenRate(t, now)
+			rated := float64(ret) * rate
+			if rated < 0 {
+				ret = int(rated - 0.5)
+			} else {
+				ret = int(rated + 0.5)
 			}
-			return strconv.Itoa(ret), nil
+			return strconv.Itoa(ret), -1, nil
 		case "float":
 			lower := t.Lower * int(math.Pow10(t.Precision))
 			upper := t.Upper * int(math.Pow10(t.Precision))
@@ -225,71 +218,84 @@ func (t Token) GenReplacement(choice *int64, et time.Time, lt time.Time, now tim
 			} else {
 				f = float64(upper) / math.Pow10(t.Precision)
 			}
-			if t.Type == "rated" {
-				rate := t.Rater.TokenRate(&t, now)
-				f = f * rate
-			}
-			return strconv.FormatFloat(f, 'f', t.Precision, 64), nil
+			rate := t.Rater.TokenRate(t, now)
+			f = f * rate
+			return strconv.FormatFloat(f, 'f', t.Precision, 64), -1, nil
+		}
+	case "random":
+		switch t.Replacement {
+		case "int":
+			ri := randgen.Intn(t.Upper-t.Lower) + t.Lower
+			return strconv.Itoa(ri), -1, nil
+		case "float":
+			lower := t.Lower * int(math.Pow10(t.Precision))
+			upper := t.Upper * int(math.Pow10(t.Precision))
+			f := float64(randgen.Intn(upper-lower)+lower) / math.Pow10(t.Precision)
+			return strconv.FormatFloat(f, 'f', t.Precision, 64), -1, nil
 		case "string", "hex":
-			b := make([]byte, t.Length)
-			var l string
-			if t.Replacement == "string" {
-				l = randStringLetters
-			} else {
-				l = randHexLetters
+			var ret string
+			for i := 0; i < t.Length; i++ {
+				if t.Replacement == "string" {
+					ri := randgen.Intn(len(randStringLetters))
+					ret += randStringLetters[ri : ri+1]
+				} else {
+					ri := randgen.Intn(len(randHexLetters))
+					ret += randHexLetters[ri : ri+1]
+				}
 			}
-			for i := range b {
-				b[i] = l[randgen.Intn(len(l))]
-			}
-			return string(b), nil
+			return ret, -1, nil
 		case "guid":
 			u := uuid.NewV4()
-			return u.String(), nil
+			return u.String(), -1, nil
 		case "ipv4":
 			var ret string
 			for i := 0; i < 4; i++ {
-				ret = ret + strconv.Itoa(randgen.Intn(255)) + "."
+				ri := randgen.Intn(255)
+				ret += strconv.Itoa(ri)
+				if i < 3 {
+					ret += "."
+				}
 			}
-			ret = strings.TrimRight(ret, ".")
-			return ret, nil
+			return ret, -1, nil
 		case "ipv6":
 			var ret string
 			for i := 0; i < 8; i++ {
-				ret = ret + fmt.Sprintf("%x", randgen.Intn(65535)) + ":"
+				ri := randgen.Intn(65535)
+				ret += fmt.Sprintf("%x", ri)
+				if i < 7 {
+					ret += ":"
+				}
 			}
-			ret = strings.TrimRight(ret, ":")
-			return ret, nil
+			return ret, -1, nil
 		}
 	case "choice":
-		if c == -1 {
-			c = int64(randgen.Intn(len(t.Choice)))
-			*choice = c
+		if choice == -1 {
+			choice = randgen.Intn(len(t.Choice))
 		}
-		return t.Choice[c], nil
+		return t.Choice[choice], choice, nil
 	case "weightedChoice":
 		// From http://eli.thegreenplace.net/2010/01/22/weighted-random-generation-in-python/
-		var totals []int
-		runningTotal := 0
-
-		for _, w := range t.WeightedChoice {
-			runningTotal += w.Weight
-			totals = append(totals, runningTotal)
+		if t.weightedChoiceTotals == nil {
+			t.weightedChoiceTotals = make([]int, len(t.WeightedChoice))
+			for i, w := range t.WeightedChoice {
+				t.weightedChoiceRunningTotal += w.Weight
+				t.weightedChoiceTotals[i] = t.weightedChoiceRunningTotal
+			}
 		}
 
-		r := randgen.Float64() * float64(runningTotal)
-		for j, total := range totals {
+		r := randgen.Float64() * float64(t.weightedChoiceRunningTotal)
+		for j, total := range t.weightedChoiceTotals {
 			if r < float64(total) {
-				*choice = int64(j)
+				choice = j
 				break
 			}
 		}
-		return t.WeightedChoice[*choice].Choice, nil
+		return t.WeightedChoice[choice].Choice, choice, nil
 	case "fieldChoice":
-		if c == -1 {
-			c = int64(randgen.Intn(len(t.FieldChoice)))
-			*choice = c
+		if choice == -1 {
+			choice = randgen.Intn(len(t.FieldChoice))
 		}
-		return t.FieldChoice[c][t.SrcField], nil
+		return t.FieldChoice[choice][t.SrcField], choice, nil
 	case "script":
 		L := lua.NewState()
 		defer L.Close()
@@ -297,7 +303,7 @@ func (t Token) GenReplacement(choice *int64, et time.Time, lt time.Time, now tim
 		if err := L.DoString(t.Script); err != nil {
 			log.Errorf("Error executing script for token '%s' in sample '%s': %s", t.Name, t.Parent.Name, err)
 		}
-		return lua.LVAsString(L.Get(-1)), nil
+		return lua.LVAsString(L.Get(-1)), -1, nil
 	}
-	return "", fmt.Errorf("GenReplacement called with invalid type for token '%s' with type '%s'", t.Name, t.Type)
+	return "", -1, fmt.Errorf("GenReplacement called with invalid type for token '%s' with type '%s'", t.Name, t.Type)
 }
