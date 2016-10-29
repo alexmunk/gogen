@@ -306,7 +306,8 @@ func main() {
 				fmt.Printf("%15s : %s\n", "Gogen", g.Gogen)
 				fmt.Printf("%15s : %s\n", "Owner", g.Owner)
 				fmt.Printf("%15s : %s\n", "Name", g.Name)
-				fmt.Printf("%15s : %s\n\n", "Description", g.Description)
+				fmt.Printf("%15s : %s\n", "Description", g.Description)
+				fmt.Printf("%15s : %s\n", "Gist Link", fmt.Sprintf("https://gist.github.com/%s/%s", g.Owner, g.GistID))
 				if len(g.Notes) > 0 {
 					fmt.Printf("Notes:\n")
 					fmt.Printf("------------------------------------------------------\n")
