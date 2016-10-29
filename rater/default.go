@@ -22,6 +22,6 @@ func (dr *DefaultRater) EventRate(s *config.Sample, now time.Time, count int) in
 }
 
 // TokenRate takes a token and returns the rated value
-func (dr *DefaultRater) TokenRate(t *config.Token, now time.Time) float64 {
+func (dr *DefaultRater) TokenRate(t config.Token, now time.Time) float64 {
 	return TokenRate(t, now)
 }

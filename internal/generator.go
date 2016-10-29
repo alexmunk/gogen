@@ -11,6 +11,7 @@ type GenQueueItem struct {
 	Count    int
 	Earliest time.Time
 	Latest   time.Time
+	Now      time.Time
 	OQ       chan *OutQueueItem
 	Rand     *rand.Rand
 }

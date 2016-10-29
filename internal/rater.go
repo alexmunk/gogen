@@ -14,5 +14,5 @@ type RaterConfig struct {
 type Rater interface {
 	GetRate(now time.Time) float64
 	EventRate(s *Sample, now time.Time, count int) int
-	TokenRate(t *Token, now time.Time) float64
+	TokenRate(t Token, now time.Time) float64
 }
