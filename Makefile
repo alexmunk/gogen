@@ -1,6 +1,13 @@
 GITHUB_OAUTH_CLIENT_ID = 39c483e563cd5cedf7c1
 GITHUB_OAUTH_CLIENT_SECRET = 024b16270452504c35f541aca4bf78781cd06db9
 
+ifeq ($(OS),Windows_NT)
+	dockercmd := docker run -e TERM --rm -it -v $(CURDIR):/go/src/github.com/coccyx/gogen clintsharp/gogen bash
+else
+	cd := $(shell pwd)
+	dockercmd := docker run --rm -it -v $(cd):/go/src/github.com/coccyx/gogen clintsharp/gogen bash
+endif
+
 all: install
 
 build:
@@ -11,3 +18,6 @@ install:
 
 test:
 	go test -v ./...
+
+docker:
+	$(dockercmd)
