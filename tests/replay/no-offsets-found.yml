@@ -1,0 +1,10 @@
+name: no-offsets-found
+generator: replay
+tokens:
+  - name: ts1
+    type: timestamp
+    replacement: "%Y-%m-%dT%H:%M:%S"
+    format: regex
+    token: "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}"
+lines:
+- "_raw": nope

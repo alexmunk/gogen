@@ -1,0 +1,10 @@
+name: bad-strptime-timestamp
+generator: replay
+tokens:
+  - name: ts1
+    type: timestamp
+    replacement: "bad"
+    format: regex
+    token: "(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2})"
+lines:
+- "_raw": "2001-10-20T12:00:00"
