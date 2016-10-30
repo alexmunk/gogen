@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	strftime "github.com/cactus/gostrftime"
@@ -100,11 +101,13 @@ type Token struct {
 	FieldChoice    []map[string]string `json:"fieldChoice,omitempty"`
 	Choice         []string            `json:"choice,omitempty"`
 	Script         string              `json:"script,omitempty"`
+	Init           map[string]string   `json:"init,omitempty"`
 	RaterString    string              `json:"rater,omitempty"`
 	Rater          Rater               `json:"-"`
 
 	L                          *lua.LState `json:"-"`
 	luaState                   *lua.LTable
+	mutex                      *sync.Mutex
 	weightedChoiceTotals       []int
 	weightedChoiceRunningTotal int
 }
@@ -299,6 +302,8 @@ func (t Token) GenReplacement(choice int, et time.Time, lt time.Time, now time.T
 		}
 		return t.FieldChoice[choice][t.SrcField], choice, nil
 	case "script":
+		t.mutex.Lock()
+		defer t.mutex.Unlock()
 		L := lua.NewState()
 		defer L.Close()
 		L.SetGlobal("state", t.luaState)

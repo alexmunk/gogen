@@ -21,6 +21,9 @@ type ScriptRater struct {
 func (sr *ScriptRater) GetRate(now time.Time) float64 {
 	if sr.luaState == nil {
 		sr.luaState = new(lua.LTable)
+		for k, v := range sr.c.Init {
+			sr.luaState.RawSet(lua.LString(k), lua.LString(v))
+		}
 	}
 	L := lua.NewState()
 	defer L.Close()

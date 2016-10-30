@@ -6,8 +6,9 @@ import "time"
 type RaterConfig struct {
 	Name    string                 `json:"name"`
 	Type    string                 `json:"type"`
-	Script  string                 `json:"script"`
-	Options map[string]interface{} `json:"options"`
+	Script  string                 `json:"script,omitempty"`
+	Options map[string]interface{} `json:"options,omitempty"`
+	Init    map[string]string      `json:"init,omitempty"`
 }
 
 // Rater will rate an event according to RaterConfig

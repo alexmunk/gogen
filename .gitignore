@@ -9,3 +9,5 @@ build.sh
 linecount.sh
 gogen-api/getswagger.sh
 local/**
+.vim*
+.bash*

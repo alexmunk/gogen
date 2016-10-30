@@ -15,12 +15,10 @@ samples:
       - name: id
         format: template
         type: script
+        init:
+            id: 0
         script: >
-            if state["id"] == nil then
-                state["id"] = 1
-            else
-                state["id"] = state["id"] + 1
-            end
+            state["id"] = state["id"] + 1
             return state["id"]
     lines:
     - "_raw": id=$id$ value=$rated$
@@ -29,11 +27,9 @@ raters:
     type: script
     # Goes up by multiplier on every iteration
     script: >
-        if state["count"] == nil then
-            state["count"] = 1.0
-        else
-            state["count"] = state["count"] * options["multiplier"]
-        end
+        state["count"] = state["count"] * options["multiplier"]
         return state["count"]
     options:
         multiplier: 1.01
+    init:
+        count: 1

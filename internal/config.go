@@ -548,7 +548,7 @@ func (c *Config) validate(s *Sample) {
 			log.Infof("No interval set for sample '%s', setting endIntervals to 1", s.Name)
 			s.EndIntervals = 1
 		}
-		for _, t := range s.Tokens {
+		for i, t := range s.Tokens {
 			switch t.Type {
 			case "random", "rated":
 				if t.Replacement == "int" || t.Replacement == "float" {
@@ -591,6 +591,11 @@ func (c *Config) validate(s *Sample) {
 						s.Disabled = true
 						break
 					}
+				}
+			case "script":
+				s.Tokens[i].mutex = &sync.Mutex{}
+				for k, v := range t.Init {
+					t.luaState.RawSet(lua.LString(k), lua.LString(v))
 				}
 			}
 		}
