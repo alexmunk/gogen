@@ -1,5 +1,5 @@
 name: translog
-interval: 1
+interval: 2
 count: 5
 randomizeEvents: true
 earliest: -3s

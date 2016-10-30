@@ -11,6 +11,7 @@ import (
 )
 
 func TestScriptRaterTokenRate(t *testing.T) {
+	config.ResetConfig()
 	// Setup environment
 	os.Setenv("GOGEN_HOME", "..")
 	os.Setenv("GOGEN_ALWAYS_REFRESH", "")

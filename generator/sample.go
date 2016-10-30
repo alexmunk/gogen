@@ -46,34 +46,37 @@ func genSinglePass(item *config.GenQueueItem) error {
 
 	if slen > 0 {
 		events := make([]map[string]string, 0, item.Count)
-
-		if s.RandomizeEvents {
-			// log.Debugf("Random filling events for sample '%s' with %d events", s.Name, item.Count)
-
-			for i := 0; i < item.Count; i++ {
-				events = append(events, getBrokenEvent(item, item.Rand.Intn(slen)))
-			}
+		if s.Generator == "replay" {
+			events = append(events, getBrokenEvent(item, item.Event))
 		} else {
-			if item.Count <= slen {
+			if s.RandomizeEvents {
+				// log.Debugf("Random filling events for sample '%s' with %d events", s.Name, item.Count)
+
 				for i := 0; i < item.Count; i++ {
-					// log.Debugf("Count <= sample len, filling with sample '%s' for %d events", s.Name, item.Count)
-					events = append(events, getBrokenEvent(item, i))
+					events = append(events, getBrokenEvent(item, item.Rand.Intn(slen)))
 				}
 			} else {
-				iters := int(math.Ceil(float64(item.Count) / float64(slen)))
-				// log.Debugf("Sequentially filling events for sample '%s' of size %d with %d events over %d iterations", s.Name, slen, item.Count, iters)
-				for i := 0; i < iters; i++ {
-					var count int
-					// start := i * slen
-					if i == iters-1 {
-						count = (item.Count - (i * slen))
-					} else {
-						count = slen
+				if item.Count <= slen {
+					for i := 0; i < item.Count; i++ {
+						// log.Debugf("Count <= sample len, filling with sample '%s' for %d events", s.Name, item.Count)
+						events = append(events, getBrokenEvent(item, i))
 					}
-					// log.Debugf("Appending %d events from lines, length %d", count, slen)
-					// end := (i * slen) + count
-					for j := 0; j < count; j++ {
-						events = append(events, getBrokenEvent(item, j))
+				} else {
+					iters := int(math.Ceil(float64(item.Count) / float64(slen)))
+					// log.Debugf("Sequentially filling events for sample '%s' of size %d with %d events over %d iterations", s.Name, slen, item.Count, iters)
+					for i := 0; i < iters; i++ {
+						var count int
+						// start := i * slen
+						if i == iters-1 {
+							count = (item.Count - (i * slen))
+						} else {
+							count = slen
+						}
+						// log.Debugf("Appending %d events from lines, length %d", count, slen)
+						// end := (i * slen) + count
+						for j := 0; j < count; j++ {
+							events = append(events, getBrokenEvent(item, j))
+						}
 					}
 				}
 			}
@@ -124,32 +127,36 @@ func genMultiPass(item *config.GenQueueItem) error {
 	if slen > 0 {
 		var events []map[string]string
 		events = make([]map[string]string, 0, item.Count)
-		if s.RandomizeEvents {
-			// log.Debugf("Random filling events for sample '%s' with %d events", s.Name, item.Count)
-
-			for i := 0; i < item.Count; i++ {
-				events = append(events, copyevent(s.Lines[item.Rand.Intn(slen)]))
-			}
+		if s.Generator == "replay" {
+			events = append(events, copyevent(s.Lines[item.Event]))
 		} else {
-			if item.Count <= slen {
+			if s.RandomizeEvents {
+				// log.Debugf("Random filling events for sample '%s' with %d events", s.Name, item.Count)
+
 				for i := 0; i < item.Count; i++ {
-					events = append(events, copyevent(s.Lines[i]))
+					events = append(events, copyevent(s.Lines[item.Rand.Intn(slen)]))
 				}
 			} else {
-				iters := int(math.Ceil(float64(item.Count) / float64(slen)))
-				// log.Debugf("Sequentially filling events for sample '%s' of size %d with %d events over %d iterations", s.Name, slen, item.Count, iters)
-				for i := 0; i < iters; i++ {
-					var count int
-					// start := i * slen
-					if i == iters-1 {
-						count = (item.Count - (i * slen))
-					} else {
-						count = slen
+				if item.Count <= slen {
+					for i := 0; i < item.Count; i++ {
+						events = append(events, copyevent(s.Lines[i]))
 					}
-					// log.Debugf("Appending %d events from lines, length %d", count, slen)
-					// end := (i * slen) + count
-					for j := 0; j < count; j++ {
-						events = append(events, copyevent(s.Lines[j]))
+				} else {
+					iters := int(math.Ceil(float64(item.Count) / float64(slen)))
+					// log.Debugf("Sequentially filling events for sample '%s' of size %d with %d events over %d iterations", s.Name, slen, item.Count, iters)
+					for i := 0; i < iters; i++ {
+						var count int
+						// start := i * slen
+						if i == iters-1 {
+							count = (item.Count - (i * slen))
+						} else {
+							count = slen
+						}
+						// log.Debugf("Appending %d events from lines, length %d", count, slen)
+						// end := (i * slen) + count
+						for j := 0; j < count; j++ {
+							events = append(events, copyevent(s.Lines[j]))
+						}
 					}
 				}
 			}

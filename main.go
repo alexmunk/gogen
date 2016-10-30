@@ -120,8 +120,8 @@ func table(l []share.GogenList) {
 
 func main() {
 	if config.ProfileOn {
-		// defer profile.Start(profile.CPUProfile, profile.ProfilePath(".")).Stop()
-		defer profile.Start(profile.MemProfile, profile.ProfilePath(".")).Stop()
+		defer profile.Start(profile.CPUProfile, profile.ProfilePath(".")).Stop()
+		// defer profile.Start(profile.MemProfile, profile.ProfilePath(".")).Stop()
 	}
 	rand.Seed(time.Now().UnixNano())
 
@@ -179,6 +179,7 @@ func main() {
 					if clic.Int("endIntervals") > 0 {
 						log.Infof("Setting endIntervals to %d", clic.Int("endIntervals"))
 						c.Samples[i].EndIntervals = clic.Int("endIntervals")
+						config.ParseBeginEnd(c.Samples[i])
 					}
 					if clic.Int("count") > 0 {
 						log.Infof("Setting count to %d for sample '%s'", clic.Int("count"), c.Samples[i].Name)

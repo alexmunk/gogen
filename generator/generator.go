@@ -23,7 +23,7 @@ func Start(gq chan *config.GenQueueItem, gqs chan int) {
 		// Check to see if our generator is not set
 		if item.S.Gen == nil {
 			log.Infof("Setting sample '%s' to generator '%s'", item.S.Name, item.S.Generator)
-			if item.S.Generator == "sample" {
+			if item.S.Generator == "sample" || item.S.Generator == "replay" {
 				s := new(sample)
 				item.S.Gen = s
 			}

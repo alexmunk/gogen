@@ -4,11 +4,12 @@ package timeparser
 
 import (
 	"fmt"
-	"github.com/joyt/godate"
 	"math"
 	"regexp"
 	"strconv"
 	"time"
+
+	godate "github.com/joyt/godate"
 )
 
 var (
@@ -114,7 +115,7 @@ func TimeParserNowInLocation(ts string, now func() time.Time, loc *time.Location
 				return ret, nil
 			}
 		} else { // We're not a relative time, so try our best to interpret the date passed
-			return date.ParseInLocation(ts, loc)
+			return godate.ParseInLocation(ts, loc)
 		}
 	}
 	return now(), fmt.Errorf("Got to the end but didn't return")

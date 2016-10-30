@@ -544,7 +544,7 @@ func (c *Config) validate(s *Sample) {
 			return
 		}
 		// If no interval is set, generate one time and exit
-		if s.Interval == 0 {
+		if s.Interval == 0 && s.Generator != "replay" {
 			log.Infof("No interval set for sample '%s', setting endIntervals to 1", s.Name)
 			s.EndIntervals = 1
 		}
@@ -794,6 +794,15 @@ func (c *Config) FindRater(name string) *RaterConfig {
 
 // ParseBeginEnd parses the Begin and End settings for a sample
 func ParseBeginEnd(s *Sample) {
+	// EndIntervals overrides begin and end
+	if s.EndIntervals > 0 {
+		if s.Interval == 0 {
+			s.Interval = 1
+		}
+		s.Begin = "-" + strconv.Itoa(s.EndIntervals*s.Interval) + "s"
+		s.End = "now"
+		log.Infof("EndIntervals set, setting Begin to '%s' and end to '%s'", s.Begin, s.End)
+	}
 	// Setup Begin & End
 	// If End is not set, then we're intended to always run in realtime
 	if s.End == "" {

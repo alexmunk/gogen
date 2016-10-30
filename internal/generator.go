@@ -9,6 +9,7 @@ import (
 type GenQueueItem struct {
 	S        *Sample
 	Count    int
+	Event    int
 	Earliest time.Time
 	Latest   time.Time
 	Now      time.Time
