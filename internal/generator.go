@@ -5,6 +5,16 @@ import (
 	"time"
 )
 
+// GeneratorConfig holds our configuration for custom generators
+type GeneratorConfig struct {
+	Name           string            `json:"name"`
+	Init           map[string]string `json:"init,omitempty"`
+	Options        map[string]string `json:"options,omitempty"`
+	Script         string            `json:"script"`
+	FileName       string            `json:"fileName,omitempty"`
+	SingleThreaded bool              `json:"singleThreaded,omitempty"`
+}
+
 // GenQueueItem represents one generation job
 type GenQueueItem struct {
 	S        *Sample

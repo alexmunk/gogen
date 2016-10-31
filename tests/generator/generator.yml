@@ -1,0 +1,14 @@
+generators:
+  - name: custom
+    options:
+        foo: bar
+    init:
+        somevar: 1
+    script: >
+        return options["foo"] + state["somevar"]
+    singleThreaded: false
+samples:
+  - name: generator
+    generator: custom
+    interval: 1
+    endIntervals: 5

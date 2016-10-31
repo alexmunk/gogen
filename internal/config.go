@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"encoding/csv"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -24,10 +25,11 @@ import (
 // Config is a struct representing a Singleton which contains a copy of the running config
 // across all processes.  Should mirror the structure of $GOGEN_HOME/configs/default/global.yml
 type Config struct {
-	Global      Global         `json:"global"`
-	Samples     []*Sample      `json:"samples"`
-	Templates   []*Template    `json:"templates"`
-	Raters      []*RaterConfig `json:"raters"`
+	Global      Global             `json:"global,omitempty"`
+	Samples     []*Sample          `json:"samples"`
+	Templates   []*Template        `json:"templates,omitempty"`
+	Raters      []*RaterConfig     `json:"raters,omitempty"`
+	Generators  []*GeneratorConfig `json:"generators,omitempty"`
 	initialized bool
 
 	// Exported but internal use variables
@@ -231,6 +233,21 @@ func NewConfig() *Config {
 			return nil
 		})
 
+		// Read all generators in $GOGEN_HOME/config/generators
+		fullPath = filepath.Join(home, "config", "generators")
+		acceptableExtensions = map[string]bool{".yml": true, ".yaml": true, ".json": true}
+		c.walkPath(fullPath, acceptableExtensions, func(innerPath string) error {
+			var g GeneratorConfig
+
+			if err := c.parseFileConfig(&g, innerPath); err != nil {
+				log.Errorf("Error parsing config %s: %s", innerPath, err)
+				return err
+			}
+
+			c.Generators = append(c.Generators, &g)
+			return nil
+		})
+
 		c.readSamplesDir(samplesDir)
 	}
 
@@ -281,6 +298,13 @@ func NewConfig() *Config {
 	// Raters brought in from config will be typed wrong, validate and fixes
 	for i := 0; i < len(c.Raters); i++ {
 		c.validateRater(c.Raters[i])
+	}
+
+	// Allow bringing in generator scripts from a file
+	for i := 0; i < len(c.Generators); i++ {
+		if c.Generators[i].FileName != "" {
+			c.readGenerator(home, c.Generators[i])
+		}
 	}
 
 	// Due to data structure differences, we append default raters later in the startup process
@@ -399,7 +423,7 @@ func (c *Config) validate(s *Sample) {
 		if len(s.Name) == 0 {
 			s.Disabled = true
 			s.realSample = false
-		} else if len(s.Lines) == 0 {
+		} else if len(s.Lines) == 0 && (s.Generator == "sample" || s.Generator == "replay") {
 			s.Disabled = true
 			s.realSample = false
 			log.Errorf("Disabling sample '%s', no lines in sample", s.Name)
@@ -785,6 +809,28 @@ func (c *Config) validateRater(r *RaterConfig) {
 		opt[k] = newvset
 	}
 	r.Options = opt
+}
+
+// Brings in a Generator script from a file
+func (c *Config) readGenerator(home string, g *GeneratorConfig) error {
+	// First try to find the file by absolute path
+	fullPath := os.ExpandEnv(g.FileName)
+	_, err := os.Stat(fullPath)
+	if os.IsNotExist(err) {
+		fullPath = os.ExpandEnv(filepath.Join(home, "config", "generators", g.FileName))
+		_, err = os.Stat(fullPath)
+		if err != nil {
+			return fmt.Errorf("Cannot find generator file for generator '%s'", g.Name)
+		}
+	} else {
+		return err
+	}
+	contents, err := ioutil.ReadFile(fullPath)
+	if err != nil {
+		return err
+	}
+	g.Script = string(contents)
+	return nil
 }
 
 // FindRater returns a RaterConfig matched by the passed name

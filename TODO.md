@@ -1,7 +1,6 @@
 # Todo
 
 * Unit test coverage 90%
-* Implement replay generator
 * Integrate LUA interpret for custom generators and raters
     * Add Sample as reflected global in Lua interpreter
     * Add options map to Sample to pass optional parameters to the generator
