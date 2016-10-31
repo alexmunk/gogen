@@ -7,12 +7,12 @@ go:
 - master
 before_script:
 - printf "$GITHUB_OAUTH_TOKEN" > .githubtoken
-- go get github.com/mattn/goveralls
-- go get github.com/LawrenceWoodman/roveralls
+- go get -u github.com/mattn/goveralls
+- go get -u github.com/LawrenceWoodman/roveralls
 script:
 - go test -v ./...
-- $GOPATH/bin/roveralls
-- $GOPATH/bin/goveralls -coverprofile=roveralls.coverprofile -service=travis-ci -repotoken $COVERALLS_TOKEN
+- $HOME/gopath/bin/roveralls
+- $HOME/gopath/bin/goveralls -coverprofile=roveralls.coverprofile -service=travis-ci -repotoken $COVERALLS_TOKEN
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]];   then go build -ldflags "-X github.com/coccyx/gogen/share.gitHubClientID=$GITHUB_OAUTH_CLIENT_ID -X github.com/coccyx/gogen/share.gitHubClientSecret=$GITHUB_OAUTH_CLIENT_SECRET" -o build/osx/gogen  ; fi
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then go build -ldflags "-X github.com/coccyx/gogen/share.gitHubClientID=$GITHUB_OAUTH_CLIENT_ID -X github.com/coccyx/gogen/share.gitHubClientSecret=$GITHUB_OAUTH_CLIENT_SECRET" -o build/linux/gogen; fi
 deploy:
