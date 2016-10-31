@@ -303,7 +303,10 @@ func NewConfig() *Config {
 	// Allow bringing in generator scripts from a file
 	for i := 0; i < len(c.Generators); i++ {
 		if c.Generators[i].FileName != "" {
-			c.readGenerator(home, c.Generators[i])
+			err := c.readGenerator(home, c.Generators[i])
+			if err != nil {
+				log.Fatalf("Error reading generator file: %s", err)
+			}
 		}
 	}
 
@@ -773,6 +776,29 @@ func (c *Config) validate(s *Sample) {
 				}
 				s.ReplayOffsets[0] = avgOffset
 			}
+		} else if s.Generator != "sample" {
+			for _, g := range c.Generators {
+				if g.Name == s.Generator {
+					s.LuaMutex = &sync.Mutex{}
+					s.CustomGenerator = g
+					s.LuaState = new(lua.LTable)
+					for k, v := range s.CustomGenerator.Init {
+						s.LuaState.RawSet(lua.LString(k), lua.LString(v))
+					}
+					s.LuaLines = new(lua.LTable)
+					for _, line := range s.Lines {
+						lualine := new(lua.LTable)
+						for k, v := range line {
+							lualine.RawSetString(k, lua.LString(v))
+						}
+						s.LuaLines.Append(lualine)
+					}
+				}
+			}
+			if s.CustomGenerator == nil {
+				log.Errorf("Generator '%s' not found for sample '%s', disabling sample", s.Generator, s.Name)
+				s.Disabled = true
+			}
 		}
 	}
 }
@@ -822,7 +848,7 @@ func (c *Config) readGenerator(home string, g *GeneratorConfig) error {
 		if err != nil {
 			return fmt.Errorf("Cannot find generator file for generator '%s'", g.Name)
 		}
-	} else {
+	} else if err != nil {
 		return err
 	}
 	contents, err := ioutil.ReadFile(fullPath)

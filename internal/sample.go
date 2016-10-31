@@ -46,19 +46,24 @@ type Sample struct {
 	SinglePass      bool                `json:"singlepass,omitempty"`
 
 	// Internal use variables
-	Gen            Generator                    `json:"-"`
-	Out            Outputter                    `json:"-"`
-	Rater          Rater                        `json:"-"`
-	Output         *Output                      `json:"-"`
-	EarliestParsed time.Duration                `json:"-"`
-	LatestParsed   time.Duration                `json:"-"`
-	BeginParsed    time.Time                    `json:"-"`
-	EndParsed      time.Time                    `json:"-"`
-	Current        time.Time                    `json:"-"` // If we are backfilling or generating for a specified time window, what time is it?
-	Realtime       bool                         `json:"-"` // Are we done doing batch backfill or specified time window?
-	BrokenLines    []map[string][]StringOrToken `json:"-"`
-	ReplayOffsets  []time.Duration              `json:"-"`
-	realSample     bool                         // Used to represent samples which aren't just used to store lines from CSV or raw
+	Gen             Generator                    `json:"-"`
+	Out             Outputter                    `json:"-"`
+	Rater           Rater                        `json:"-"`
+	Output          *Output                      `json:"-"`
+	EarliestParsed  time.Duration                `json:"-"`
+	LatestParsed    time.Duration                `json:"-"`
+	BeginParsed     time.Time                    `json:"-"`
+	EndParsed       time.Time                    `json:"-"`
+	Current         time.Time                    `json:"-"` // If we are backfilling or generating for a specified time window, what time is it?
+	Realtime        bool                         `json:"-"` // Are we done doing batch backfill or specified time window?
+	BrokenLines     []map[string][]StringOrToken `json:"-"`
+	ReplayOffsets   []time.Duration              `json:"-"`
+	CustomGenerator *GeneratorConfig             `json:"-"`
+	LuaState        *lua.LTable                  `json:"-"`
+	LuaLines        *lua.LTable                  `json:"-"`
+	LuaMutex        *sync.Mutex                  `json:"-"`
+	LuaChoices      map[int]int                  `json:"-"`
+	realSample      bool                         // Used to represent samples which aren't just used to store lines from CSV or raw
 }
 
 // Clock allows for implementers to keep track of their own view

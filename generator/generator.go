@@ -26,11 +26,17 @@ func Start(gq chan *config.GenQueueItem, gqs chan int) {
 			if item.S.Generator == "sample" || item.S.Generator == "replay" {
 				s := new(sample)
 				item.S.Gen = s
+			} else {
+				s := new(luagen)
+				item.S.Gen = s
 			}
 			PrimeRater(item.S)
 		}
 		log.Debugf("Generating item %#v", item)
-		item.S.Gen.Gen(item)
+		err := item.S.Gen.Gen(item)
+		if err != nil {
+			log.Errorf("Error received from generator: %s", err)
+		}
 		log.Debugf("Finished generating item %#v", item)
 	}
 }
