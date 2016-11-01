@@ -1,6 +1,6 @@
 # Still to be done
 
-In the absence of a real README, here's a few commands to get you started:
+In the absence of a real README, here are a few commands to get you started:
 
     gogen
     gogen -c examples/weblog/weblog.yml 
