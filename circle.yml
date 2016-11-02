@@ -11,19 +11,15 @@ dependencies:
   override:
     - mkdir -p "/home/ubuntu/.go_workspace/src/$IMPORT_PATH"
     - rsync -azC --delete ./ "/home/ubuntu/.go_workspace/src/$IMPORT_PATH/"
-    - env GOOS=linux GOARCH=amd64 godep go build -ldflags "-X github.com/coccyx/gogen/share.gitHubClientID=$GITHUB_OAUTH_CLIENT_ID -X github.com/coccyx/gogen/share.gitHubClientSecret=$GITHUB_OAUTH_CLIENT_SECRET" -o build/linux/gogen:
-        pwd: /home/ubuntu/.go_workspace/src/$IMPORT_PATH
-    - env GOOS=darwin GOARCH=amd64  godep go build -ldflags "-X github.com/coccyx/gogen/share.gitHubClientID=$GITHUB_OAUTH_CLIENT_ID -X github.com/coccyx/gogen/share.gitHubClientSecret=$GITHUB_OAUTH_CLIENT_SECRET" -o build/osx/gogen:
-        pwd: /home/ubuntu/.go_workspace/src/$IMPORT_PATH
-    - env GOOS=windows GOARCH=amd64 godep go build -ldflags "-X github.com/coccyx/gogen/share.gitHubClientID=$GITHUB_OAUTH_CLIENT_ID -X github.com/coccyx/gogen/share.gitHubClientSecret=$GITHUB_OAUTH_CLIENT_SECRET" -o build/windows/gogen.exe:
-        pwd: /home/ubuntu/.go_workspace/src/$IMPORT_PATH
+    - cd /home/ubuntu/.go_workspace/src/$IMPORT_PATH && env GOOS=linux GOARCH=amd64 godep go build -ldflags "-X github.com/coccyx/gogen/share.gitHubClientID=$GITHUB_OAUTH_CLIENT_ID -X github.com/coccyx/gogen/share.gitHubClientSecret=$GITHUB_OAUTH_CLIENT_SECRET" -o build/linux/gogen
+    - cd /home/ubuntu/.go_workspace/src/$IMPORT_PATH && env GOOS=darwin GOARCH=amd64  godep go build -ldflags "-X github.com/coccyx/gogen/share.gitHubClientID=$GITHUB_OAUTH_CLIENT_ID -X github.com/coccyx/gogen/share.gitHubClientSecret=$GITHUB_OAUTH_CLIENT_SECRET" -o build/osx/gogen
+    - cd /home/ubuntu/.go_workspace/src/$IMPORT_PATH && env GOOS=windows GOARCH=amd64 godep go build -ldflags "-X github.com/coccyx/gogen/share.gitHubClientID=$GITHUB_OAUTH_CLIENT_ID -X github.com/coccyx/gogen/share.gitHubClientSecret=$GITHUB_OAUTH_CLIENT_SECRET" -o build/windows/gogen.exe
 
 
 ## Customize test commands
 test:
   override:
-    - godep go test -v ./...:
-        pwd: /home/ubuntu/.go_workspace/src/$IMPORT_PATH
+    - cd /home/ubuntu/.go_workspace/src/$IMPORT_PATH && godep go test -v ./...
   post:
     - ${HOME}/.go_workspace/roveralls
     - ${HOME}/.go_workspace/goveralls -coverprofile=roveralls.coverprofile -service=travis-ci -repotoken $COVERALLS_TOKEN
