@@ -22,7 +22,7 @@ test:
     - cd /home/ubuntu/.go_workspace/src/$IMPORT_PATH && godep go test -v ./...
   post:
     - cd /home/ubuntu/.go_workspace/src/$IMPORT_PATH && ${HOME}/.go_workspace/bin/roveralls
-    - cd /home/ubuntu/.go_workspace/src/$IMPORT_PATH && ${HOME}/.go_workspace/bin/goveralls -coverprofile=roveralls.coverprofile -service=travis-ci -repotoken $COVERALLS_TOKEN
+    - cd /home/ubuntu/.go_workspace/src/$IMPORT_PATH && ${HOME}/.go_workspace/bin/goveralls -coverprofile=roveralls.coverprofile -service=circleci -repotoken $COVERALLS_TOKEN
 
 # ## Customize deployment commands
 # deployment:
