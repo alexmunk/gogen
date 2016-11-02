@@ -1,4 +1,4 @@
-sdependencies:
+dependencies:
   pre:
     - printf "$GITHUB_OAUTH_TOKEN" > .githubtoken
     - go get github.com/mattn/goveralls
