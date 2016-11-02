@@ -21,8 +21,8 @@ test:
   override:
     - cd /home/ubuntu/.go_workspace/src/$IMPORT_PATH && godep go test -v ./...
   post:
-    - ${HOME}/.go_workspace/roveralls
-    - ${HOME}/.go_workspace/goveralls -coverprofile=roveralls.coverprofile -service=travis-ci -repotoken $COVERALLS_TOKEN
+    - cd /home/ubuntu/.go_workspace/src/$IMPORT_PATH && ${HOME}/.go_workspace/bin/roveralls
+    - cd /home/ubuntu/.go_workspace/src/$IMPORT_PATH && ${HOME}/.go_workspace/bin/goveralls -coverprofile=roveralls.coverprofile -service=travis-ci -repotoken $COVERALLS_TOKEN
 
 # ## Customize deployment commands
 # deployment:
