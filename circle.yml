@@ -1,0 +1,23 @@
+sdependencies:
+  pre:
+    - printf "$GITHUB_OAUTH_TOKEN" > .githubtoken
+    - go get github.com/mattn/goveralls
+    - go get github.com/LawrenceWoodman/roveralls
+  override:
+    - env GOOS=linux GOARCH=amd64 go build -v -ldflags "-X github.com/coccyx/gogen/share.gitHubClientID=$GITHUB_OAUTH_CLIENT_ID -X github.com/coccyx/gogen/share.gitHubClientSecret=$GITHUB_OAUTH_CLIENT_SECRET" -o build/linux/gogen
+    - env GOOS=darwin GOARCH=amd64  go build -v -ldflags "-X github.com/coccyx/gogen/share.gitHubClientID=$GITHUB_OAUTH_CLIENT_ID -X github.com/coccyx/gogen/share.gitHubClientSecret=$GITHUB_OAUTH_CLIENT_SECRET" -o build/osx/gogen
+    - env GOOS=windows GOARCH=amd64 go build -v -ldflags "-X github.com/coccyx/gogen/share.gitHubClientID=$GITHUB_OAUTH_CLIENT_ID -X github.com/coccyx/gogen/share.gitHubClientSecret=$GITHUB_OAUTH_CLIENT_SECRET" -o build/windows/gogen
+    - go build -v
+
+## Customize test commands
+test:
+  post:
+    - ${HOME}/.go_workspace/roveralls
+    - ${HOME}/.go_workspace//goveralls -coverprofile=roveralls.coverprofile -service=travis-ci -repotoken $COVERALLS_TOKEN
+
+# ## Customize deployment commands
+# deployment:
+#   staging:
+#     branch: master
+#     heroku:
+#       appname: foo-bar-123

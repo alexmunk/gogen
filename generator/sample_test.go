@@ -16,6 +16,7 @@ func TestSampleGen(t *testing.T) {
 	// Setup environment
 	os.Setenv("GOGEN_HOME", "..")
 	os.Setenv("GOGEN_ALWAYS_REFRESH", "1")
+	os.Setenv("GOGEN_FULLCONFIG", "")
 	home := filepath.Join("..", "tests", "tokens")
 	os.Setenv("GOGEN_SAMPLES_DIR", home)
 	loc, _ := time.LoadLocation("Local")
@@ -30,14 +31,17 @@ func TestSampleGen(t *testing.T) {
 	// gq := make(chan *config.GenQueueItem)
 	oq := make(chan *config.OutQueueItem)
 	s := tests.FindSampleInFile(home, "token-static")
-	gqi := &config.GenQueueItem{Count: 1, Earliest: now(), Latest: now(), S: s, OQ: oq, Rand: randgen}
+	if s == nil {
+		t.Fatalf("Sample token-static not found in file: %s", home)
+	}
+	gqi := &config.GenQueueItem{Count: 1, Earliest: now(), Latest: now(), Now: now(), S: s, OQ: oq, Rand: randgen}
 	gen := new(sample)
 	go gen.Gen(gqi)
 	oqi := <-oq
 	assert.Equal(t, "foo", oqi.Events[0]["_raw"])
 
 	s = tests.FindSampleInFile(home, "token-regex")
-	gqi = &config.GenQueueItem{Count: 1, Earliest: now(), Latest: now(), S: s, OQ: oq, Rand: randgen}
+	gqi = &config.GenQueueItem{Count: 1, Earliest: now(), Latest: now(), Now: now(), S: s, OQ: oq, Rand: randgen}
 	gen = new(sample)
 	go gen.Gen(gqi)
 	oqi = <-oq

@@ -15,7 +15,7 @@ import (
 var DefaultLogLevel logrus.Level
 
 func init() {
-	DefaultLogLevel = logrus.DebugLevel
+	DefaultLogLevel = logrus.ErrorLevel
 }
 
 // Fields allows passing key value pairs to Logrus

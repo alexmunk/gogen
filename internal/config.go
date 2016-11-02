@@ -423,6 +423,9 @@ func (c *Config) readSamplesDir(samplesDir string) {
 // string map to the randutil Choice struct
 func (c *Config) validate(s *Sample) {
 	if s.realSample {
+		if s.Generator == "" {
+			s.Generator = defaultGenerator
+		}
 		if len(s.Name) == 0 {
 			s.Disabled = true
 			s.realSample = false
@@ -438,9 +441,6 @@ func (c *Config) validate(s *Sample) {
 		s.Output = &c.Global.Output
 
 		// Setup defaults
-		if s.Generator == "" {
-			s.Generator = defaultGenerator
-		}
 		if s.Earliest == "" {
 			s.Earliest = defaultEarliest
 		}
