@@ -18,7 +18,7 @@ func TestGeneratorConfig(t *testing.T) {
 	c := NewConfig()
 
 	g := getGenerator(c, "custom")
-	assert.Equal(t, map[string]string{"foo": "bar"}, g.Options)
+	assert.Equal(t, map[string]interface{}{"foo": "bar"}, g.Options)
 	assert.Equal(t, `return options["foo"] + state["somevar"]`+"\n", g.Script)
 	assert.Equal(t, false, g.SingleThreaded)
 }
@@ -33,7 +33,7 @@ func TestGeneratorFileConfig(t *testing.T) {
 	c := NewConfig()
 
 	g := getGenerator(c, "custom")
-	assert.Equal(t, map[string]string{"foo": "bar"}, g.Options)
+	assert.Equal(t, map[string]interface{}{"foo": "bar"}, g.Options)
 	assert.Equal(t, `return options["foo"] + state["somevar"]`, g.Script)
 	assert.Equal(t, false, g.SingleThreaded)
 }

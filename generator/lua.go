@@ -13,6 +13,7 @@ import (
 type luagen struct {
 	initialized bool
 	currentItem *config.GenQueueItem
+	tokens      []config.Token
 }
 
 func sleep(L *lua.LState) int {
@@ -72,32 +73,89 @@ func (lg *luagen) getEventsFromTable(lv lua.LValue) ([]map[string]string, error)
 	return events, nil
 }
 
+func (lg *luagen) setToken(L *lua.LState) int {
+	top := L.GetTop()
+	tokenName := L.ToString(1)
+	tokenValue := L.ToString(2)
+	var tokenField string
+	if top > 2 {
+		tokenField = L.ToString(3)
+	} else {
+		tokenField = config.DefaultField
+	}
+
+	found := false
+	for i := 0; i < len(lg.tokens); i++ {
+		if lg.tokens[i].Name == tokenName {
+			lg.tokens[i].Replacement = tokenValue
+			found = true
+		}
+	}
+	if !found {
+		var t config.Token
+		t.Name = tokenName
+		t.Type = "static"
+		t.Format = "template"
+		t.Token = "$" + tokenName + "$"
+		t.Replacement = tokenValue
+		t.Field = tokenField
+		lg.tokens = append(lg.tokens, t)
+		log.Debugf("Added token")
+	}
+
+	return 0
+}
+
 func (lg *luagen) replaceTokens(L *lua.LState) int {
 	item := lg.currentItem
 
+	// Get number of args and events map
+	top := L.GetTop()
+
+	// Get events map
 	luaEvent := L.ToTable(1)
-	keepChoices := L.ToBool(1)
 	event := make(map[string]string)
-	if keepChoices {
-		if item.S.LuaChoices == nil {
-			item.S.LuaChoices = make(map[int]int)
-		}
-	} else {
-		item.S.LuaChoices = nil
-	}
 	luaEvent.ForEach(func(k lua.LValue, v lua.LValue) {
 		event[lua.LVAsString(k)] = lua.LVAsString(v)
 	})
-	replaceTokens(item, &event, &item.S.LuaChoices)
+
+	// Get choices from args, or if omitted create a new map
+	var choices map[int]int
+	var ok bool
+	if top > 1 {
+		ud := L.CheckUserData(2)
+		if choices, ok = ud.Value.(map[int]int); !ok {
+			L.ArgError(2, "expecting choices map[int]int")
+			return 0
+		}
+	} else {
+		choices = make(map[int]int)
+	}
+
+	// Replace configured tokens
+	replaceTokens(item, &event, &choices, item.S.Tokens)
+
+	// Replace any tokens submitted through setTokens
+	if len(lg.tokens) > 0 {
+		throwawayChoices := make(map[int]int)
+		replaceTokens(item, &event, &throwawayChoices, lg.tokens)
+	}
+
+	// Return a table of the event created from our map and a userdata of the choices map[int]int
 	retEvent := new(lua.LTable)
 	for k, v := range event {
 		retEvent.RawSetString(k, lua.LString(v))
 	}
 	L.Push(retEvent)
-	return 1
+	L.Push(luar.New(L, choices))
+	return 2
 }
 
 func (lg *luagen) Gen(item *config.GenQueueItem) error {
+	if !lg.initialized {
+		lg.tokens = make([]config.Token, 0)
+		lg.initialized = true
+	}
 	// log.Debugf("Lua Gen called for sample '%s'", item.S.Name)
 	L := lua.NewState()
 	defer L.Close()
@@ -110,11 +168,17 @@ func (lg *luagen) Gen(item *config.GenQueueItem) error {
 	L.SetGlobal("state", s.LuaState)
 	L.SetGlobal("options", luar.New(L, s.CustomGenerator.Options))
 	L.SetGlobal("lines", s.LuaLines)
+	L.SetGlobal("count", luar.New(L, item.Count))
+	L.SetGlobal("earliest", luar.New(L, item.Earliest))
+	L.SetGlobal("latest", luar.New(L, item.Latest))
+	L.SetGlobal("now", luar.New(L, item.Now))
 
 	// Register functions
 	L.SetGlobal("sleep", L.NewFunction(sleep))
 	L.SetGlobal("debug", L.NewFunction(logdebug))
 	L.SetGlobal("replaceTokens", L.NewFunction(lg.replaceTokens))
+	L.SetGlobal("send", L.NewFunction(lg.send))
+	L.SetGlobal("setToken", L.NewFunction(lg.setToken))
 
 	// log.Debugf("Calling DoString for %# v", s.CustomGenerator.Script)
 	if err := L.DoString(s.CustomGenerator.Script); err != nil {
@@ -122,11 +186,11 @@ func (lg *luagen) Gen(item *config.GenQueueItem) error {
 	}
 	// log.Debugf("Script returned")
 
-	lv := L.Get(-1)
-	events, err := lg.getEventsFromTable(lv)
-	if err != nil {
-		return err
-	}
-	lg.sendevents(events)
+	// lv := L.Get(-1)
+	// events, err := lg.getEventsFromTable(lv)
+	// if err != nil {
+	// 	return err
+	// }
+	// lg.sendevents(events)
 	return nil
 }

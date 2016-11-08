@@ -62,7 +62,6 @@ type Sample struct {
 	LuaState        *lua.LTable                  `json:"-"`
 	LuaLines        *lua.LTable                  `json:"-"`
 	LuaMutex        *sync.Mutex                  `json:"-"`
-	LuaChoices      map[int]int                  `json:"-"`
 	realSample      bool                         // Used to represent samples which aren't just used to store lines from CSV or raw
 }
 

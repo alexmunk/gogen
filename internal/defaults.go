@@ -3,6 +3,9 @@ package config
 // ProfileOn determines whether we should run a CPU profiler for perf optimization
 const ProfileOn = false
 
+// DefaultField is the default field to replace a token in
+const DefaultField = "_raw"
+
 // Default global values
 const defaultGeneratorWorkers = 1
 const defaultOutputWorkers = 1
@@ -15,7 +18,6 @@ const defaultGenerator = "sample"
 const defaultEarliest = "now"
 const defaultLatest = "now"
 const defaultRandomizeEvents = false
-const defaultField = "_raw"
 const defaultRater = "default"
 
 // Default file output values

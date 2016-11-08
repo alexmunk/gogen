@@ -165,7 +165,7 @@ func genMultiPass(item *config.GenQueueItem) error {
 		// log.Debugf("Events: %#v", events)
 
 		for i := 0; i < item.Count; i++ {
-			replaceTokens(item, &events[i], nil)
+			replaceTokens(item, &events[i], nil, item.S.Tokens)
 		}
 
 		outitem := &config.OutQueueItem{S: item.S, Events: events}
@@ -174,7 +174,7 @@ func genMultiPass(item *config.GenQueueItem) error {
 	return nil
 }
 
-func replaceTokens(item *config.GenQueueItem, event *map[string]string, outsidechoices *map[int]int) {
+func replaceTokens(item *config.GenQueueItem, event *map[string]string, outsidechoices *map[int]int, tokens []config.Token) {
 	s := item.S
 	var choices map[int]int
 	if outsidechoices == nil {
@@ -183,7 +183,7 @@ func replaceTokens(item *config.GenQueueItem, event *map[string]string, outsidec
 		choices = *outsidechoices
 	}
 	e := *event
-	for _, token := range s.Tokens {
+	for _, token := range tokens {
 		if fieldval, ok := e[token.Field]; ok {
 			var choice int
 			var err error

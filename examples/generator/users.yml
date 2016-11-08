@@ -5,17 +5,23 @@ generators:
   - name: usermodel
     fileName: $GOGEN_HOME/examples/generator/users.lua
     options:
-        users:
+      users:
         - joe
         - bob
         - mary
         - jane
         - alice
+      countdown:
+        0: 30
+        1: 60
+        2: 30
     init:
         stage: 0
+        stage1line: 0
+        repeats: 0
 samples:
   - name: generator
-    generator: custom
+    generator: usermodel
     interval: 1
     endIntervals: 6
     tokens:
@@ -41,18 +47,20 @@ samples:
           format: template
           type: choice
           sample: external_ips.sample
+          group: 2
         - name: status
           format: template
           type: weightedChoice
           weightedChoice:
-          - weight: 10
-          choice: 200
-          - weight: 4
-          choice: 301
+          - weight: 20
+            choice: 200
           - weight: 3
-          choice: 404
+            choice: 301
           - weight: 2
-          choice: 503
+            choice: 404
+          - weight: 1
+            choice: 503
+          group: 3
         - name: timetaken
           format: template
           type: random
@@ -63,6 +71,7 @@ samples:
           format: template
           type: choice
           sample: useragents.sample
+          group: 4
         - name: size
           format: template
           type: random

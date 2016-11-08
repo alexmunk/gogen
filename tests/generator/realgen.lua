@@ -65,4 +65,4 @@ count = countlines(lines)
 if state["cur"] >= count then
   state["cur"] = 0
 end
-return ret
+send(ret)

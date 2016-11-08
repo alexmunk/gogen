@@ -32,11 +32,11 @@ func Start(gq chan *config.GenQueueItem, gqs chan int) {
 			}
 			PrimeRater(item.S)
 		}
-		log.Debugf("Generating item %#v", item)
+		// log.Debugf("Generating item %#v", item)
 		err := item.S.Gen.Gen(item)
 		if err != nil {
 			log.Errorf("Error received from generator: %s", err)
 		}
-		log.Debugf("Finished generating item %#v", item)
+		// log.Debugf("Finished generating item %#v", item)
 	}
 }

@@ -24,9 +24,9 @@ test:
     - cd /home/ubuntu/.go_workspace/src/$IMPORT_PATH && ${HOME}/.go_workspace/bin/roveralls
     - cd /home/ubuntu/.go_workspace/src/$IMPORT_PATH && ${HOME}/.go_workspace/bin/goveralls -coverprofile=roveralls.coverprofile -service=circleci -repotoken $COVERALLS_TOKEN
 
-# ## Customize deployment commands
-# deployment:
-#   staging:
-#     branch: master
-#     heroku:
-#       appname: foo-bar-123
+## Customize deployment commands
+deployment:
+  staging:
+    branch: master
+    heroku:
+      appname: foo-bar-123

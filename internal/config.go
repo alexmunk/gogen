@@ -451,7 +451,7 @@ func (c *Config) validate(s *Sample) {
 			s.RandomizeEvents = defaultRandomizeEvents
 		}
 		if s.Field == "" {
-			s.Field = defaultField
+			s.Field = DefaultField
 		}
 		if s.RaterString == "" {
 			s.RaterString = defaultRater
@@ -622,7 +622,12 @@ func (c *Config) validate(s *Sample) {
 			case "script":
 				s.Tokens[i].mutex = &sync.Mutex{}
 				for k, v := range t.Init {
-					t.luaState.RawSet(lua.LString(k), lua.LString(v))
+					vAsNum, err := strconv.ParseFloat(v, 64)
+					if err != nil {
+						t.luaState.RawSet(lua.LString(k), lua.LNumber(vAsNum))
+					} else {
+						t.luaState.RawSet(lua.LString(k), lua.LString(v))
+					}
 				}
 			}
 		}
@@ -778,12 +783,18 @@ func (c *Config) validate(s *Sample) {
 			}
 		} else if s.Generator != "sample" {
 			for _, g := range c.Generators {
+				// TODO If not single threaded, we won't establish state in the sample object
 				if g.Name == s.Generator {
 					s.LuaMutex = &sync.Mutex{}
 					s.CustomGenerator = g
 					s.LuaState = new(lua.LTable)
 					for k, v := range s.CustomGenerator.Init {
-						s.LuaState.RawSet(lua.LString(k), lua.LString(v))
+						vAsNum, err := strconv.ParseFloat(v, 64)
+						if err == nil {
+							s.LuaState.RawSet(lua.LString(k), lua.LNumber(vAsNum))
+						} else {
+							s.LuaState.RawSet(lua.LString(k), lua.LString(v))
+						}
 					}
 					s.LuaLines = new(lua.LTable)
 					for _, line := range s.Lines {
@@ -944,7 +955,11 @@ func (c *Config) parseFileConfig(out interface{}, path ...string) error {
 	switch filepath.Ext(fullPath) {
 	case ".yml", ".yaml":
 		if err := yaml.Unmarshal(contents, out); err != nil {
-			log.Panicf("YAML parsing error in file '%s': %v", fullPath, err)
+			if ute, ok := err.(*json.UnmarshalTypeError); ok {
+				log.Panicf("JSON parsing error in file '%s' at offset %d: %v", fullPath, ute.Offset, ute)
+			} else {
+				log.Panicf("YAML parsing error in file '%s': %v", fullPath, err)
+			}
 		}
 	case ".json":
 		if err := json.Unmarshal(contents, out); err != nil {
