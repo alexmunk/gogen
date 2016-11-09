@@ -1,0 +1,113 @@
+global:
+  samplesDir:
+  - $GOGEN_HOME/examples/common
+generators:
+  - name: usermodel
+    fileName: $GOGEN_HOME/examples/generator/users.lua
+    singleThreaded: false
+    options:
+      users:
+        - joe
+        - bob
+        - mary
+        - jane
+        - alice
+      countdown:
+        0: 30
+        1: 60
+        2: 30
+    init:
+        stage: 0
+        stage1line: 0
+        repeats: 0
+samples:
+  - name: generator
+    generator: usermodel
+    interval: 1
+    endIntervals: 6
+    tokens:
+        - name: ts-dmyhmsms
+          format: template
+          token: $ts$
+          type: gotimestamp
+          replacement: "02/Jan/2006 03:04:05"
+        - name: host
+          format: template
+          type: fieldChoice
+          srcField: host
+          field: host
+          sample: webhosts.csv
+          group: 1
+        - name: ip
+          format: template
+          type: fieldChoice
+          srcField: ip
+          sample: webhosts.csv
+          group: 1
+        - name: clientip
+          format: template
+          type: choice
+          sample: external_ips.sample
+          group: 2
+        - name: status
+          format: template
+          type: weightedChoice
+          weightedChoice:
+          - weight: 20
+            choice: 200
+          - weight: 3
+            choice: 301
+          - weight: 2
+            choice: 404
+          - weight: 1
+            choice: 503
+          group: 3
+        - name: timetaken
+          format: template
+          type: random
+          replacement: int
+          lower: 100
+          upper: 1000
+        - name: useragent
+          format: template
+          type: choice
+          sample: useragents.sample
+          group: 4
+        - name: size
+          format: template
+          type: random
+          replacement: int
+          lower: 200
+          upper: 4000
+    lines:
+    - index: main
+      sourcetype: badgelog
+      source: /var/log/badges.log
+      host: physicalsecurity
+      _raw: $ts$ $user$ badged in
+    - index: main
+      sourcetype: access_combined
+      source: /var/log/httpd/access_log
+      host: $host$
+      _raw: $ip$ $clientip$ - - [$ts$] "GET /login HTTP 1.1" $status$ $timetaken$ "http://foo.okta.com" "$useragent$" $size$
+    - index: main
+      sourcetype: access_combined
+      source: /var/log/httpd/access_log
+      host: $host$
+      _raw: $ip$ $clientip$ - - [$ts$] "POST /admin/post HTTP 1.1" $status$ $timetaken$ "http://blog.foo.com/login" "$useragent$" $size$
+    - index: main
+      sourcetype: access_combined
+      source: /var/log/httpd/access_log
+      host: $host$
+      _raw: $ip$ $clientip$ - - [$ts$] "GET / HTTP 1.1" $status$ $timetaken$ "" "$useragent$" $size$
+    - index: main
+      sourcetype: access_combined
+      source: /var/log/httpd/access_log
+      host: $host$
+      _raw: $ip$ $clientip$ - - [$ts$] "POST /logout HTTP 1.1" $status$ $timetaken$ "" "$useragent$" $size$
+    - index: main
+      sourcetype: badgelog
+      source: /var/log/badges.log
+      host: physicalsecurity
+      _raw: $ts$ $user$ badged out
+      

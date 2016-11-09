@@ -1,0 +1,13 @@
+generators:
+  - name: custom
+    options:
+        foo: bar
+    init:
+        somevar: 1
+    fileName: $GOGEN_HOME/tests/generator/generator.lua
+    singleThreaded: false
+samples:
+  - name: generator
+    generator: custom
+    interval: 1
+    endIntervals: 5

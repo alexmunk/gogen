@@ -11,3 +11,6 @@ gogen-api/getswagger.sh
 local/**
 .vim*
 .bash*
+.aws*
+.profile
+.screenrc

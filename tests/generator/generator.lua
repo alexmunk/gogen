@@ -1,0 +1,1 @@
+return options["foo"] + state["somevar"]

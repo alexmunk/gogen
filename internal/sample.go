@@ -46,19 +46,20 @@ type Sample struct {
 	SinglePass      bool                `json:"singlepass,omitempty"`
 
 	// Internal use variables
-	Gen            Generator                    `json:"-"`
-	Out            Outputter                    `json:"-"`
-	Rater          Rater                        `json:"-"`
-	Output         *Output                      `json:"-"`
-	EarliestParsed time.Duration                `json:"-"`
-	LatestParsed   time.Duration                `json:"-"`
-	BeginParsed    time.Time                    `json:"-"`
-	EndParsed      time.Time                    `json:"-"`
-	Current        time.Time                    `json:"-"` // If we are backfilling or generating for a specified time window, what time is it?
-	Realtime       bool                         `json:"-"` // Are we done doing batch backfill or specified time window?
-	BrokenLines    []map[string][]StringOrToken `json:"-"`
-	ReplayOffsets  []time.Duration              `json:"-"`
-	realSample     bool                         // Used to represent samples which aren't just used to store lines from CSV or raw
+	Rater           Rater                        `json:"-"`
+	Output          *Output                      `json:"-"`
+	EarliestParsed  time.Duration                `json:"-"`
+	LatestParsed    time.Duration                `json:"-"`
+	BeginParsed     time.Time                    `json:"-"`
+	EndParsed       time.Time                    `json:"-"`
+	Current         time.Time                    `json:"-"` // If we are backfilling or generating for a specified time window, what time is it?
+	Realtime        bool                         `json:"-"` // Are we done doing batch backfill or specified time window?
+	BrokenLines     []map[string][]StringOrToken `json:"-"`
+	ReplayOffsets   []time.Duration              `json:"-"`
+	CustomGenerator *GeneratorConfig             `json:"-"`
+	GeneratorState  *GeneratorState              `json:"-"`
+	LuaMutex        *sync.Mutex                  `json:"-"`
+	realSample      bool                         // Used to represent samples which aren't just used to store lines from CSV or raw
 }
 
 // Clock allows for implementers to keep track of their own view
@@ -130,6 +131,7 @@ func (tp tokenspos) Len() int           { return len(tp) }
 func (tp tokenspos) Less(i, j int) bool { return tp[i].Pos1 < tp[j].Pos2 }
 func (tp tokenspos) Swap(i, j int)      { tp[i], tp[j] = tp[j], tp[i] }
 
+// StringOrToken is used for SinglePass and stores either a string or a token
 type StringOrToken struct {
 	S string
 	T *Token
