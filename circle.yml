@@ -26,7 +26,7 @@ test:
 
 ## Customize deployment commands
 deployment:
-  staging:
+  prod:
     branch: master
-    heroku:
-      appname: foo-bar-123
+    commands:
+      - aws s3 sync build s3://gogen-artifacts/ --delete
