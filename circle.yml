@@ -29,4 +29,4 @@ deployment:
   prod:
     branch: master
     commands:
-      - aws s3 sync build s3://gogen-artifacts/ --delete
+      - cd /home/ubuntu/.go_workspace/src/$IMPORT_PATH && aws s3 sync build s3://gogen-artifacts/ --delete
