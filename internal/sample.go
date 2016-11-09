@@ -46,8 +46,6 @@ type Sample struct {
 	SinglePass      bool                `json:"singlepass,omitempty"`
 
 	// Internal use variables
-	Gen             Generator                    `json:"-"`
-	Out             Outputter                    `json:"-"`
 	Rater           Rater                        `json:"-"`
 	Output          *Output                      `json:"-"`
 	EarliestParsed  time.Duration                `json:"-"`
@@ -59,8 +57,7 @@ type Sample struct {
 	BrokenLines     []map[string][]StringOrToken `json:"-"`
 	ReplayOffsets   []time.Duration              `json:"-"`
 	CustomGenerator *GeneratorConfig             `json:"-"`
-	LuaState        *lua.LTable                  `json:"-"`
-	LuaLines        *lua.LTable                  `json:"-"`
+	GeneratorState  *GeneratorState              `json:"-"`
 	LuaMutex        *sync.Mutex                  `json:"-"`
 	realSample      bool                         // Used to represent samples which aren't just used to store lines from CSV or raw
 }
@@ -134,6 +131,7 @@ func (tp tokenspos) Len() int           { return len(tp) }
 func (tp tokenspos) Less(i, j int) bool { return tp[i].Pos1 < tp[j].Pos2 }
 func (tp tokenspos) Swap(i, j int)      { tp[i], tp[j] = tp[j], tp[i] }
 
+// StringOrToken is used for SinglePass and stores either a string or a token
 type StringOrToken struct {
 	S string
 	T *Token

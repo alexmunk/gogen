@@ -4,6 +4,7 @@ global:
 generators:
   - name: usermodel
     fileName: $GOGEN_HOME/examples/generator/users.lua
+    singleThreaded: false
     options:
       users:
         - joe

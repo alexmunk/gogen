@@ -14,6 +14,7 @@ type luagen struct {
 	initialized bool
 	currentItem *config.GenQueueItem
 	tokens      []config.Token
+	states      map[string]*config.GeneratorState
 }
 
 func sleep(L *lua.LState) int {
@@ -154,20 +155,31 @@ func (lg *luagen) replaceTokens(L *lua.LState) int {
 func (lg *luagen) Gen(item *config.GenQueueItem) error {
 	if !lg.initialized {
 		lg.tokens = make([]config.Token, 0)
+		lg.states = make(map[string]*config.GeneratorState)
 		lg.initialized = true
 	}
 	// log.Debugf("Lua Gen called for sample '%s'", item.S.Name)
 	L := lua.NewState()
 	defer L.Close()
 	s := item.S
-	s.LuaMutex.Lock()
-	defer s.LuaMutex.Unlock()
+	var gs *config.GeneratorState
+	if s.CustomGenerator.SingleThreaded {
+		s.LuaMutex.Lock()
+		defer s.LuaMutex.Unlock()
+		gs = s.GeneratorState
+	} else {
+		var ok bool
+		if gs, ok = lg.states[s.Name]; !ok {
+			lg.states[s.Name] = config.NewGeneratorState(s)
+			gs = lg.states[s.Name]
+		}
+	}
 	lg.currentItem = item
 
 	// Register global variables
-	L.SetGlobal("state", s.LuaState)
+	L.SetGlobal("state", gs.LuaState)
 	L.SetGlobal("options", luar.New(L, s.CustomGenerator.Options))
-	L.SetGlobal("lines", s.LuaLines)
+	L.SetGlobal("lines", gs.LuaLines)
 	L.SetGlobal("count", luar.New(L, item.Count))
 	L.SetGlobal("earliest", luar.New(L, item.Earliest))
 	L.SetGlobal("latest", luar.New(L, item.Latest))

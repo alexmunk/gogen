@@ -787,22 +787,8 @@ func (c *Config) validate(s *Sample) {
 				if g.Name == s.Generator {
 					s.LuaMutex = &sync.Mutex{}
 					s.CustomGenerator = g
-					s.LuaState = new(lua.LTable)
-					for k, v := range s.CustomGenerator.Init {
-						vAsNum, err := strconv.ParseFloat(v, 64)
-						if err == nil {
-							s.LuaState.RawSet(lua.LString(k), lua.LNumber(vAsNum))
-						} else {
-							s.LuaState.RawSet(lua.LString(k), lua.LString(v))
-						}
-					}
-					s.LuaLines = new(lua.LTable)
-					for _, line := range s.Lines {
-						lualine := new(lua.LTable)
-						for k, v := range line {
-							lualine.RawSetString(k, lua.LString(v))
-						}
-						s.LuaLines.Append(lualine)
+					if g.SingleThreaded {
+						s.GeneratorState = NewGeneratorState(s)
 					}
 				}
 			}
