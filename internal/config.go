@@ -302,7 +302,7 @@ func NewConfig() *Config {
 
 	// Allow bringing in generator scripts from a file
 	for i := 0; i < len(c.Generators); i++ {
-		if c.Generators[i].FileName != "" {
+		if c.Generators[i].FileName != "" && c.Generators[i].Script == "" {
 			err := c.readGenerator(home, c.Generators[i])
 			if err != nil {
 				log.Fatalf("Error reading generator file: %s", err)

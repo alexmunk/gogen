@@ -112,8 +112,10 @@ func Pull(gogen string, dir string, deconstruct bool) {
 		if deconstruct {
 			samplesDir := filepath.Join(dir, "samples")
 			templatesDir := filepath.Join(dir, "templates")
+			generatorsDir := filepath.Join(dir, "generators")
 			err := os.Mkdir(samplesDir, 0755)
 			err = os.Mkdir(templatesDir, 0755)
+			err = os.Mkdir(generatorsDir, 0755)
 			if err != nil && !os.IsExist(err) {
 				log.Fatalf("Error creating directories %s or %s", samplesDir, templatesDir)
 			}

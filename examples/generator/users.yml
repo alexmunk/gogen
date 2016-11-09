@@ -21,7 +21,12 @@ generators:
         stage1line: 0
         repeats: 0
 samples:
-  - name: generator
+  - name: users
+    description: Example of a custom lua generator
+    notes: >
+      Simulates a user which badges in, does 4 web requests and then badges out.  Good example of using lua
+      scripts to generate data using custom logic.  Simulating multiple users is accomplished by running multiple
+      generator threads which each maintain their own state.
     generator: usermodel
     interval: 1
     endIntervals: 6
