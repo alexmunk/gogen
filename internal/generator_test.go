@@ -21,6 +21,12 @@ func TestGeneratorConfig(t *testing.T) {
 	assert.Equal(t, map[string]interface{}{"foo": "bar"}, g.Options)
 	assert.Equal(t, `return options["foo"] + state["somevar"]`+"\n", g.Script)
 	assert.Equal(t, false, g.SingleThreaded)
+
+	s := c.FindSampleByName("generator")
+	gs := NewGeneratorState(s)
+	assert.NotNil(t, gs)
+	assert.NotNil(t, gs.LuaState)
+	assert.NotNil(t, gs.LuaLines)
 }
 
 func TestGeneratorFileConfig(t *testing.T) {
