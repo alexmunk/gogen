@@ -1,5 +1,0 @@
-gogen:
-    image: golang:1.7
-    volumes:
-      - $GOPATH:/gogen
-    command: bash
