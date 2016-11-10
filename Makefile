@@ -21,3 +21,6 @@ test:
 
 docker:
 	$(dockercmd)
+
+splunkapp:
+	tar cfz splunk_app_gogen.spl splunk_app_gogen

@@ -42,6 +42,7 @@ var (
 	defaultJSONTemplate      *Template
 	defaultSplunkHECTemplate *Template
 	defaultRawTemplate       *Template
+	defaultModinputTemplate  *Template
 
 	defaultRaterConfig       *RaterConfig
 	defaultConfigRaterConfig *RaterConfig
@@ -70,6 +71,12 @@ func init() {
 		Name:   "raw",
 		Header: "",
 		Row:    `{{ ._raw }}`,
+		Footer: "",
+	}
+	defaultModinputTemplate = &Template{
+		Name:   "modinput",
+		Header: "",
+		Row:    `{{ modinput . | printf "%s" }}`,
 		Footer: "",
 	}
 

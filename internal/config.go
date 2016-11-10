@@ -184,7 +184,7 @@ func NewConfig() *Config {
 		}
 
 		// Add default templates
-		templates := []*Template{defaultCSVTemplate, defaultJSONTemplate, defaultSplunkHECTemplate, defaultRawTemplate}
+		templates := []*Template{defaultCSVTemplate, defaultJSONTemplate, defaultSplunkHECTemplate, defaultRawTemplate, defaultModinputTemplate}
 		for _, t := range templates {
 			if len(t.Header) > 0 {
 				_ = template.New(t.Name+"_header", t.Header)

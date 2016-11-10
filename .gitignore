@@ -14,3 +14,4 @@ local/**
 .aws*
 .profile
 .screenrc
+splunk_app_gogen.spl
