@@ -83,6 +83,14 @@ func ResetConfig() {
 // GOGEN_FULLCONFIG: The reference is to a full exported config, so don't resolve or validate
 // GOGEN_EXPORT: Don't set defaults for export
 func NewConfig() *Config {
+	home := os.Getenv("GOGEN_HOME")
+	if len(home) == 0 {
+		log.Debug("GOGEN_HOME not set, setting to '.'")
+		home = "."
+		os.Setenv("GOGEN_HOME", home)
+	}
+	log.Debugf("Home: %v\n", home)
+
 	var c *Config
 	if os.Getenv("GOGEN_ALWAYS_REFRESH") != "1" {
 		c = getConfig()
@@ -96,14 +104,6 @@ func NewConfig() *Config {
 
 	// Setup timezone
 	c.Timezone, _ = time.LoadLocation("Local")
-
-	home := os.Getenv("GOGEN_HOME")
-	if len(home) == 0 {
-		log.Debug("GOGEN_HOME not set, setting to '.'")
-		home = "."
-		os.Setenv("GOGEN_HOME", home)
-	}
-	log.Debugf("Home: %v\n", home)
 
 	samplesDir := os.Getenv("GOGEN_SAMPLES_DIR")
 	if len(samplesDir) == 0 {

@@ -15,3 +15,5 @@ local/**
 .profile
 .screenrc
 splunk_app_gogen.spl
+.configcache*
+.versioncache*

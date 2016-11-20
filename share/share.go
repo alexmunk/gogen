@@ -1,6 +1,7 @@
 package share
 
 import (
+	"bytes"
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
@@ -8,9 +9,11 @@ import (
 	"io/ioutil"
 	"math/rand"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -78,9 +81,20 @@ func Push(name string) (string, string) {
 		os.Exit(1)
 	}
 
+	oldGogen := Get(gogen)
+	version := oldGogen.Version + 1
 	gi := gh.Push(name)
 
-	g := GogenInfo{Gogen: gogen, Name: name, Description: sample.Description, Notes: sample.Notes, Owner: *gu.Login, SampleEvent: c.Buf.String(), GistID: *gi.ID}
+	g := GogenInfo{
+		Gogen:       gogen,
+		Name:        name,
+		Description: sample.Description,
+		Notes:       sample.Notes,
+		Owner:       *gu.Login,
+		SampleEvent: c.Buf.String(),
+		GistID:      *gi.ID,
+		Version:     version,
+	}
 	Upsert(g)
 
 	return *gu.Login, *gi.ID
@@ -95,7 +109,8 @@ func Pull(gogen string, dir string, deconstruct bool) {
 	} else {
 		name = gogen
 	}
-	gist := pull(gogen)
+	g := Get(gogen)
+	gist := getGist(g)
 	for _, file := range gist.Files {
 		filename := filepath.Join(dir, *file.Filename)
 		client := &http.Client{}
@@ -209,26 +224,89 @@ func Pull(gogen string, dir string, deconstruct bool) {
 
 // PullFile pulls a config from the Gogen API + GitHub gist and writes it to a single file
 func PullFile(gogen string, filename string) {
-	gist := pull(gogen)
-	for _, file := range gist.Files {
-		log.Debugf("Writing config at file '%s' for gogen '%s'", filename, gogen)
-		client := &http.Client{}
-		resp, err := client.Get(*file.RawURL)
-		f, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE, 0644)
-		defer f.Close()
+	g := Get(gogen)
+	var version int
+	cached := false
+
+	var readFrom io.ReadCloser
+	cacheFile := filepath.Join(os.ExpandEnv("$GOGEN_HOME"), ".configcache_"+url.QueryEscape(gogen))
+	versionCacheFile := filepath.Join(os.ExpandEnv("$GOGEN_HOME"), ".versioncache_"+url.QueryEscape(gogen))
+	_, err := os.Stat(versionCacheFile)
+	if err == nil {
+		versionBytes, err := ioutil.ReadFile(versionCacheFile)
 		if err != nil {
-			log.Fatalf("Couldn't open file %s: %s", filename, err)
+			log.Fatalf("Error reading version cache file '%s': %s", versionCacheFile, err)
 		}
-		_, err = io.Copy(f, resp.Body)
+		version, err = strconv.Atoi(string(versionBytes))
 		if err != nil {
-			log.Fatalf("Error writing to file %s: %s", filename, err)
+			log.Fatalf("Error converting value in version cache file '%s' to integer: %s", versionCacheFile, err)
 		}
-		break
+		if version == g.Version {
+			log.Debugf("Reading config from cache file '%s'", cacheFile)
+			readFrom, err = os.Open(cacheFile)
+			if err != nil {
+				log.Fatalf("Couldn't open cache file %s: %s", cacheFile, err)
+			}
+			cached = true
+		} else {
+			log.Debugf("Verison mismatch, Gogen version %d cached version %d", g.Version, version)
+		}
+	}
+	if !cached {
+		gist := getGist(g)
+		for _, file := range gist.Files {
+			log.Debugf("Reading config from GitHub")
+			client := &http.Client{}
+			resp, err := client.Get(*file.RawURL)
+			if err != nil {
+				log.Fatalf("Could not read from HTTP url '%s' for gist '%s': %s", *file.RawURL, gogen, err)
+			}
+			readFrom = resp.Body
+			break
+		}
+	}
+	// Make a copy of readFrom in case we need to write it to cache
+	var buf bytes.Buffer
+	if _, err = buf.ReadFrom(readFrom); err != nil {
+		log.Fatalf("Couldn't read from readFrom into buffer: %s", err)
+	}
+	if err = readFrom.Close(); err != nil {
+		log.Fatalf("Error closing readFrom: %s", err)
+	}
+
+	f, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE, 0644)
+	defer f.Close()
+	if err != nil {
+		log.Fatalf("Couldn't open file %s: %s", filename, err)
+	}
+	_, err = io.Copy(f, bytes.NewReader(buf.Bytes()))
+	if err != nil {
+		log.Fatalf("Error writing to file %s: %s", filename, err)
+	}
+
+	if !cached {
+		versioncachef, err := os.OpenFile(versionCacheFile, os.O_WRONLY|os.O_CREATE, 0644)
+		if err != nil {
+			log.Fatalf("Couldn't open version cache file '%s': %s", versionCacheFile, err)
+		}
+		defer versioncachef.Close()
+		_, err = versioncachef.WriteString(strconv.Itoa(g.Version))
+		if err != nil {
+			log.Fatalf("Error writing to version cache file: '%s': %s", versionCacheFile, err)
+		}
+		cachef, err := os.OpenFile(cacheFile, os.O_WRONLY|os.O_CREATE, 0644)
+		defer cachef.Close()
+		if err != nil {
+			log.Fatalf("Couldn't open cache file '%s': %s", cacheFile, err)
+		}
+		_, err = io.Copy(cachef, bytes.NewReader(buf.Bytes()))
+		if err != nil {
+			log.Fatalf("Error writing to cache file '%s': %s", cacheFile, err)
+		}
 	}
 }
 
-func pull(gogen string) (gist *github.Gist) {
-	g := Get(gogen)
+func getGist(g GogenInfo) (gist *github.Gist) {
 	gh := NewGitHub(false)
 	gist, _, err := gh.client.Gists.Get(g.GistID)
 	if err != nil {

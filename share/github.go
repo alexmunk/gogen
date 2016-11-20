@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"path/filepath"
 
 	"github.com/kr/pretty"
 	uuid "github.com/satori/go.uuid"
@@ -126,7 +127,7 @@ func NewGitHub(requireauth bool) *GitHub {
 
 	c := config.NewConfig()
 	gh.c = c
-	tokenFile := os.ExpandEnv("$GOGEN_HOME/.githubtoken")
+	tokenFile := filepath.Join(os.ExpandEnv("$GOGEN_HOME"), ".githubtoken")
 	_, err := os.Stat(tokenFile)
 	if err == nil {
 		buf, err := ioutil.ReadFile(tokenFile)

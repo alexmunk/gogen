@@ -21,6 +21,7 @@ type GogenInfo struct {
 	Notes       string `json:"notes"`
 	SampleEvent string `json:"sampleEvent"`
 	GistID      string `json:"gistID"`
+	Version     int    `json:"version"`
 }
 
 // GogenList is returned by the /v1/list and /v1/search APIs for Gogen
@@ -80,13 +81,15 @@ func Get(q string) (g GogenInfo) {
 	client := &http.Client{}
 	resp, err := client.Get("https://api.gogen.io/v1/get/" + q)
 	if err != nil || resp.StatusCode != 200 {
-		if resp.StatusCode == 404 {
-			fmt.Printf("Could not find Gogen: %s\n", q)
-			os.Exit(1)
-		}
-		if resp.StatusCode != 200 {
-			body, _ := ioutil.ReadAll(resp.Body)
-			log.Fatalf("Non 200 response code retrieving Gogen: %s", string(body))
+		if resp != nil {
+			if resp.StatusCode == 404 {
+				fmt.Printf("Could not find Gogen: %s\n", q)
+				os.Exit(1)
+			}
+			if resp.StatusCode != 200 {
+				body, _ := ioutil.ReadAll(resp.Body)
+				log.Fatalf("Non 200 response code retrieving Gogen: %s", string(body))
+			}
 		} else {
 			log.Fatalf("Error retrieving Gogen %s: %s", q, err)
 		}
