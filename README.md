@@ -1,4 +1,4 @@
-# Gogen [![Travis](https://img.shields.io/travis/rust-lang/rust.svg)](https://github.com/coccyx/gogen) [![Coveralls](https://img.shields.io/coveralls/jekyll/jekyll.svg)](http://github.com/coccyx/gogen) [![Go Report Card](https://goreportcard.com/badge/github.com/coccyx/gogen)](https://goreportcard.com/report/github.com/coccyx/gogen) 
+# Gogen [![CircleCI](https://img.shields.io/circleci/project/github/RedSparr0w/node-csgo-parser.svg)](https://github.com/coccyx/gogen) [![Coveralls](https://img.shields.io/coveralls/jekyll/jekyll.svg)](http://github.com/coccyx/gogen) [![Go Report Card](https://goreportcard.com/badge/github.com/coccyx/gogen)](https://goreportcard.com/report/github.com/coccyx/gogen) 
 
 Gogen is an open source data generator.  Gogen can be used for any type of data, and it has first class support for time series data.  Primarily,
 it's been used and tested to generate log and metric data for testing time series systems.
