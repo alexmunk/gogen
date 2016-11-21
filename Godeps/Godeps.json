@@ -1,7 +1,7 @@
 {
 	"ImportPath": "github.com/coccyx/gogen",
 	"GoVersion": "go1.7",
-	"GodepVersion": "v74",
+	"GodepVersion": "v75",
 	"Packages": [
 		"./..."
 	],
@@ -155,6 +155,10 @@
 			"ImportPath": "gopkg.in/urfave/cli.v1",
 			"Comment": "v1.18.1",
 			"Rev": "a14d7d367bc02b1f57d88de97926727f2d936387"
+		},
+		{
+			"ImportPath": "gopkg.in/yaml.v2",
+			"Rev": "a5b47d31c556af34a302ce5d659e6fea44d90de0"
 		}
 	]
 }
