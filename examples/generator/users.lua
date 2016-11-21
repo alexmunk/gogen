@@ -36,6 +36,14 @@ function getentry(ud, i)
   end
 end
 
+function getudvalue(ud, key)
+  for k, v in ud() do
+    if tostring(k) == key then
+      return v
+    end
+  end
+end
+
 function pairsByKeys (t, f)
   local a = {}
   for n in pairs(t) do table.insert(a, n) end
@@ -69,7 +77,8 @@ end
 
 function setcountdown()
   -- Countdown a random amount of seconds
-  countdown =  math.random(1, options["countdown"][tostring(state["stage"])])
+  upper = getudvalue(options["countdown"], tostring(state["stage"]))
+  countdown =  math.random(1, upper)
   state["countdown"] = countdown
 end
 

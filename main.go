@@ -50,11 +50,11 @@ func Setup(clic *cli.Context) {
 		if cstr[0:4] == "http" || cstr[len(cstr)-3:] == "yml" || cstr[len(cstr)-4:] == "yaml" || cstr[len(cstr)-4:] == "json" {
 			os.Setenv("GOGEN_FULLCONFIG", cstr)
 		} else {
-			share.PullFile(cstr, ".config.json")
+			share.PullFile(cstr, ".config.yml")
 			config.ResetConfig()
-			os.Setenv("GOGEN_FULLCONFIG", ".config.json")
+			os.Setenv("GOGEN_FULLCONFIG", ".config.yml")
 			defer func() {
-				os.Remove(".config.json")
+				os.Remove(".config.yml")
 			}()
 		}
 	} else if len(clic.String("samplesDir")) > 0 {
@@ -241,13 +241,13 @@ func main() {
 				c = config.NewConfig()
 				var outb []byte
 				var err error
-				if clic.String("format") == "yaml" {
-					if outb, err = yaml.Marshal(c); err != nil {
-						log.Panicf("YAML output error: %v", err)
-					}
-				} else {
+				if clic.String("format") == "json" {
 					if outb, err = json.MarshalIndent(c, "", "  "); err != nil {
 						log.Panicf("JSON output error: %v", err)
+					}
+				} else {
+					if outb, err = yaml.Marshal(c); err != nil {
+						log.Panicf("YAML output error: %v", err)
 					}
 				}
 				out := string(outb)

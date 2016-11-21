@@ -10,12 +10,12 @@ import (
 
 // GeneratorConfig holds our configuration for custom generators
 type GeneratorConfig struct {
-	Name           string                 `json:"name"`
-	Init           map[string]string      `json:"init,omitempty"`
-	Options        map[string]interface{} `json:"options,omitempty"`
-	Script         string                 `json:"script"`
-	FileName       string                 `json:"fileName,omitempty"`
-	SingleThreaded bool                   `json:"singleThreaded,omitempty"`
+	Name           string                 `json:"name" yaml:"name"`
+	Init           map[string]string      `json:"init,omitempty" yaml:"init,omitempty"`
+	Options        map[string]interface{} `json:"options,omitempty" yaml:"options,omitempty"`
+	Script         string                 `json:"script" yaml:"script"`
+	FileName       string                 `json:"fileName,omitempty" yaml:"fileName,omitempty"`
+	SingleThreaded bool                   `json:"singleThreaded,omitempty" yaml:"singleThreaded,omitempty"`
 }
 
 // GenQueueItem represents one generation job

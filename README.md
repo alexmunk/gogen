@@ -1,15 +1,15 @@
-# Still to be done
+# Gogen [![Travis](https://img.shields.io/travis/rust-lang/rust.svg)](https://github.com/coccyx/gogen) [![Coveralls](https://img.shields.io/coveralls/jekyll/jekyll.svg)](http://github.com/coccyx/gogen) [![Go Report Card](https://goreportcard.com/badge/github.com/coccyx/gogen)](https://goreportcard.com/report/github.com/coccyx/gogen) 
 
-In the absence of a real README, here are a few commands to get you started:
+Gogen is an open source data generator.  Gogen can be used for any type of data, and it has first class support for time series data.  Primarily,
+it's been used and tested to generate log and metric data for testing time series systems.
 
-    gogen
-    gogen -c examples/weblog/weblog.yml 
-    gogen -c examples/csv/csv.yml
+## Features
 
-To see what we're doing behind the scenes:
-
-    gogen -v gen -s translog -c 1 -ei 1
-
-To see how good your laptop is:
-
-    gogen -v -g 4 -c tests/perf/weblog.yml gen -s weblog -o devnull 
+* Generates complex time series data via token substitutions in original raw events
+* Support for arbitrary key/value datasets, tokens can replace in any field
+* Many token types: static, randomly generated, different types of choices from lists, or custom scripts
+* Three generation modes: random substitution of tokens from a sample file, replaying a sample in time series order, or custom generation scripts
+* Extensible via custom Lua scripts
+* Easy configuration via YAML or JSON files
+* Easy sharing of configurations via a centralized service
+* Simple getting started experience as one statically linked binary, compiled on multiple platforms

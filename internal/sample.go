@@ -13,7 +13,7 @@ import (
 	strftime "github.com/cactus/gostrftime"
 	log "github.com/coccyx/gogen/logger"
 	"github.com/pbnjay/strptime"
-	"github.com/satori/go.uuid"
+	uuid "github.com/satori/go.uuid"
 	lua "github.com/yuin/gopher-lua"
 )
 
@@ -23,42 +23,42 @@ const randHexLetters = "ABCDEF0123456789"
 // Sample is the main configuration data structure which is passed around through Gogen
 // Publicly exported options are brought in through YAML or JSON configs, and some state is maintained in private unexposed variables.
 type Sample struct {
-	Name            string              `json:"name"`
-	Description     string              `json:"description,omitempty"`
-	Notes           string              `json:"notes,omitempty"`
-	Disabled        bool                `json:"disabled"`
-	Generator       string              `json:"generator,omitempty"`
-	RaterString     string              `json:"rater,omitempty"`
-	Interval        int                 `json:"interval,omitempty"`
-	Delay           int                 `json:"delay,omitempty"`
-	Count           int                 `json:"count,omitempty"`
-	Earliest        string              `json:"earliest,omitempty"`
-	Latest          string              `json:"latest,omitempty"`
-	Begin           string              `json:"begin,omitempty"`
-	End             string              `json:"end,omitempty"`
-	EndIntervals    int                 `json:"endIntervals,omitempty"`
-	RandomizeCount  float32             `json:"randomizeCount,omitempty"`
-	RandomizeEvents bool                `json:"randomizeEvents,omitempty"`
-	Tokens          []Token             `json:"tokens,omitempty"`
-	Lines           []map[string]string `json:"lines,omitempty"`
-	Field           string              `json:"field,omitempty"`
-	FromSample      string              `json:"fromSample,omitempty"`
-	SinglePass      bool                `json:"singlepass,omitempty"`
+	Name            string              `json:"name" yaml:"name"`
+	Description     string              `json:"description,omitempty" yaml:"description,omitempty"`
+	Notes           string              `json:"notes,omitempty" yaml:"notes,omitempty"`
+	Disabled        bool                `json:"disabled" yaml:"disabled"`
+	Generator       string              `json:"generator,omitempty" yaml:"generator,omitempty"`
+	RaterString     string              `json:"rater,omitempty" yaml:"rater,omitempty"`
+	Interval        int                 `json:"interval,omitempty" yaml:"interval,omitempty"`
+	Delay           int                 `json:"delay,omitempty" yaml:"delay,omitempty"`
+	Count           int                 `json:"count,omitempty" yaml:"count,omitempty"`
+	Earliest        string              `json:"earliest,omitempty" yaml:"earliest,omitempty"`
+	Latest          string              `json:"latest,omitempty" yaml:"latest,omitempty"`
+	Begin           string              `json:"begin,omitempty" yaml:"begin,omitempty"`
+	End             string              `json:"end,omitempty" yaml:"end,omitempty"`
+	EndIntervals    int                 `json:"endIntervals,omitempty" yaml:"endIntervals,omitempty"`
+	RandomizeCount  float32             `json:"randomizeCount,omitempty" yaml:"randomizeCount,omitempty"`
+	RandomizeEvents bool                `json:"randomizeEvents,omitempty" yaml:"randomizeEvents,omitempty"`
+	Tokens          []Token             `json:"tokens,omitempty" yaml:"tokens,omitempty"`
+	Lines           []map[string]string `json:"lines,omitempty" yaml:"lines,omitempty"`
+	Field           string              `json:"field,omitempty" yaml:"field,omitempty"`
+	FromSample      string              `json:"fromSample,omitempty" yaml:"fromSample,omitempty"`
+	SinglePass      bool                `json:"singlepass,omitempty" yaml:"singlepass,omitempty"`
 
 	// Internal use variables
-	Rater           Rater                        `json:"-"`
-	Output          *Output                      `json:"-"`
-	EarliestParsed  time.Duration                `json:"-"`
-	LatestParsed    time.Duration                `json:"-"`
-	BeginParsed     time.Time                    `json:"-"`
-	EndParsed       time.Time                    `json:"-"`
-	Current         time.Time                    `json:"-"` // If we are backfilling or generating for a specified time window, what time is it?
-	Realtime        bool                         `json:"-"` // Are we done doing batch backfill or specified time window?
-	BrokenLines     []map[string][]StringOrToken `json:"-"`
-	ReplayOffsets   []time.Duration              `json:"-"`
-	CustomGenerator *GeneratorConfig             `json:"-"`
-	GeneratorState  *GeneratorState              `json:"-"`
-	LuaMutex        *sync.Mutex                  `json:"-"`
+	Rater           Rater                        `json:"-" yaml:"-"`
+	Output          *Output                      `json:"-" yaml:"-"`
+	EarliestParsed  time.Duration                `json:"-" yaml:"-"`
+	LatestParsed    time.Duration                `json:"-" yaml:"-"`
+	BeginParsed     time.Time                    `json:"-" yaml:"-"`
+	EndParsed       time.Time                    `json:"-" yaml:"-"`
+	Current         time.Time                    `json:"-" yaml:"-"` // If we are backfilling or generating for a specified time window, what time is it?
+	Realtime        bool                         `json:"-" yaml:"-"` // Are we done doing batch backfill or specified time window?
+	BrokenLines     []map[string][]StringOrToken `json:"-" yaml:"-"`
+	ReplayOffsets   []time.Duration              `json:"-" yaml:"-"`
+	CustomGenerator *GeneratorConfig             `json:"-" yaml:"-"`
+	GeneratorState  *GeneratorState              `json:"-" yaml:"-"`
+	LuaMutex        *sync.Mutex                  `json:"-" yaml:"-"`
 	realSample      bool                         // Used to represent samples which aren't just used to store lines from CSV or raw
 }
 
@@ -83,30 +83,30 @@ func (s *Sample) Now() time.Time {
 
 // Token describes a replacement task to run against a sample
 type Token struct {
-	Name           string              `json:"name"`
-	Format         string              `json:"format"`
-	Token          string              `json:"token"`
-	Type           string              `json:"type"`
-	Replacement    string              `json:"replacement,omitempty"`
-	Group          int                 `json:"group,omitempty"`
-	Sample         *Sample             `json:"-"`
-	Parent         *Sample             `json:"-"`
-	SampleString   string              `json:"sample,omitempty"`
-	Field          string              `json:"field,omitempty"`
-	SrcField       string              `json:"srcField,omitempty"`
-	Precision      int                 `json:"precision,omitempty"`
-	Lower          int                 `json:"lower,omitempty"`
-	Upper          int                 `json:"upper,omitempty"`
-	Length         int                 `json:"length,omitempty"`
-	WeightedChoice []WeightedChoice    `json:"weightedChoice,omitempty"`
-	FieldChoice    []map[string]string `json:"fieldChoice,omitempty"`
-	Choice         []string            `json:"choice,omitempty"`
-	Script         string              `json:"script,omitempty"`
-	Init           map[string]string   `json:"init,omitempty"`
-	RaterString    string              `json:"rater,omitempty"`
-	Rater          Rater               `json:"-"`
+	Name           string              `json:"name" yaml:"name"`
+	Format         string              `json:"format" yaml:"format"`
+	Token          string              `json:"token" yaml:"token"`
+	Type           string              `json:"type" yaml:"type"`
+	Replacement    string              `json:"replacement,omitempty" yaml:"replacement,omitempty"`
+	Group          int                 `json:"group,omitempty" yaml:"group,omitempty"`
+	Sample         *Sample             `json:"-" yaml:"-"`
+	Parent         *Sample             `json:"-" yaml:"-"`
+	SampleString   string              `json:"sample,omitempty" yaml:"sample,omitempty"`
+	Field          string              `json:"field,omitempty" yaml:"field,omitempty"`
+	SrcField       string              `json:"srcField,omitempty" yaml:"srcField,omitempty"`
+	Precision      int                 `json:"precision,omitempty" yaml:"precision,omitempty"`
+	Lower          int                 `json:"lower,omitempty" yaml:"lower,omitempty"`
+	Upper          int                 `json:"upper,omitempty" yaml:"upper,omitempty"`
+	Length         int                 `json:"length,omitempty" yaml:"length,omitempty"`
+	WeightedChoice []WeightedChoice    `json:"weightedChoice,omitempty" yaml:"weightedChoice,omitempty"`
+	FieldChoice    []map[string]string `json:"fieldChoice,omitempty" yaml:"fieldChoice,omitempty"`
+	Choice         []string            `json:"choice,omitempty" yaml:"choice,omitempty"`
+	Script         string              `json:"script,omitempty" yaml:"script,omitempty"`
+	Init           map[string]string   `json:"init,omitempty" yaml:"init,omitempty"`
+	RaterString    string              `json:"rater,omitempty" yaml:"rater,omitempty"`
+	Rater          Rater               `json:"-" yaml:"-"`
 
-	L                          *lua.LState `json:"-"`
+	L                          *lua.LState `json:"-" yaml:"-"`
 	luaState                   *lua.LTable
 	mutex                      *sync.Mutex
 	weightedChoiceTotals       []int
@@ -115,8 +115,8 @@ type Token struct {
 
 // WeightedChoice is a simple data structure for allowing a list of items with a Choice to pick and a Weight for that choice
 type WeightedChoice struct {
-	Weight int    `json:"weight"`
-	Choice string `json:"choice"`
+	Weight int    `json:"weight" yaml:"weight"`
+	Choice string `json:"choice" yaml:"choice"`
 }
 
 type tokenpos struct {

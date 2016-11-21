@@ -3,7 +3,6 @@ package share
 import (
 	"bytes"
 	"encoding/csv"
-	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -22,6 +21,7 @@ import (
 	log "github.com/coccyx/gogen/logger"
 	"github.com/coccyx/gogen/outputter"
 	"github.com/google/go-github/github"
+	yaml "gopkg.in/yaml.v2"
 )
 
 // Push pushes the running config to the Gogen API and creates a GitHub gist.  Returns the owner and ID of the Gist.
@@ -190,12 +190,12 @@ func Pull(gogen string, dir string, deconstruct bool) {
 
 						var outb []byte
 						var err error
-						if outb, err = json.MarshalIndent(s, "", "  "); err != nil {
+						if outb, err = yaml.Marshal(s); err != nil {
 							log.Fatalf("Cannot Marshal sample '%s', err: %s", s.Name, err)
 						}
-						err = ioutil.WriteFile(filepath.Join(samplesDir, name+".json"), outb, 0644)
+						err = ioutil.WriteFile(filepath.Join(samplesDir, name+".yml"), outb, 0644)
 						if err != nil {
-							log.Fatalf("Cannot write file %s: %s", filepath.Join(samplesDir, name+".json"), err)
+							log.Fatalf("Cannot write file %s: %s", filepath.Join(samplesDir, name+".yml"), err)
 						}
 					}
 				}
@@ -204,12 +204,12 @@ func Pull(gogen string, dir string, deconstruct bool) {
 			for _, t := range c.Templates {
 				var outb []byte
 				var err error
-				if outb, err = json.MarshalIndent(t, "", "  "); err != nil {
+				if outb, err = yaml.Marshal(t); err != nil {
 					log.Fatalf("Cannot Marshal template '%s', err: %s", t.Name, err)
 				}
-				err = ioutil.WriteFile(filepath.Join(templatesDir, t.Name+".json"), outb, 0644)
+				err = ioutil.WriteFile(filepath.Join(templatesDir, t.Name+".yml"), outb, 0644)
 				if err != nil {
-					log.Fatalf("Error writing file %s", filepath.Join(templatesDir, t.Name+".json"))
+					log.Fatalf("Error writing file %s", filepath.Join(templatesDir, t.Name+".yml"))
 				}
 			}
 
@@ -249,7 +249,7 @@ func PullFile(gogen string, filename string) {
 			}
 			cached = true
 		} else {
-			log.Debugf("Verison mismatch, Gogen version %d cached version %d", g.Version, version)
+			log.Debugf("Version mismatch, Gogen version %d cached version %d", g.Version, version)
 		}
 	}
 	if !cached {
@@ -285,6 +285,8 @@ func PullFile(gogen string, filename string) {
 	}
 
 	if !cached {
+		os.Remove(versionCacheFile)
+		os.Remove(cacheFile)
 		versioncachef, err := os.OpenFile(versionCacheFile, os.O_WRONLY|os.O_CREATE, 0644)
 		if err != nil {
 			log.Fatalf("Couldn't open version cache file '%s': %s", versionCacheFile, err)

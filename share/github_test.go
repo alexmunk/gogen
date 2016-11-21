@@ -50,13 +50,13 @@ func TestValid(t *testing.T) {
 	// fmt.Printf("%# v", pretty.Formatter(g))
 	_, err = gh.client.Gists.Delete(id)
 	assert.NoError(t, err, "Failed deleting gist")
-	content := []byte(*g.Files["test_config.json"].Content)
-	err = ioutil.WriteFile("test_config.json", content, 444)
-	assert.NoError(t, err, "Cannot write test_config.json")
+	content := []byte(*g.Files["test_config.yml"].Content)
+	err = ioutil.WriteFile("test_config.yml", content, 444)
+	assert.NoError(t, err, "Cannot write test_config.yml")
 
-	os.Setenv("GOGEN_FULLCONFIG", "test_config.json")
+	os.Setenv("GOGEN_FULLCONFIG", "test_config.yml")
 	tc = config.NewConfig()
-	_ = os.Remove("test_config.json")
+	_ = os.Remove("test_config.yml")
 
 	assert.Equal(t, c.Samples[0].Name, tc.Samples[0].Name)
 }

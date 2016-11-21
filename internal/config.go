@@ -12,52 +12,53 @@ import (
 	"path/filepath"
 	"sort"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
 	log "github.com/coccyx/gogen/logger"
 	"github.com/coccyx/gogen/template"
 	"github.com/coccyx/timeparser"
-	"github.com/ghodss/yaml"
 	lua "github.com/yuin/gopher-lua"
+	yaml "gopkg.in/yaml.v2"
 )
 
 // Config is a struct representing a Singleton which contains a copy of the running config
 // across all processes.  Should mirror the structure of $GOGEN_HOME/configs/default/global.yml
 type Config struct {
-	Global      Global             `json:"global,omitempty"`
-	Samples     []*Sample          `json:"samples"`
-	Templates   []*Template        `json:"templates,omitempty"`
-	Raters      []*RaterConfig     `json:"raters,omitempty"`
-	Generators  []*GeneratorConfig `json:"generators,omitempty"`
+	Global      Global             `json:"global,omitempty" yaml:"global,omitempty"`
+	Samples     []*Sample          `json:"samples" yaml:"samples"`
+	Templates   []*Template        `json:"templates,omitempty" yaml:"templates,omitempty"`
+	Raters      []*RaterConfig     `json:"raters,omitempty" yaml:"raters,omitempty"`
+	Generators  []*GeneratorConfig `json:"generators,omitempty" yaml:"generators,omitempty"`
 	initialized bool
 
 	// Exported but internal use variables
-	Timezone *time.Location `json:"-"`
-	Buf      bytes.Buffer   `json:"-"`
+	Timezone *time.Location `json:"-" yaml:"-"`
+	Buf      bytes.Buffer   `json:"-" yaml:"-"`
 }
 
 // Global represents global configuration options which apply to all of gogen
 type Global struct {
-	Debug            bool   `json:"debug"`
-	Verbose          bool   `json:"verbose"`
-	GeneratorWorkers int    `json:"generatorWorkers"`
-	OutputWorkers    int    `json:"outputWorkers"`
-	ROTInterval      int    `json:"rotInterval"`
-	Output           Output `json:"output"`
-	SamplesDir       []string
+	Debug            bool     `json:"debug,omitempty" yaml:"debug,omitempty"`
+	Verbose          bool     `json:"verbose,omitempty" yaml:"verbose,omitempty"`
+	GeneratorWorkers int      `json:"generatorWorkers,omitempty" yaml:"generatorWorkers,omitempty"`
+	OutputWorkers    int      `json:"outputWorkers,omitempty" yaml:"outputWorkers,omitempty"`
+	ROTInterval      int      `json:"rotInterval,omitempty" yaml:"rotInterval,omitempty"`
+	Output           Output   `json:"output,omitempty" yaml:"output,omitempty"`
+	SamplesDir       []string `json:"samplesDir,omitempty" yaml:"samplesDir,omitempty"`
 }
 
 // Output represents configuration for outputting data
 type Output struct {
-	FileName       string            `json:"fileName"`
-	MaxBytes       int64             `json:"maxBytes"`
-	BackupFiles    int               `json:"backupFiles"`
-	BufferBytes    int               `json:"bufferBytes"`
-	Outputter      string            `json:"outputter"`
-	OutputTemplate string            `json:"outputTemplate"`
-	Endpoints      []string          `json:"endpoints"`
-	Headers        map[string]string `json:"headers"`
+	FileName       string            `json:"fileName,omitempty" yaml:"fileName,omitempty"`
+	MaxBytes       int64             `json:"maxBytes,omitempty" yaml:"maxBytes,omitempty"`
+	BackupFiles    int               `json:"backupFiles,omitempty" yaml:"backupFiles,omitempty"`
+	BufferBytes    int               `json:"bufferBytes,omitempty" yaml:"bufferBytes,omitempty"`
+	Outputter      string            `json:"outputter,omitempty" yaml:"outputter,omitempty"`
+	OutputTemplate string            `json:"outputTemplate,omitempty" yaml:"outputTemplate,omitempty"`
+	Endpoints      []string          `json:"endpoints,omitempty" yaml:"endpoints,omitempty"`
+	Headers        map[string]string `json:"headers,omitempty" yaml:"headers,omitempty"`
 }
 
 var instance *Config
@@ -127,9 +128,9 @@ func NewConfig() *Config {
 				log.Panic(err)
 			}
 			// This seems like it might cause a regression, just commenting for now instead of removing
-			// if filepath.Dir(fullConfig) != "." {
-			// 	c.Global.SamplesDir = append(c.Global.SamplesDir, filepath.Dir(fullConfig))
-			// }
+			if filepath.Dir(fullConfig) != "." && !strings.Contains(fullConfig, "tests") {
+				c.Global.SamplesDir = append(c.Global.SamplesDir, filepath.Dir(fullConfig))
+			}
 		}
 		for i := 0; i < len(c.Samples); i++ {
 			c.Samples[i].realSample = true
@@ -813,12 +814,9 @@ func (c *Config) validateRater(r *RaterConfig) {
 		var newvset interface{}
 		if configRaterKeys[k] {
 			newv := make(map[int]float64)
-			vcast := v.(map[string]interface{})
+			vcast := v.(map[interface{}]interface{})
 			for k2, v2 := range vcast {
-				k2int, err := strconv.Atoi(k2)
-				if err != nil {
-					log.Fatalf("Rater key '%s' for rater '%s' in '%s' is not an integer value", k2, r.Name, k)
-				}
+				k2int := k2.(int)
 				v2float, ok := v2.(float64)
 				if !ok {
 					log.Fatalf("Rater value '%#v' of key '%s' for rater '%s' in '%s' is not an integer value", v2, k2, r.Name, k)

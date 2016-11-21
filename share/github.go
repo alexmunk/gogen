@@ -3,11 +3,12 @@ package share
 // Mostly from https://jacobmartins.com/2016/02/29/getting-started-with-oauth2-in-go/
 
 import (
-	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
+
+	yaml "gopkg.in/yaml.v2"
 
 	"github.com/kr/pretty"
 	uuid "github.com/satori/go.uuid"
@@ -42,18 +43,18 @@ type GitHub struct {
 	c      *config.Config
 }
 
-// Push will create a public gist of "name.json" from our running config
+// Push will create a public gist of "name.yml" from our running config
 func (gh *GitHub) Push(name string) *github.Gist {
 	gist := new(github.Gist)
 	files := make(map[github.GistFilename]github.GistFile)
 
 	file := new(github.GistFile)
-	fname := name + ".json"
+	fname := name + ".yml"
 	file.Filename = &fname
 	var outb []byte
 	var outbs *string
 	var err error
-	if outb, err = json.MarshalIndent(gh.c, "", "  "); err != nil {
+	if outb, err = yaml.Marshal(gh.c); err != nil {
 		log.Fatalf("Cannot Marshal c.Global, err: %s", err)
 	}
 	outbs = new(string)
@@ -90,7 +91,7 @@ func (gh *GitHub) Pull(name string) *github.Gist {
 	var gist *github.Gist
 	gist = gh.findgist(name)
 	if gist == nil {
-		log.Fatalf("Error finding gist %s", name+".json")
+		log.Fatalf("Error finding gist %s", name+".yml")
 	}
 	return gist
 }
@@ -103,8 +104,8 @@ func (gh *GitHub) findgist(name string) (foundgist *github.Gist) {
 findgist:
 	for _, testgist := range gists {
 		for _, gistfile := range testgist.Files {
-			log.Debugf("Testing %s if match %s", *gistfile.Filename, name+".json")
-			if *gistfile.Filename == name+".json" {
+			log.Debugf("Testing %s if match %s", *gistfile.Filename, name+".yml")
+			if *gistfile.Filename == name+".yml" {
 				foundgist = testgist
 				break findgist
 			}
