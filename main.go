@@ -53,9 +53,6 @@ func Setup(clic *cli.Context) {
 			share.PullFile(cstr, ".config.yml")
 			config.ResetConfig()
 			os.Setenv("GOGEN_FULLCONFIG", ".config.yml")
-			defer func() {
-				os.Remove(".config.yml")
-			}()
 		}
 	} else if len(clic.String("samplesDir")) > 0 {
 		os.Setenv("GOGEN_SAMPLES_DIR", clic.String("samplesDir"))
@@ -78,7 +75,7 @@ func Setup(clic *cli.Context) {
 			c.Samples[i].Output.Outputter = clic.String("outputter")
 		}
 		if len(clic.String("filename")) > 0 {
-			log.Infof("Setting filename to '%s'")
+			log.Infof("Setting filename to '%s'", clic.String("filename"))
 			c.Samples[i].Output.FileName = clic.String("filename")
 		}
 		if len(clic.String("url")) > 0 {
@@ -119,6 +116,9 @@ func table(l []share.GogenList) {
 }
 
 func main() {
+	defer func() {
+		os.Remove(".config.yml")
+	}()
 	if config.ProfileOn {
 		defer profile.Start(profile.CPUProfile, profile.ProfilePath(".")).Stop()
 		// defer profile.Start(profile.MemProfile, profile.ProfilePath(".")).Stop()
@@ -152,7 +152,8 @@ func main() {
 				},
 				cli.IntFlag{
 					Name:  "interval, i",
-					Usage: "Output every `seconds` seconds"},
+					Usage: "Output every `seconds` seconds",
+				},
 				cli.IntFlag{
 					Name:  "endIntervals, ei",
 					Usage: "Only run from `number` intervals",
@@ -176,6 +177,10 @@ func main() {
 					os.Exit(1)
 				}
 				for i := 0; i < len(c.Samples); i++ {
+					if clic.Int("interval") > 0 {
+						log.Infof("Setting interval to %d for sample '%s'", clic.Int("interval"), c.Samples[i].Name)
+						c.Samples[i].Interval = clic.Int("interval")
+					}
 					if clic.Int("endIntervals") > 0 {
 						log.Infof("Setting endIntervals to %d", clic.Int("endIntervals"))
 						c.Samples[i].EndIntervals = clic.Int("endIntervals")
@@ -184,10 +189,6 @@ func main() {
 					if clic.Int("count") > 0 {
 						log.Infof("Setting count to %d for sample '%s'", clic.Int("count"), c.Samples[i].Name)
 						c.Samples[i].Count = clic.Int("count")
-					}
-					if clic.Int("interval") > 0 {
-						log.Infof("Setting interval to %d for sample '%s'", clic.Int("interval"), c.Samples[i].Name)
-						c.Samples[i].Interval = clic.Int("interval")
 					}
 					if len(clic.String("begin")) > 0 {
 						log.Infof("Setting begin to %s for sample '%s'", clic.String("begin"), c.Samples[i].Name)
@@ -418,7 +419,7 @@ from the sample referenced by [name]`,
 			EnvVar: "GOGEN_GENERATORS",
 		},
 		cli.IntFlag{
-			Name:   "outputters, o",
+			Name:   "outputters, os",
 			Usage:  "Sets number of outputter `threads`",
 			EnvVar: "GOGEN_OUTPUTTERS",
 		},
@@ -428,7 +429,7 @@ from the sample referenced by [name]`,
 			EnvVar: "GOGEN_OUTPUTTEMPLATE",
 		},
 		cli.StringFlag{
-			Name:   "outputter, out",
+			Name:   "outputter, o",
 			Usage:  "Use outputter `(stdout|devnull|file|http) for output",
 			EnvVar: "GOGEN_OUT",
 		},

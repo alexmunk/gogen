@@ -167,21 +167,17 @@ func NewConfig() *Config {
 		//
 		// Setup defaults for outputs
 		//
-		switch c.Global.Output.Outputter {
-		case "file":
-			if c.Global.Output.FileName == "" {
-				c.Global.Output.FileName = defaultFileName
-			}
-			if c.Global.Output.BackupFiles == 0 {
-				c.Global.Output.BackupFiles = defaultBackupFiles
-			}
-			if c.Global.Output.MaxBytes == 0 {
-				c.Global.Output.MaxBytes = defaultMaxBytes
-			}
-		case "http":
-			if c.Global.Output.BufferBytes == 0 {
-				c.Global.Output.BufferBytes = defaultBufferBytes
-			}
+		if c.Global.Output.FileName == "" {
+			c.Global.Output.FileName = defaultFileName
+		}
+		if c.Global.Output.BackupFiles == 0 {
+			c.Global.Output.BackupFiles = defaultBackupFiles
+		}
+		if c.Global.Output.MaxBytes == 0 {
+			c.Global.Output.MaxBytes = defaultMaxBytes
+		}
+		if c.Global.Output.BufferBytes == 0 {
+			c.Global.Output.BufferBytes = defaultBufferBytes
 		}
 
 		// Add default templates
