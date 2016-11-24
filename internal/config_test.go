@@ -25,8 +25,25 @@ func TestSingleton(t *testing.T) {
 func TestGlobal(t *testing.T) {
 	os.Setenv("GOGEN_HOME", "..")
 	c := NewConfig()
-	output := Output{Outputter: "stdout", OutputTemplate: "raw"}
-	global := Global{Debug: false, Verbose: false, GeneratorWorkers: 1, OutputWorkers: 1, ROTInterval: 1, Output: output}
+	output := Output{
+		Outputter:      "stdout",
+		OutputTemplate: "raw",
+		FileName:       "/tmp/test.log",
+		MaxBytes:       10485760,
+		BackupFiles:    5,
+		BufferBytes:    102400,
+		Endpoints:      []string(nil),
+		Headers:        map[string]string(nil),
+	}
+	global := Global{
+		Debug:            false,
+		Verbose:          false,
+		GeneratorWorkers: 1,
+		OutputWorkers:    1,
+		ROTInterval:      1,
+		Output:           output,
+		SamplesDir:       []string(nil),
+	}
 	assert.Equal(t, global, c.Global)
 }
 
