@@ -88,7 +88,7 @@ func Start(oq chan *config.OutQueueItem, oqs chan int, num int) {
 				var bytes int64
 				defer item.IO.W.Close()
 				switch item.S.Output.OutputTemplate {
-				case "raw", "json":
+				case "raw", "json", "splunktcp":
 					for _, line := range item.Events {
 						var tempbytes int
 						var err error
@@ -105,6 +105,11 @@ func Start(oq chan *config.OutQueueItem, oqs chan int, num int) {
 									log.Errorf("Error marshaling json: %s", err)
 								}
 								tempbytes, err = item.IO.W.Write(jb)
+								if err != nil {
+									log.Errorf("Error writing to IO Buffer: %s", err)
+								}
+							case "splunktcp":
+								tempbytes, err = item.IO.W.Write(encodeEvent(line))
 								if err != nil {
 									log.Errorf("Error writing to IO Buffer: %s", err)
 								}
@@ -175,6 +180,8 @@ func setup(generator *rand.Rand, item *config.OutQueueItem, num int) config.Outp
 			gout[num] = new(httpout)
 		case "buf":
 			gout[num] = new(buf)
+		case "splunktcp":
+			gout[num] = new(splunktcp)
 		default:
 			gout[num] = new(stdout)
 		}
