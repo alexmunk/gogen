@@ -20,5 +20,4 @@ func TestSplunkTCPOutput(t *testing.T) {
 	if s != nil {
 		run.Run(c)
 	}
-	run.Run(c)
 }

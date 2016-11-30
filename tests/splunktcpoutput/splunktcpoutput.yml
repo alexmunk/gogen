@@ -6,14 +6,13 @@ global:
   rotInterval: 1
   output:
     outputter: splunktcp
-    fileName: c:\users\csharp\test.out
     outputTemplate: splunktcp
     bufferBytes: 1
     endpoints:
       - wimpy:20097
 samples:
   - name: outputsample
-    disabled: false
+    disabled: true
     endIntervals: 1
     interval: 1
     count: 1
