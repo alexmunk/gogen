@@ -9,7 +9,7 @@ global:
     outputTemplate: splunktcp
     bufferBytes: 1
     endpoints:
-      - wimpy:20097
+      - localhost:9997
 samples:
   - name: outputsample
     disabled: true

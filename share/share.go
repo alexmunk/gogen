@@ -116,7 +116,6 @@ func Pull(gogen string, dir string, deconstruct bool) {
 		client := &http.Client{}
 		resp, err := client.Get(*file.RawURL)
 		f, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE, 0644)
-		defer f.Close()
 		if err != nil {
 			log.Fatalf("Couldn't open file %s: %s", filename, err)
 		}
@@ -124,6 +123,7 @@ func Pull(gogen string, dir string, deconstruct bool) {
 		if err != nil {
 			log.Fatalf("Error writing to file %s: %s", filename, err)
 		}
+		f.Close()
 		if deconstruct {
 			samplesDir := filepath.Join(dir, "samples")
 			templatesDir := filepath.Join(dir, "templates")
@@ -210,6 +210,28 @@ func Pull(gogen string, dir string, deconstruct bool) {
 				err = ioutil.WriteFile(filepath.Join(templatesDir, t.Name+".yml"), outb, 0644)
 				if err != nil {
 					log.Fatalf("Error writing file %s", filepath.Join(templatesDir, t.Name+".yml"))
+				}
+			}
+
+			for i, g := range c.Generators {
+				if g.FileName != "" {
+					fname := filepath.Base(g.FileName)
+					err = ioutil.WriteFile(filepath.Join(generatorsDir, fname), []byte(g.Script), 0644)
+					if err != nil {
+						log.Fatalf("Error writing file %s", filepath.Join(generatorsDir, fname))
+					}
+					c.Generators[i].FileName = fname
+					c.Generators[i].Script = ""
+				}
+
+				var outb []byte
+				var err error
+				if outb, err = yaml.Marshal(g); err != nil {
+					log.Fatalf("Cannot Marshal generator '%s', err: %s", g.Name, err)
+				}
+				err = ioutil.WriteFile(filepath.Join(generatorsDir, g.Name+".yml"), outb, 0644)
+				if err != nil {
+					log.Fatalf("Error writing file %s", filepath.Join(generatorsDir, g.Name+".yml"))
 				}
 			}
 

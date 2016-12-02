@@ -54,6 +54,8 @@ func Setup(clic *cli.Context) {
 			config.ResetConfig()
 			os.Setenv("GOGEN_FULLCONFIG", ".config.yml")
 		}
+	} else if len(clic.String("configDir")) > 0 {
+		os.Setenv("GOGEN_CONFIG_DIR", clic.String("configDir"))
 	} else if len(clic.String("samplesDir")) > 0 {
 		os.Setenv("GOGEN_SAMPLES_DIR", clic.String("samplesDir"))
 	}
@@ -447,6 +449,11 @@ from the sample referenced by [name]`,
 			Name:   "splunkHECToken",
 			Usage:  "Set Authorization: Splunk <token> HTTP header for Splunk's HTTP Event Collector",
 			EnvVar: "GOGEN_HEC_TOKEN",
+		},
+		cli.StringFlag{
+			Name:   "configDir, cd",
+			Usage:  "Sets `directory` to search for config files, default '$GOGEN_HOME/config'",
+			EnvVar: "GOGEN_CONFIG_DIR",
 		},
 		cli.StringFlag{
 			Name:   "samplesDir, sd",

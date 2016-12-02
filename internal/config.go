@@ -106,9 +106,15 @@ func NewConfig() *Config {
 	// Setup timezone
 	c.Timezone, _ = time.LoadLocation("Local")
 
+	configDir := os.Getenv("GOGEN_CONFIG_DIR")
+	if len(configDir) == 0 {
+		configDir = filepath.Join(home, "config")
+		log.Debugf("GOGEN_CONFIG_DIR not set, setting to '%s'", configDir)
+	}
+
 	samplesDir := os.Getenv("GOGEN_SAMPLES_DIR")
 	if len(samplesDir) == 0 {
-		samplesDir = filepath.Join(home, "config", "samples")
+		samplesDir = filepath.Join(configDir, "samples")
 		log.Debugf("GOGEN_SAMPLES_DIR not set, setting to '%s'", samplesDir)
 	}
 
@@ -197,7 +203,7 @@ func NewConfig() *Config {
 
 	if len(fullConfig) == 0 {
 		// Read all templates in $GOGEN_HOME/config/templates
-		fullPath := filepath.Join(home, "config", "templates")
+		fullPath := filepath.Join(configDir, "templates")
 		acceptableExtensions := map[string]bool{".yml": true, ".yaml": true, ".json": true}
 		c.walkPath(fullPath, acceptableExtensions, func(innerPath string) error {
 			t := new(Template)
@@ -216,7 +222,7 @@ func NewConfig() *Config {
 		})
 
 		// Read all raters in $GOGEN_HOME/config/raters
-		fullPath = filepath.Join(home, "config", "raters")
+		fullPath = filepath.Join(configDir, "raters")
 		acceptableExtensions = map[string]bool{".yml": true, ".yaml": true, ".json": true}
 		c.walkPath(fullPath, acceptableExtensions, func(innerPath string) error {
 			var r RaterConfig
@@ -231,7 +237,7 @@ func NewConfig() *Config {
 		})
 
 		// Read all generators in $GOGEN_HOME/config/generators
-		fullPath = filepath.Join(home, "config", "generators")
+		fullPath = filepath.Join(configDir, "generators")
 		acceptableExtensions = map[string]bool{".yml": true, ".yaml": true, ".json": true}
 		c.walkPath(fullPath, acceptableExtensions, func(innerPath string) error {
 			var g GeneratorConfig
@@ -300,7 +306,7 @@ func NewConfig() *Config {
 	// Allow bringing in generator scripts from a file
 	for i := 0; i < len(c.Generators); i++ {
 		if c.Generators[i].FileName != "" && c.Generators[i].Script == "" {
-			err := c.readGenerator(home, c.Generators[i])
+			err := c.readGenerator(configDir, c.Generators[i])
 			if err != nil {
 				log.Fatalf("Error reading generator file: %s", err)
 			}
@@ -829,12 +835,12 @@ func (c *Config) validateRater(r *RaterConfig) {
 }
 
 // Brings in a Generator script from a file
-func (c *Config) readGenerator(home string, g *GeneratorConfig) error {
+func (c *Config) readGenerator(configDir string, g *GeneratorConfig) error {
 	// First try to find the file by absolute path
 	fullPath := os.ExpandEnv(g.FileName)
 	_, err := os.Stat(fullPath)
 	if os.IsNotExist(err) {
-		fullPath = os.ExpandEnv(filepath.Join(home, "config", "generators", g.FileName))
+		fullPath = os.ExpandEnv(filepath.Join(configDir, "generators", g.FileName))
 		_, err = os.Stat(fullPath)
 		if err != nil {
 			return fmt.Errorf("Cannot find generator file for generator '%s'", g.Name)
