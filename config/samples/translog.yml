@@ -7,8 +7,8 @@ latest: now
 tokens:
   - name: ts-ymdhmsms-regex
     format: regex                                                                                                                     
-    token: (\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2},\d{3})                                                                                                       
-    type: gotimestamp                                                                                                                                          
+    token: (\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2},\d{3})
+    type: gotimestamp
     replacement: "2006-01-02 15:04:05.000"
   - name: transtype          # An inline token defined in this YAML
     format: regex
@@ -24,12 +24,10 @@ tokens:
   - name: integerid
     format: template
     type: script
+    init:
+      id: "0"
     script: >
-      if state["id"] == nil then
-        state["id"] = 0
-      else
-        state["id"] = state["id"] + 1
-      end
+      state["id"] = state["id"] + 1
       return state["id"]
   - name: guid-template
     format: template
