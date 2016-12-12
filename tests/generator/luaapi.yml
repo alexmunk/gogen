@@ -1,0 +1,88 @@
+generators:
+  - name: setToken
+    script: |
+        setToken("test", "test")
+  - name: getChoice
+    script: |
+        choices = getChoice("getChoice")
+        setToken("getChoice", choices[1])
+  - name: getFieldChoice
+    script: |
+        choices = getFieldChoice("getFieldChoice", "field")
+        setToken("getFieldChoice", choices[1])
+  - name: getLine
+    script: |
+        line = getLine(0)
+        setToken("line", line["_raw"])
+  - name: getLines
+    script: |
+        line = getLines()
+        setToken("line1", line[1]["_raw"])
+        setToken("line2", line[2]["_raw"])
+  - name: replaceTokens
+    script: |
+        line = getLine(0)
+        line = replaceTokens(line)
+        events = { }
+        table.insert(events, line)
+        send(events)
+samples:
+  - name: setToken
+    generator: setToken
+    interval: 1
+    endIntervals: 1
+    lines:
+    - _raw: notused
+  - name: getChoice
+    generator: getChoice
+    interval: 1
+    endIntervals: 1
+    tokens:
+    - name: getChoice
+      type: choice
+      disabled: true
+      choice:
+      - foo
+  - name: getFieldChoice
+    generator: getFieldChoice
+    interval: 1
+    endIntervals: 1
+    tokens:
+    - name: getFieldChoice
+      type: fieldChoice
+      srcField: field
+      disabled: true
+      fieldChoice:
+      - field: foo
+    lines:
+    - _raw: notused
+  - name: getLine
+    generator: getLine
+    interval: 1
+    endIntervals: 1
+    tokens:
+    - name: static
+      type: static
+      replacement: foo
+    lines:
+    - _raw: foo
+  - name: getLines
+    generator: getLines
+    interval: 1
+    endIntervals: 1
+    lines:
+    - _raw: foo
+    - _raw: bar
+  - name: replaceTokens
+    generator: replaceTokens
+    interval: 1
+    endIntervals: 1
+    tokens:
+    - name: static
+      type: static
+      format: template
+      replacement: foo
+    lines:
+    - _raw: $static$
+      index: foo
+      
