@@ -330,11 +330,10 @@ func main() {
 		{
 			Name:  "push",
 			Usage: "Push running config to Gogen sharing service",
-			ArgsUsage: "[name]\n\n" + `This will push your running config to the Gogen sharing API.  This will publish the running config in a Git Gist and make an entry in the
-Gogen API database pointing to the gist with a bit of metadata.app
-
-The [name] argument should be the name of the primary sample you are publishing.  The entry in the database will get its Name, Description and Notes
-from the sample referenced by [name]`,
+			ArgsUsage: "[name]\n\n" + "This will push your running config to the Gogen sharing API.  This will publish the running config\n" +
+				"in a Git Gist and make an entry in the Gogen API database pointing to the gist with a bit of metadata.\n\n" +
+				"The [name] argument should be the name of the primary sample you are publishing.  The entry in the database\n" +
+				"will get its Name, Description and Notes from the sample referenced by [name]",
 			Action: func(clic *cli.Context) error {
 				config.ResetConfig()
 				os.Setenv("GOGEN_EXPORT", "1")

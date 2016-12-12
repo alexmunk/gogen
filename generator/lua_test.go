@@ -29,23 +29,153 @@ func TestLuaGen(t *testing.T) {
 	testLuaGen(t, s, gen, "20/Oct/2001 12:00:00 walked in")
 }
 
-func testLuaGen(t *testing.T, s *config.Sample, gen *luagen, expected string) {
-	// gq := make(chan *config.GenQueueItem)
-	oq := make(chan *config.OutQueueItem)
-	loc, _ := time.LoadLocation("Local")
-	source := rand.NewSource(0)
-	randgen := rand.New(source)
+func TestSetToken(t *testing.T) {
+	config.ResetConfig()
 
-	n := time.Date(2001, 10, 20, 12, 0, 0, 100000, loc)
-	now := func() time.Time {
-		return n
+	os.Setenv("GOGEN_HOME", "..")
+	os.Setenv("GOGEN_ALWAYS_REFRESH", "")
+	home := ".."
+	os.Setenv("GOGEN_FULLCONFIG", filepath.Join(home, "tests", "generator", "luaapi.yml"))
+
+	c := config.NewConfig()
+	s := c.FindSampleByName("setToken")
+	gen := new(luagen)
+	runLuaGen(t, s, gen)
+	time.Sleep(100 * time.Millisecond)
+	found := false
+	for _, t := range gen.tokens {
+		if t.Name == "test" {
+			found = true
+		}
 	}
+	assert.True(t, found, "Couldn't find token 'test' in sample setToken")
+}
 
-	gqi := &config.GenQueueItem{Count: 1, Earliest: now(), Latest: now(), Now: now(), S: s, OQ: oq, Rand: randgen}
-	var err error
-	go func() {
-		err = gen.Gen(gqi)
-	}()
+func TestGetChoice(t *testing.T) {
+	config.ResetConfig()
+
+	os.Setenv("GOGEN_HOME", "..")
+	os.Setenv("GOGEN_ALWAYS_REFRESH", "")
+	home := ".."
+	os.Setenv("GOGEN_FULLCONFIG", filepath.Join(home, "tests", "generator", "luaapi.yml"))
+
+	c := config.NewConfig()
+	s := c.FindSampleByName("getChoice")
+	gen := new(luagen)
+	runLuaGen(t, s, gen)
+	time.Sleep(100 * time.Millisecond)
+	found := false
+	var token config.Token
+	for _, t := range gen.tokens {
+		if t.Name == "getChoice" {
+			found = true
+			token = t
+		}
+	}
+	assert.True(t, found, "Couldn't find token 'getChoice' in sample getChoice")
+	assert.Equal(t, "foo", token.Replacement)
+}
+
+func TestGetFieldChoice(t *testing.T) {
+	config.ResetConfig()
+
+	os.Setenv("GOGEN_HOME", "..")
+	os.Setenv("GOGEN_ALWAYS_REFRESH", "")
+	home := ".."
+	os.Setenv("GOGEN_FULLCONFIG", filepath.Join(home, "tests", "generator", "luaapi.yml"))
+
+	c := config.NewConfig()
+	s := c.FindSampleByName("getFieldChoice")
+	gen := new(luagen)
+	runLuaGen(t, s, gen)
+	time.Sleep(100 * time.Millisecond)
+	found := false
+	var token config.Token
+	for _, t := range gen.tokens {
+		if t.Name == "getFieldChoice" {
+			found = true
+			token = t
+		}
+	}
+	assert.True(t, found, "Couldn't find token 'getFieldChoice' in sample getFieldChoice")
+	assert.Equal(t, "foo", token.Replacement)
+}
+
+func TestGetLine(t *testing.T) {
+	config.ResetConfig()
+
+	os.Setenv("GOGEN_HOME", "..")
+	os.Setenv("GOGEN_ALWAYS_REFRESH", "")
+	home := ".."
+	os.Setenv("GOGEN_FULLCONFIG", filepath.Join(home, "tests", "generator", "luaapi.yml"))
+
+	c := config.NewConfig()
+	s := c.FindSampleByName("getLine")
+	gen := new(luagen)
+	runLuaGen(t, s, gen)
+	time.Sleep(100 * time.Millisecond)
+	found := false
+	var token config.Token
+	for _, t := range gen.tokens {
+		if t.Name == "line" {
+			found = true
+			token = t
+		}
+	}
+	assert.True(t, found, "Couldn't find token 'line' in sample getLine")
+	assert.Equal(t, "foo", token.Replacement)
+}
+
+func TestGetLines(t *testing.T) {
+	config.ResetConfig()
+
+	os.Setenv("GOGEN_HOME", "..")
+	os.Setenv("GOGEN_ALWAYS_REFRESH", "")
+	home := ".."
+	os.Setenv("GOGEN_FULLCONFIG", filepath.Join(home, "tests", "generator", "luaapi.yml"))
+
+	c := config.NewConfig()
+	s := c.FindSampleByName("getLines")
+	gen := new(luagen)
+	runLuaGen(t, s, gen)
+	time.Sleep(100 * time.Millisecond)
+	found := false
+	var token config.Token
+	for _, t := range gen.tokens {
+		if t.Name == "line1" {
+			found = true
+			token = t
+		}
+	}
+	assert.True(t, found, "Couldn't find token 'line1' in sample getLines")
+	assert.Equal(t, "foo", token.Replacement)
+	found = false
+	for _, t := range gen.tokens {
+		if t.Name == "line2" {
+			found = true
+			token = t
+		}
+	}
+	assert.True(t, found, "Couldn't find token 'line2' in sample getLines")
+	assert.Equal(t, "bar", token.Replacement)
+}
+
+func TestReplaceTokens(t *testing.T) {
+	config.ResetConfig()
+
+	os.Setenv("GOGEN_HOME", "..")
+	os.Setenv("GOGEN_ALWAYS_REFRESH", "")
+	home := ".."
+	os.Setenv("GOGEN_FULLCONFIG", filepath.Join(home, "tests", "generator", "luaapi.yml"))
+
+	c := config.NewConfig()
+	s := c.FindSampleByName("replaceTokens")
+	gen := new(luagen)
+	testLuaGen(t, s, gen, "foo")
+}
+
+func testLuaGen(t *testing.T, s *config.Sample, gen *luagen, expected string) {
+	oq, err := runLuaGen(t, s, gen)
 	timeout := make(chan bool, 1)
 	go func() {
 		time.Sleep(1 * time.Second)
@@ -62,4 +192,24 @@ func testLuaGen(t *testing.T, s *config.Sample, gen *luagen, expected string) {
 			t.Fatalf("Timed out, err: %s", err)
 		}
 	}
+}
+
+func runLuaGen(t *testing.T, s *config.Sample, gen *luagen) (chan *config.OutQueueItem, error) {
+	// gq := make(chan *config.GenQueueItem)
+	oq := make(chan *config.OutQueueItem)
+	loc, _ := time.LoadLocation("Local")
+	source := rand.NewSource(0)
+	randgen := rand.New(source)
+
+	n := time.Date(2001, 10, 20, 12, 0, 0, 100000, loc)
+	now := func() time.Time {
+		return n
+	}
+
+	gqi := &config.GenQueueItem{Count: 1, Earliest: now(), Latest: now(), Now: now(), S: s, OQ: oq, Rand: randgen}
+	var err error
+	go func() {
+		err = gen.Gen(gqi)
+	}()
+	return oq, err
 }

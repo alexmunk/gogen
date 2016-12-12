@@ -83,6 +83,20 @@ func (lg *luagen) getLine(L *lua.LState) int {
 	return 1
 }
 
+func (lg *luagen) getLines(L *lua.LState) int {
+	s := lg.currentItem.S
+	ret := new(lua.LTable)
+	for _, l := range s.Lines {
+		ll := new(lua.LTable)
+		for k, v := range l {
+			ll.RawSetString(k, lua.LString(v))
+		}
+		ret.Append(ll)
+	}
+	L.Push(ret)
+	return 1
+}
+
 func (lg *luagen) getChoice(L *lua.LState) int {
 	s := lg.currentItem.S
 
@@ -282,6 +296,7 @@ func (lg *luagen) Gen(item *config.GenQueueItem) error {
 				L.SetGlobal("setToken", L.NewFunction(lg.setToken))
 				L.SetGlobal("round", L.NewFunction(lg.round))
 				L.SetGlobal("getLine", L.NewFunction(lg.getLine))
+				L.SetGlobal("getLines", L.NewFunction(lg.getLines))
 				L.SetGlobal("getChoice", L.NewFunction(lg.getChoice))
 				L.SetGlobal("getFieldChoice", L.NewFunction(lg.getFieldChoice))
 				return L
