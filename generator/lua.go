@@ -2,6 +2,8 @@ package generator
 
 import (
 	"fmt"
+	"math"
+	"sync"
 	"time"
 
 	config "github.com/coccyx/gogen/internal"
@@ -15,6 +17,8 @@ type luagen struct {
 	currentItem *config.GenQueueItem
 	tokens      []config.Token
 	states      map[string]*config.GeneratorState
+	code        map[string]*lua.LFunction
+	lstates     map[string]*sync.Pool
 }
 
 func sleep(L *lua.LState) int {
@@ -45,6 +49,86 @@ func (lg *luagen) sendevents(events []map[string]string) {
 	// log.Debugf("events: %# v", pretty.Formatter(events))
 	outitem := &config.OutQueueItem{S: item.S, Events: events}
 	item.OQ <- outitem
+}
+
+func (lg *luagen) round(L *lua.LState) int {
+	var ret float64
+	var lret lua.LNumber
+	num := float64(L.ToNumber(1))
+	prec := L.ToInt(2)
+
+	mult := math.Pow10(prec)
+	if num >= 0 {
+		ret = math.Floor(num*mult+0.5) / mult
+	} else {
+		ret = math.Ceil(num*mult-0.5) / mult
+	}
+	lret = lua.LNumber(ret)
+	L.Push(lret)
+	return 1
+}
+
+func (lg *luagen) getLine(L *lua.LState) int {
+	s := lg.currentItem.S
+
+	lv := L.ToInt(1)
+	if lv > len(s.Lines) {
+		L.ArgError(1, "Index out of range")
+	}
+	ret := new(lua.LTable)
+	for k, v := range s.Lines[lv] {
+		ret.RawSetString(k, lua.LString(v))
+	}
+	L.Push(ret)
+	return 1
+}
+
+func (lg *luagen) getChoice(L *lua.LState) int {
+	s := lg.currentItem.S
+
+	token := L.ToString(1)
+	var found *config.Token
+	for _, t := range s.Tokens {
+		if t.Name == token {
+			found = &t
+			break
+		}
+	}
+	if found == nil {
+		L.ArgError(1, "Choice not found")
+	}
+	ret := new(lua.LTable)
+	for _, l := range found.Choice {
+		ret.Append(lua.LString(l))
+	}
+	L.Push(ret)
+	return 1
+}
+
+func (lg *luagen) getFieldChoice(L *lua.LState) int {
+	s := lg.currentItem.S
+
+	token := L.ToString(1)
+	field := L.ToString(2)
+
+	var found *config.Token
+	for _, t := range s.Tokens {
+		if t.Name == token {
+			found = &t
+			break
+		}
+	}
+	if found == nil {
+		L.ArgError(1, "Field Choice not found")
+	}
+	ret := new(lua.LTable)
+	for _, l := range found.FieldChoice {
+		if fv, ok := l[field]; ok {
+			ret.Append(lua.LString(fv))
+		}
+	}
+	L.Push(ret)
+	return 1
 }
 
 func (lg *luagen) getEventsFromTable(lv lua.LValue) ([]map[string]string, error) {
@@ -88,6 +172,7 @@ func (lg *luagen) setToken(L *lua.LState) int {
 	found := false
 	for i := 0; i < len(lg.tokens); i++ {
 		if lg.tokens[i].Name == tokenName {
+			// log.Debugf("Replaced %s token value with %s", tokenName, tokenValue)
 			lg.tokens[i].Replacement = tokenValue
 			found = true
 		}
@@ -101,7 +186,7 @@ func (lg *luagen) setToken(L *lua.LState) int {
 		t.Replacement = tokenValue
 		t.Field = tokenField
 		lg.tokens = append(lg.tokens, t)
-		log.Debugf("Added token")
+		// log.Debugf("Added token")
 	}
 
 	return 0
@@ -156,11 +241,10 @@ func (lg *luagen) Gen(item *config.GenQueueItem) error {
 	if !lg.initialized {
 		lg.tokens = make([]config.Token, 0)
 		lg.states = make(map[string]*config.GeneratorState)
+		lg.code = make(map[string]*lua.LFunction)
+		lg.lstates = make(map[string]*sync.Pool)
 		lg.initialized = true
 	}
-	// log.Debugf("Lua Gen called for sample '%s'", item.S.Name)
-	L := lua.NewState()
-	defer L.Close()
 	s := item.S
 	var gs *config.GeneratorState
 	if s.CustomGenerator.SingleThreaded {
@@ -176,7 +260,36 @@ func (lg *luagen) Gen(item *config.GenQueueItem) error {
 	}
 	lg.currentItem = item
 
-	// Register global variables
+	// log.Debugf("Lua Gen called for sample '%s'", item.S.Name)
+	if _, ok := lg.lstates[s.Name]; !ok {
+		lg.lstates[s.Name] = &sync.Pool{
+			New: func() interface{} {
+				L := lua.NewState()
+				// Register global variables
+				L.SetGlobal("state", gs.LuaState)
+				L.SetGlobal("options", luar.New(L, s.CustomGenerator.Options))
+				L.SetGlobal("lines", gs.LuaLines)
+				L.SetGlobal("count", luar.New(L, item.Count))
+				L.SetGlobal("earliest", luar.New(L, item.Earliest))
+				L.SetGlobal("latest", luar.New(L, item.Latest))
+				L.SetGlobal("now", luar.New(L, item.Now))
+
+				// Register functions
+				L.SetGlobal("sleep", L.NewFunction(sleep))
+				L.SetGlobal("debug", L.NewFunction(logdebug))
+				L.SetGlobal("replaceTokens", L.NewFunction(lg.replaceTokens))
+				L.SetGlobal("send", L.NewFunction(lg.send))
+				L.SetGlobal("setToken", L.NewFunction(lg.setToken))
+				L.SetGlobal("round", L.NewFunction(lg.round))
+				L.SetGlobal("getLine", L.NewFunction(lg.getLine))
+				L.SetGlobal("getChoice", L.NewFunction(lg.getChoice))
+				L.SetGlobal("getFieldChoice", L.NewFunction(lg.getFieldChoice))
+				return L
+			},
+		}
+	}
+	L := lg.lstates[s.Name].Get().(*lua.LState)
+	defer lg.lstates[s.Name].Put(L)
 	L.SetGlobal("state", gs.LuaState)
 	L.SetGlobal("options", luar.New(L, s.CustomGenerator.Options))
 	L.SetGlobal("lines", gs.LuaLines)
@@ -184,16 +297,24 @@ func (lg *luagen) Gen(item *config.GenQueueItem) error {
 	L.SetGlobal("earliest", luar.New(L, item.Earliest))
 	L.SetGlobal("latest", luar.New(L, item.Latest))
 	L.SetGlobal("now", luar.New(L, item.Now))
-
-	// Register functions
-	L.SetGlobal("sleep", L.NewFunction(sleep))
-	L.SetGlobal("debug", L.NewFunction(logdebug))
-	L.SetGlobal("replaceTokens", L.NewFunction(lg.replaceTokens))
-	L.SetGlobal("send", L.NewFunction(lg.send))
-	L.SetGlobal("setToken", L.NewFunction(lg.setToken))
+	// L := lua.NewState()
+	// defer L.Close()
 
 	// log.Debugf("Calling DoString for %# v", s.CustomGenerator.Script)
-	if err := L.DoString(s.CustomGenerator.Script); err != nil {
+	var f *lua.LFunction
+	if _, ok := lg.code[s.Name]; !ok {
+		var err error
+		f, err = L.LoadString(s.CustomGenerator.Script)
+		if err != nil {
+			return fmt.Errorf("Error parsing script for generator '%s': %s", s.CustomGenerator.Name, err)
+		}
+		lg.code[s.Name] = f
+	} else {
+		f = lg.code[s.Name]
+	}
+	L.Push(f)
+	err := L.PCall(0, lua.MultRet, nil)
+	if err != nil {
 		return fmt.Errorf("Error executing script for generator '%s': %s", s.CustomGenerator.Name, err)
 	}
 	// log.Debugf("Script returned")

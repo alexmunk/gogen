@@ -184,25 +184,27 @@ func replaceTokens(item *config.GenQueueItem, event *map[string]string, outsidec
 	}
 	e := *event
 	for _, token := range tokens {
-		if fieldval, ok := e[token.Field]; ok {
-			var choice int
-			var err error
-			if _, ok := choices[token.Group]; ok {
-				choice = choices[token.Group]
+		if !token.Disabled {
+			if fieldval, ok := e[token.Field]; ok {
+				var choice int
+				var err error
+				if _, ok := choices[token.Group]; ok {
+					choice = choices[token.Group]
+				} else {
+					choice = -1
+				}
+				// log.Debugf("Replacing token '%s':'%s' with choice %d in fieldval: %s", token.Name, token.Token, *choice, fieldval)
+				if choice, err = token.Replace(&fieldval, choice, item.Earliest, item.Latest, item.Now, item.Rand); err == nil {
+					e[token.Field] = fieldval
+				} else {
+					log.Error(err)
+				}
+				if token.Group > 0 {
+					choices[token.Group] = choice
+				}
 			} else {
-				choice = -1
+				log.Errorf("Field %s not found in event for sample %s", token.Field, s.Name)
 			}
-			// log.Debugf("Replacing token '%s':'%s' with choice %d in fieldval: %s", token.Name, token.Token, *choice, fieldval)
-			if choice, err = token.Replace(&fieldval, choice, item.Earliest, item.Latest, item.Now, item.Rand); err == nil {
-				e[token.Field] = fieldval
-			} else {
-				log.Error(err)
-			}
-			if token.Group > 0 {
-				choices[token.Group] = choice
-			}
-		} else {
-			log.Errorf("Field %s not found in event for sample %s", token.Field, s.Name)
 		}
 	}
 }

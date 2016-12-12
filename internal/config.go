@@ -266,33 +266,38 @@ func NewConfig() *Config {
 			for j := 0; j < len(c.Samples); j++ {
 				if c.Samples[j].Name == c.Samples[i].FromSample {
 					log.Debugf("Copying sample '%s' to sample '%s' because fromSample set", c.Samples[j].Name, c.Samples[i].Name)
-					tempname := c.Samples[i].Name
-					tempcount := c.Samples[i].Count
-					tempinterval := c.Samples[i].Interval
-					tempendintervals := c.Samples[i].EndIntervals
-					tempbegin := c.Samples[i].Begin
-					tempend := c.Samples[i].End
-					temp := *c.Samples[j]
-					c.Samples[i] = &temp
-					c.Samples[i].Disabled = false
-					c.Samples[i].Name = tempname
-					c.Samples[i].FromSample = ""
-					if tempcount > 0 {
-						c.Samples[i].Count = tempcount
+					ext := filepath.Ext(c.Samples[j].Name)
+					if ext == ".csv" || ext == ".sample" {
+						c.Samples[i].Lines = c.Samples[j].Lines
+					} else {
+						tempname := c.Samples[i].Name
+						tempcount := c.Samples[i].Count
+						tempinterval := c.Samples[i].Interval
+						tempendintervals := c.Samples[i].EndIntervals
+						tempbegin := c.Samples[i].Begin
+						tempend := c.Samples[i].End
+						temp := *c.Samples[j]
+						c.Samples[i] = &temp
+						c.Samples[i].Disabled = false
+						c.Samples[i].Name = tempname
+						c.Samples[i].FromSample = ""
+						if tempcount > 0 {
+							c.Samples[i].Count = tempcount
+						}
+						if tempinterval > 0 {
+							c.Samples[i].Interval = tempinterval
+						}
+						if tempendintervals > 0 {
+							c.Samples[i].EndIntervals = tempendintervals
+						}
+						if len(tempbegin) > 0 {
+							c.Samples[i].Begin = tempbegin
+						}
+						if len(tempend) > 0 {
+							c.Samples[i].End = tempend
+						}
+						break
 					}
-					if tempinterval > 0 {
-						c.Samples[i].Interval = tempinterval
-					}
-					if tempendintervals > 0 {
-						c.Samples[i].EndIntervals = tempendintervals
-					}
-					if len(tempbegin) > 0 {
-						c.Samples[i].Begin = tempbegin
-					}
-					if len(tempend) > 0 {
-						c.Samples[i].End = tempend
-					}
-					break
 				}
 			}
 		}
@@ -499,7 +504,7 @@ func (c *Config) validate(s *Sample) {
 			for j := 0; j < len(c.Samples); j++ {
 				s.Tokens[i].Parent = s
 				s.Tokens[i].luaState = new(lua.LTable)
-				if s.Tokens[i].SampleString == c.Samples[j].Name {
+				if s.Tokens[i].SampleString != "" && s.Tokens[i].SampleString == c.Samples[j].Name {
 					log.Debugf("Resolving sample '%s' for token '%s'", c.Samples[j].Name, s.Tokens[i].Name)
 					s.Tokens[i].Sample = c.Samples[j]
 					// See if a field exists other than _raw, if so, FieldChoice
@@ -908,6 +913,13 @@ func ParseBeginEnd(s *Sample) {
 }
 
 func (c *Config) walkPath(fullPath string, acceptableExtensions map[string]bool, callback func(string) error) error {
+	// info, err := os.Stat(fullPath)
+	// if err != nil {
+	// 	return err
+	// }
+	// if info.IsDir() {
+	// 	fullPath += string(filepath.Separator)
+	// }
 	filepath.Walk(os.ExpandEnv(fullPath), func(path string, _ os.FileInfo, err error) error {
 		log.Debugf("Walking, at %s", path)
 		if os.IsNotExist(err) {
@@ -927,7 +939,7 @@ func (c *Config) walkPath(fullPath string, acceptableExtensions map[string]bool,
 
 func (c *Config) parseFileConfig(out interface{}, path ...string) error {
 	fullPath := filepath.Join(path...)
-	log.Debugf("Config Path: %v\n", fullPath)
+	log.Debugf("Config Path: %v", fullPath)
 	if _, err := os.Stat(fullPath); os.IsNotExist(err) {
 		return err
 	}

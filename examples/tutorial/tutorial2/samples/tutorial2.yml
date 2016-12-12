@@ -1,12 +1,10 @@
-samples:
-  - name: tutorial2
-    generator: replay
-    
-    tokens:
-    - name: ts1
-      type: epochtimestamp
-      format: regex
-      token: "(\\d+)"
-      srcField: _time
+name: tutorial2
+generator: replay
 
-    fromSample: results.csv
+tokens:
+- name: ts1
+  type: epochtimestamp
+  format: regex
+  token: "(\\d+)"
+  srcField: _time
+fromSample: results.csv

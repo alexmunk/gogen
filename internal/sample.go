@@ -104,6 +104,7 @@ type Token struct {
 	Script         string              `json:"script,omitempty" yaml:"script,omitempty"`
 	Init           map[string]string   `json:"init,omitempty" yaml:"init,omitempty"`
 	RaterString    string              `json:"rater,omitempty" yaml:"rater,omitempty"`
+	Disabled       bool                `json:"disabled,omitempty" yaml:"omitempty"`
 	Rater          Rater               `json:"-" yaml:"-"`
 
 	L                          *lua.LState `json:"-" yaml:"-"`
