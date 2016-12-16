@@ -26,7 +26,7 @@ Gogen is configured via a YAML or JSON based configuration.  Lets look at a very
         - _raw: $ts$ line2
         - _raw: $ts$ line3
 
-This example is in YAML.  Gogen configurations are made up of Samples, which contain some configuration, tokens, and lines.  In this example, we will generate 1 event (`count: 1`) from a random line (`randomizeEvents: true`) every 1 second (`interval: 1`) for a total of 5 intervals (`endIntervals 5`).  When `endIntervals` is set, we will go back that number of intervals and just work as fast as we can to generate that number of events.  Gogen can also keep generating and generate in realtime, which we'll cover a bit later.  
+This example is in YAML.  Gogen configurations are made up of Samples, which contain some configuration, tokens, and lines.  In this example, we will generate 1 event (`count: 1`) from a random line (`randomizeEvents: true`) every 1 second (`interval: 1`) for a total of 5 intervals (`endIntervals: 5`).  When `endIntervals` is set, we will go back that number of intervals and just work as fast as we can to generate that number of events.  Gogen can also keep generating and generate in realtime, which we'll cover a bit later.  
 
 
 TODO:
