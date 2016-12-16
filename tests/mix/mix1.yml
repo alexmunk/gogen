@@ -1,0 +1,4 @@
+mix:
+  - sample: $GOGEN_HOME/tests/mix/sample1.yml
+  - sample: $GOGEN_HOME/tests/mix/sample2.yml
+  - sample: $GOGEN_HOME/tests/mix/sample3.yml

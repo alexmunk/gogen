@@ -1,0 +1,17 @@
+samples:
+  - name: sample1
+    interval: 1
+    endIntervals: 5
+    count: 2
+    randomizeEvents: true
+    
+    tokens:
+      - name: ts
+        format: template                                                                                                                     
+        type: timestamp
+        replacement: "%b/%d/%y %H:%M:%S"
+
+    lines:
+    - _raw: $ts$ sample1-1
+    - _raw: $ts$ sample1-2
+    - _raw: $ts$ sample1-3

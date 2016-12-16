@@ -20,8 +20,8 @@ for i, host in ipairs(hosts) do
             setToken("fs", "/dev/sdb1")
             setToken("mnt", "var")
         else
-            setToken("fs", disks[i % #disks])
-            setToken("mnt", mounts[i % #disks])
+            setToken("fs", disks[i])
+            setToken("mnt", mounts[i])
         end
         l = getLine(1)
         l = replaceTokens(l)

@@ -12,6 +12,7 @@ import (
 
 func TestReplay(t *testing.T) {
 	// Setup environment
+	config.ResetConfig()
 	os.Setenv("GOGEN_HOME", "..")
 	os.Setenv("GOGEN_ALWAYS_REFRESH", "")
 	home := ".."

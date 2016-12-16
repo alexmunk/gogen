@@ -1,4 +1,4 @@
-package share
+package internal
 
 import (
 	"bytes"
@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"math/rand"
 	"net/http"
 	"net/url"
 	"os"
@@ -14,90 +13,87 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-	"time"
 
-	"github.com/coccyx/gogen/generator"
-	config "github.com/coccyx/gogen/internal"
 	log "github.com/coccyx/gogen/logger"
-	"github.com/coccyx/gogen/outputter"
 	"github.com/google/go-github/github"
 	yaml "gopkg.in/yaml.v2"
 )
 
+// Run is an interface to run the generator
+type Run interface {
+	Once(sample string)
+}
+
 // Push pushes the running config to the Gogen API and creates a GitHub gist.  Returns the owner and ID of the Gist.
-func Push(name string) (string, string) {
-	var sample *config.Sample
-	c := config.NewConfig()
+func Push(name string, run Run) (string, string) {
+	c := NewConfig()
+	ec := BuildConfig(ConfigConfig{
+		FullConfig: c.cc.FullConfig,
+		Export:     true,
+	})
+	if len(c.Samples) > 0 {
+		// Push all file based mixes
+		for i := range ec.Mix {
+			m := ec.Mix[i]
+			acceptableExtensions := map[string]bool{".yml": true, ".yaml": true, ".json": true}
+			if _, ok := acceptableExtensions[filepath.Ext(m.Sample)]; ok {
+				sc := BuildConfig(ConfigConfig{
+					FullConfig: m.Sample,
+					Export:     true,
+				})
+				login, _ := push(sc.Samples[0].Name, sc, sc, run)
+				ec.Mix[i].Sample = login + "/" + sc.Samples[0].Name
+			}
+		}
+		return push(name, c, ec, run)
+	}
+	log.Panicf("No samples configured")
+	return "", ""
+}
+
+func push(name string, genc *Config, pushc *Config, run Run) (string, string) {
+	log.Debugf("Pushing config as '%s'", name)
 	gh := NewGitHub(true)
 	gu, _, err := gh.client.Users.Get("")
-
-	gogen := *gu.Login + "/" + name
-
 	if err != nil {
 		log.Fatalf("Error getting user in push: %s", err)
 	}
+	if len(genc.Samples) > 0 {
+		sample := genc.Samples[0]
+		gogen := *gu.Login + "/" + name
 
-	source := rand.NewSource(time.Now().UnixNano())
-	randgen := rand.New(source)
-	// Generate one event for our named sample
-	for _, s := range c.Samples {
-		if s.Name == name {
-			sample = s
+		run.Once(sample.Name)
+		log.Debugf("Buf: %s", genc.Buf.String())
 
-			if s.Description == "" {
-				log.Fatalf("Description not set for sample '%s'", s.Name)
-			}
-
-			log.Debugf("Generating for Push() sample '%s'", s.Name)
-			origOutputter := s.Output.Outputter
-			origOutputTemplate := s.Output.OutputTemplate
-			s.Output.Outputter = "buf"
-			s.Output.OutputTemplate = "json"
-			gq := make(chan *config.GenQueueItem)
-			gqs := make(chan int)
-			oq := make(chan *config.OutQueueItem)
-			oqs := make(chan int)
-
-			go generator.Start(gq, gqs)
-			go outputter.Start(oq, oqs, 1)
-
-			gqi := &config.GenQueueItem{Count: 1, Earliest: time.Now(), Latest: time.Now(), S: s, OQ: oq, Rand: randgen}
-			gq <- gqi
-
-			time.Sleep(time.Second)
-
-			close(gq)
-			close(oq)
-
-			s.Output.Outputter = origOutputter
-			s.Output.OutputTemplate = origOutputTemplate
-
-			log.Debugf("Buffer: %s", c.Buf.String())
-			break
+		if sample == nil {
+			fmt.Printf("Sample '%s' not found\n", name)
+			os.Exit(1)
 		}
-	}
-	if sample == nil {
-		fmt.Printf("Sample '%s' not found\n", name)
-		os.Exit(1)
-	}
 
-	oldGogen := Get(gogen)
-	version := oldGogen.Version + 1
-	gi := gh.Push(name)
+		oldGogen, err := Get(gogen)
+		var version int
+		if err != nil {
+			version = 0
+		} else {
+			version = oldGogen.Version + 1
+		}
+		gi := gh.Push(name, pushc)
 
-	g := GogenInfo{
-		Gogen:       gogen,
-		Name:        name,
-		Description: sample.Description,
-		Notes:       sample.Notes,
-		Owner:       *gu.Login,
-		SampleEvent: c.Buf.String(),
-		GistID:      *gi.ID,
-		Version:     version,
+		g := GogenInfo{
+			Gogen:       gogen,
+			Name:        name,
+			Description: sample.Description,
+			Notes:       sample.Notes,
+			Owner:       *gu.Login,
+			SampleEvent: genc.Buf.String(),
+			GistID:      *gi.ID,
+			Version:     version,
+		}
+		Upsert(g)
+
+		return *gu.Login, *gi.ID
 	}
-	Upsert(g)
-
-	return *gu.Login, *gi.ID
+	return "", ""
 }
 
 // Pull grabs a config from the Gogen API + GitHub gist and creates it on the filesystem for editing
@@ -109,7 +105,10 @@ func Pull(gogen string, dir string, deconstruct bool) {
 	} else {
 		name = gogen
 	}
-	g := Get(gogen)
+	g, err := Get(gogen)
+	if err != nil {
+		log.WithError(err).Fatalf("error retrieving gogen config for gogen '%s'", gogen)
+	}
 	gist := getGist(g)
 	for _, file := range gist.Files {
 		filename := filepath.Join(dir, *file.Filename)
@@ -135,9 +134,8 @@ func Pull(gogen string, dir string, deconstruct bool) {
 				log.Fatalf("Error creating directories %s or %s", samplesDir, templatesDir)
 			}
 
-			config.ResetConfig()
-			os.Setenv("GOGEN_FULLCONFIG", filename)
-			c := config.NewConfig()
+			cc := ConfigConfig{FullConfig: filename, Export: true}
+			c := BuildConfig(cc)
 			for x := 0; x < len(c.Samples); x++ {
 				s := c.Samples[x]
 				for y := 0; y < len(s.Tokens); y++ {
@@ -193,9 +191,11 @@ func Pull(gogen string, dir string, deconstruct bool) {
 						if outb, err = yaml.Marshal(s); err != nil {
 							log.Fatalf("Cannot Marshal sample '%s', err: %s", s.Name, err)
 						}
-						err = ioutil.WriteFile(filepath.Join(samplesDir, name+".yml"), outb, 0644)
+						outfname := filepath.Join(samplesDir, name+".yml")
+						log.Debugf("Writing sample file for sammple '%s' at file: %s", s.Name, outfname)
+						err = ioutil.WriteFile(outfname, outb, 0644)
 						if err != nil {
-							log.Fatalf("Cannot write file %s: %s", filepath.Join(samplesDir, name+".yml"), err)
+							log.Fatalf("Cannot write file %s: %s", outfname, err)
 						}
 					}
 				}
@@ -235,6 +235,10 @@ func Pull(gogen string, dir string, deconstruct bool) {
 				}
 			}
 
+			for _, g := range c.Mix {
+				Pull(g.Sample, dir, true)
+			}
+
 			err = os.Remove(filename)
 			if err != nil {
 				log.Debugf("Error removing original config file during deconstruction: %s", filename)
@@ -246,14 +250,17 @@ func Pull(gogen string, dir string, deconstruct bool) {
 
 // PullFile pulls a config from the Gogen API + GitHub gist and writes it to a single file
 func PullFile(gogen string, filename string) {
-	g := Get(gogen)
+	g, err := Get(gogen)
+	if err != nil {
+		log.WithError(err).Fatalf("error retrieving gogen config for gogen '%s'", gogen)
+	}
 	var version int
 	cached := false
 
 	var readFrom io.ReadCloser
 	cacheFile := filepath.Join(os.ExpandEnv("$GOGEN_HOME"), ".configcache_"+url.QueryEscape(gogen))
 	versionCacheFile := filepath.Join(os.ExpandEnv("$GOGEN_HOME"), ".versioncache_"+url.QueryEscape(gogen))
-	_, err := os.Stat(versionCacheFile)
+	_, err = os.Stat(versionCacheFile)
 	if err == nil {
 		versionBytes, err := ioutil.ReadFile(versionCacheFile)
 		if err != nil {

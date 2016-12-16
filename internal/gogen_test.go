@@ -1,4 +1,4 @@
-package share
+package internal
 
 import (
 	"os"
@@ -19,14 +19,14 @@ func TestSearch(t *testing.T) {
 }
 
 func TestGet(t *testing.T) {
-	g := Get("coccyx/weblog")
+	g, _ := Get("coccyx/weblog")
 	assert.Equal(t, "coccyx/weblog", g.Gogen)
 	assert.Equal(t, "weblog", g.Name)
 	assert.Equal(t, "coccyx", g.Owner)
 }
 
 func TestUpsert(t *testing.T) {
-	g := Get("coccyx/weblog")
+	g, _ := Get("coccyx/weblog")
 	Upsert(g)
 }
 

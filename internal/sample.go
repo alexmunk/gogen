@@ -1,6 +1,7 @@
-package config
+package internal
 
 import (
+	"bytes"
 	"fmt"
 	"math"
 	"math/rand"
@@ -59,6 +60,7 @@ type Sample struct {
 	CustomGenerator *GeneratorConfig             `json:"-" yaml:"-"`
 	GeneratorState  *GeneratorState              `json:"-" yaml:"-"`
 	LuaMutex        *sync.Mutex                  `json:"-" yaml:"-"`
+	Buf             *bytes.Buffer                `json:"-" yaml:"-"`
 	realSample      bool                         // Used to represent samples which aren't just used to store lines from CSV or raw
 }
 

@@ -11,10 +11,10 @@ endif
 all: install
 
 build:
-	godep go build -ldflags "-X github.com/coccyx/gogen/github.gitHubClientID=$GITHUB_OAUTH_CLIENT_ID -X github.com/coccyx/gogen/github.gitHubClientSecret=$GITHUB_OAUTH_CLIENT_SECRET"
+	godep go build -ldflags "-X github.com/coccyx/gogen/internal.gitHubClientID=$(GITHUB_OAUTH_CLIENT_ID) -X github.com/coccyx/gogen/internal.gitHubClientSecret=$(GITHUB_OAUTH_CLIENT_SECRET)"
 
 install:
-	godep go install -ldflags "-X github.com/coccyx/gogen/share.gitHubClientID=$(GITHUB_OAUTH_CLIENT_ID) -X github.com/coccyx/gogen/share.gitHubClientSecret=$(GITHUB_OAUTH_CLIENT_SECRET)"
+	godep go install -ldflags "-X github.com/coccyx/gogen/internal.gitHubClientID=$(GITHUB_OAUTH_CLIENT_ID) -X github.com/coccyx/gogen/internal.gitHubClientSecret=$(GITHUB_OAUTH_CLIENT_SECRET)"
 
 test:
 	godep go test -v ./...

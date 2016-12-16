@@ -1,4 +1,4 @@
-package config
+package internal
 
 import (
 	"os"
@@ -12,6 +12,8 @@ func TestDefaultConfigRater(t *testing.T) {
 	// Setup environment
 	os.Setenv("GOGEN_HOME", "..")
 	os.Setenv("GOGEN_ALWAYS_REFRESH", "1")
+	os.Setenv("GOGEN_FULLCONFIG", "")
+	os.Setenv("GOGEN_EXPORT", "")
 	home := ".."
 
 	c := NewConfig()
@@ -24,6 +26,7 @@ func TestDefaultConfigRater(t *testing.T) {
 	}
 	c.validateRater(&rater)
 	dr := getRater(c, "config")
+	assert.NotNil(t, dr, "config rater does not exist")
 	compareConfigRater(&rater, dr, t)
 }
 

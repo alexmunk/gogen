@@ -1,0 +1,44 @@
+global:
+  samplesDir:
+  - $GOGEN_HOME/examples/nixOS
+generators:
+  - name: iostat
+    fileName: $GOGEN_HOME/examples/nixOS/iostat.lua
+    options:
+      highWrites: 0
+      highReads: 0
+      maxOps: 1000
+      avgKB: 0.512
+      maxTime: 100
+samples:
+  - name: iostat
+    description: Generate Iostat Usage Metrics
+    notes: >
+      Generates iostat usage from the Splunk UNIX TA
+    generator: iostat
+    interval: 60
+    tokens:
+    - name: host
+      type: fieldChoice
+      srcField: host
+      sample: allhosts.csv
+      disabled: true
+    - name: disks
+      type: choice
+      choice:
+      - sda
+      - sdb
+      - dm-0
+      - dm-1
+      disabled: true
+    lines:
+    - index: os
+      sourcetype: iostat
+      source: iostat
+      host: $host$
+      _raw: Device	rReq_PS	wReq_PS	rKB_PS	wKB_PS	avgWaitMillis	avgSvcMillis	bandwUtilPct
+    - index: os
+      sourcetype: iostat
+      source: iostat
+      host: $host$
+      _raw: $device$	$rrps$	$wrps$	$rkbps$	$wkbps$	$avgwait$	$avgsvc$	$bwutil$

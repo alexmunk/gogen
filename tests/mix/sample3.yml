@@ -1,0 +1,21 @@
+generators:
+  - name: sample3
+    script: |
+      l = { _raw="$ts$ sample3-1 "}
+      l = replaceTokens(l)
+      events = { }
+      table.insert(events, l)
+      send(events)
+samples:
+  - name: sample3
+    generator: sample3
+    interval: 1
+    endIntervals: 5
+    count: 1
+    randomizeEvents: true
+    
+    tokens:
+      - name: ts
+        format: template                                                                                                                     
+        type: timestamp
+        replacement: "%b/%d/%y %H:%M:%S"

@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/coccyx/gogen/internal"
+	config "github.com/coccyx/gogen/internal"
 	log "github.com/coccyx/gogen/logger"
 )
 

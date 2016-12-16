@@ -1,4 +1,4 @@
-package config
+package internal
 
 // ProfileOn determines whether we should run a CPU profiler for perf optimization
 const ProfileOn = false

@@ -1,4 +1,4 @@
-package share
+package internal
 
 import (
 	"io/ioutil"
@@ -6,30 +6,29 @@ import (
 	"path/filepath"
 	"testing"
 
-	config "github.com/coccyx/gogen/internal"
 	"github.com/stretchr/testify/assert"
 )
 
 var (
 	gh *GitHub
 	id string
-	c  *config.Config
-	tc *config.Config
+	c  *Config
+	tc *Config
 )
 
 func TestLogin(t *testing.T) {
-	os.Setenv("GOGEN_HOME", "..")
-	os.Setenv("GOGEN_ALWAYS_REFRESH", "1")
-	home := ".."
-	os.Setenv("GOGEN_FULLCONFIG", filepath.Join(home, "examples", "weblog", "weblog.yml"))
-	os.Setenv("GOGEN_EXPORT", "1")
-	c = config.NewConfig()
 	gh = NewGitHub(true)
 	assert.NotNil(t, gh, "NewGitHub() returned nil")
 }
 
 func TestPush(t *testing.T) {
-	_ = gh.Push("test_config")
+	os.Setenv("GOGEN_HOME", "..")
+	os.Setenv("GOGEN_ALWAYS_REFRESH", "1")
+	home := ".."
+	os.Setenv("GOGEN_FULLCONFIG", filepath.Join(home, "examples", "weblog", "weblog.yml"))
+	os.Setenv("GOGEN_EXPORT", "1")
+	c = NewConfig()
+	_ = gh.Push("test_config", c)
 
 	l, _, _ := gh.client.Gists.List("", nil)
 	inList := false
@@ -55,7 +54,7 @@ func TestValid(t *testing.T) {
 	assert.NoError(t, err, "Cannot write test_config.yml")
 
 	os.Setenv("GOGEN_FULLCONFIG", "test_config.yml")
-	tc = config.NewConfig()
+	tc = NewConfig()
 	_ = os.Remove("test_config.yml")
 
 	assert.Equal(t, c.Samples[0].Name, tc.Samples[0].Name)

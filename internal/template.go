@@ -1,4 +1,4 @@
-package config
+package internal
 
 // Template is used for describing a output text template
 type Template struct {

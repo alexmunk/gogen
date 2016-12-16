@@ -1,0 +1,11 @@
+mix:
+  - sample: $GOGEN_HOME/tests/mix/sample1.yml
+    count: 1
+    interval: 1
+  - sample: $GOGEN_HOME/tests/mix/sample2.yml
+    count: 2
+    interval: 2
+  - sample: $GOGEN_HOME/tests/mix/sample3.yml
+    count: 3
+    interval: 3
+    endIntervals: 3

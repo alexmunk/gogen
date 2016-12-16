@@ -1,4 +1,4 @@
-package share
+package internal
 
 // Mostly from https://jacobmartins.com/2016/02/29/getting-started-with-oauth2-in-go/
 
@@ -14,7 +14,6 @@ import (
 	uuid "github.com/satori/go.uuid"
 	"github.com/skratchdot/open-golang/open"
 
-	config "github.com/coccyx/gogen/internal"
 	log "github.com/coccyx/gogen/logger"
 	"github.com/google/go-github/github"
 	"golang.org/x/oauth2"
@@ -40,11 +39,10 @@ type GitHub struct {
 	done   chan int
 	token  string
 	client *github.Client
-	c      *config.Config
 }
 
 // Push will create a public gist of "name.yml" from our running config
-func (gh *GitHub) Push(name string) *github.Gist {
+func (gh *GitHub) Push(name string, c *Config) *github.Gist {
 	gist := new(github.Gist)
 	files := make(map[github.GistFilename]github.GistFile)
 
@@ -54,7 +52,7 @@ func (gh *GitHub) Push(name string) *github.Gist {
 	var outb []byte
 	var outbs *string
 	var err error
-	if outb, err = yaml.Marshal(gh.c); err != nil {
+	if outb, err = yaml.Marshal(c); err != nil {
 		log.Fatalf("Cannot Marshal c.Global, err: %s", err)
 	}
 	outbs = new(string)
@@ -119,6 +117,8 @@ func NewGitHub(requireauth bool) *GitHub {
 	gh := new(GitHub)
 	gh.done = make(chan int)
 
+	log.Infof("GitHub OAuth Client ID: %s", gitHubClientID)
+
 	if oauthConf.ClientID == "" {
 		oauthConf.ClientID = os.Getenv("GITHUB_OAUTH_CLIENT_ID")
 	}
@@ -126,8 +126,6 @@ func NewGitHub(requireauth bool) *GitHub {
 		oauthConf.ClientSecret = os.Getenv("GITHUB_OAUTH_CLIENT_SECRET")
 	}
 
-	c := config.NewConfig()
-	gh.c = c
 	tokenFile := filepath.Join(os.ExpandEnv("$GOGEN_HOME"), ".githubtoken")
 	_, err := os.Stat(tokenFile)
 	if err == nil {

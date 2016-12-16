@@ -1,0 +1,36 @@
+global:
+  samplesDir:
+  - $GOGEN_HOME/examples/nixOS
+generators:
+  - name: cpu
+    fileName: $GOGEN_HOME/examples/nixOS/cpu.lua
+    options:
+      minCPU: 30.0
+      maxCPU: 75.0
+      numCPUs: 8
+samples:
+  - name: cpu
+    description: Generate CPU Metrics
+    notes: >
+      Generates CPU usage in the form of Splunk's UNIX TA
+    generator: cpu
+    interval: 60
+    tokens:
+    - name: host
+      type: fieldChoice
+      srcField: host
+      sample: allhosts.csv
+      disabled: true
+    lines:
+    - index: os
+      sourcetype: cpu
+      source: cpu
+      host: $host$
+      _raw: |-
+        CPU	pctUser	pctNice	pctSystem	pctIowait	pctIdle
+        all	$pctUserAll$	0	$pctSystemAll$	$pctIowaitAll$	$pctIdleAll$
+    - index: os
+      sourcetype: cpu
+      source: cpu
+      host: $host$
+      _raw: $CPU$	$pctUser$	0	$pctSystem$	$pctIowait$	$pctIdle$

@@ -1,4 +1,4 @@
-package config
+package internal
 
 import (
 	"bufio"
@@ -28,10 +28,12 @@ import (
 type Config struct {
 	Global      Global             `json:"global,omitempty" yaml:"global,omitempty"`
 	Samples     []*Sample          `json:"samples" yaml:"samples"`
+	Mix         []*Mix             `json:"mix" yaml:"mix"`
 	Templates   []*Template        `json:"templates,omitempty" yaml:"templates,omitempty"`
 	Raters      []*RaterConfig     `json:"raters,omitempty" yaml:"raters,omitempty"`
 	Generators  []*GeneratorConfig `json:"generators,omitempty" yaml:"generators,omitempty"`
 	initialized bool
+	cc          ConfigConfig
 
 	// Exported but internal use variables
 	Timezone *time.Location `json:"-" yaml:"-"`
@@ -61,8 +63,24 @@ type Output struct {
 	Headers        map[string]string `json:"headers,omitempty" yaml:"headers,omitempty"`
 }
 
+// ConfigConfig represents options to pass to NewConfig
+type ConfigConfig struct {
+	Home       string
+	GlobalFile string
+	ConfigDir  string
+	SamplesDir string
+	FullConfig string
+	Export     bool
+}
+
+// Share allows accessing the share module from Config without a circular dependency
+type Share interface {
+	PullFile(gogen string, filename string)
+}
+
 var instance *Config
 var once sync.Once
+var share Share
 
 func getConfig() *Config {
 	if instance == nil {
@@ -73,6 +91,7 @@ func getConfig() *Config {
 
 // ResetConfig will delete any current running config
 func ResetConfig() {
+	log.Debugf("Resetting config to fresh config")
 	instance = nil
 }
 
@@ -84,73 +103,88 @@ func ResetConfig() {
 // GOGEN_FULLCONFIG: The reference is to a full exported config, so don't resolve or validate
 // GOGEN_EXPORT: Don't set defaults for export
 func NewConfig() *Config {
-	home := os.Getenv("GOGEN_HOME")
-	if len(home) == 0 {
-		log.Debug("GOGEN_HOME not set, setting to '.'")
-		home = "."
-		os.Setenv("GOGEN_HOME", home)
-	}
-	log.Debugf("Home: %v\n", home)
+	var cc ConfigConfig
 
-	var c *Config
+	cc.Home = os.Getenv("GOGEN_HOME")
+	if len(cc.Home) == 0 {
+		log.Debug("GOGEN_HOME not set, setting to '.'")
+		cc.Home = "."
+		os.Setenv("GOGEN_HOME", ".")
+	}
+	log.Debugf("Home: %v", cc.Home)
+
 	if os.Getenv("GOGEN_ALWAYS_REFRESH") != "1" {
-		c = getConfig()
+		c := getConfig()
 		if c.initialized {
 			return c
 		}
 	} else {
-		c = &Config{initialized: false}
 		log.Debugf("Always refresh on, using fresh config")
 	}
+
+	cc.ConfigDir = os.Getenv("GOGEN_CONFIG_DIR")
+	if len(cc.ConfigDir) == 0 {
+		cc.ConfigDir = filepath.Join(cc.Home, "config")
+		log.Debugf("GOGEN_CONFIG_DIR not set, setting to '%s'", cc.ConfigDir)
+	}
+
+	cc.SamplesDir = os.Getenv("GOGEN_SAMPLES_DIR")
+	if len(cc.SamplesDir) == 0 {
+		cc.SamplesDir = filepath.Join(cc.ConfigDir, "samples")
+		log.Debugf("GOGEN_SAMPLES_DIR not set, setting to '%s'", cc.SamplesDir)
+	}
+
+	cc.FullConfig = os.Getenv("GOGEN_FULLCONFIG")
+	cc.GlobalFile = os.Getenv("GOGEN_GLOBAL")
+
+	if os.Getenv("GOGEN_EXPORT") == "1" {
+		cc.Export = true
+	}
+	instance = BuildConfig(cc)
+	return instance
+}
+
+// BuildConfig builds a new config object from the passed ConfigConfig
+func BuildConfig(cc ConfigConfig) *Config {
+	c := &Config{initialized: false, cc: cc}
 
 	// Setup timezone
 	c.Timezone, _ = time.LoadLocation("Local")
 
-	configDir := os.Getenv("GOGEN_CONFIG_DIR")
-	if len(configDir) == 0 {
-		configDir = filepath.Join(home, "config")
-		log.Debugf("GOGEN_CONFIG_DIR not set, setting to '%s'", configDir)
-	}
-
-	samplesDir := os.Getenv("GOGEN_SAMPLES_DIR")
-	if len(samplesDir) == 0 {
-		samplesDir = filepath.Join(configDir, "samples")
-		log.Debugf("GOGEN_SAMPLES_DIR not set, setting to '%s'", samplesDir)
-	}
-
-	fullConfig := os.Getenv("GOGEN_FULLCONFIG")
-	if len(fullConfig) > 0 {
-		if fullConfig[0:4] == "http" {
-			log.Infof("Fetching config from '%s'", fullConfig)
-			if err := c.parseWebConfig(&c, fullConfig); err != nil {
+	if len(cc.FullConfig) > 0 {
+		cc.FullConfig = os.ExpandEnv(cc.FullConfig)
+		if cc.FullConfig[0:4] == "http" {
+			log.Infof("Fetching config from '%s'", cc.FullConfig)
+			if err := c.parseWebConfig(&c, cc.FullConfig); err != nil {
 				log.Panic(err)
 			}
 		} else {
-			_, err := os.Stat(fullConfig)
+			_, err := os.Stat(cc.FullConfig)
 			if err != nil {
-				log.Fatalf("Cannot stat file %s", fullConfig)
+				log.Fatalf("Cannot stat file %s", cc.FullConfig)
 			}
-			if err := c.parseFileConfig(&c, fullConfig); err != nil {
+			if err := c.parseFileConfig(&c, cc.FullConfig); err != nil {
 				log.Panic(err)
 			}
-			// This seems like it might cause a regression, just commenting for now instead of removing
-			if filepath.Dir(fullConfig) != "." && !strings.Contains(fullConfig, "tests") {
-				c.Global.SamplesDir = append(c.Global.SamplesDir, filepath.Dir(fullConfig))
+			if filepath.Dir(cc.FullConfig) != "." && !strings.Contains(cc.FullConfig, "tests") {
+				c.Global.SamplesDir = append(c.Global.SamplesDir, filepath.Dir(cc.FullConfig))
 			}
 		}
 		for i := 0; i < len(c.Samples); i++ {
 			c.Samples[i].realSample = true
 		}
 	} else {
-		globalFile := os.Getenv("GOGEN_GLOBAL")
-		if len(globalFile) > 0 {
-			if err := c.parseFileConfig(&c.Global, globalFile); err != nil {
+		if len(cc.GlobalFile) > 0 {
+			if err := c.parseFileConfig(&c.Global, cc.GlobalFile); err != nil {
 				log.Panic(err)
 			}
 		}
 	}
+	if c.Global.ROTInterval == 0 {
+		c.Global.ROTInterval = defaultROTInterval
+	}
 	// Don't set defaults if we're exporting
-	if os.Getenv("GOGEN_EXPORT") != "1" {
+	if !cc.Export {
 		//
 		// Setup defaults for global
 		//
@@ -159,9 +193,6 @@ func NewConfig() *Config {
 		}
 		if c.Global.OutputWorkers == 0 {
 			c.Global.OutputWorkers = defaultOutputWorkers
-		}
-		if c.Global.ROTInterval == 0 {
-			c.Global.ROTInterval = defaultROTInterval
 		}
 		if c.Global.Output.Outputter == "" {
 			c.Global.Output.Outputter = defaultOutputter
@@ -201,9 +232,9 @@ func NewConfig() *Config {
 		}
 	}
 
-	if len(fullConfig) == 0 {
+	if len(cc.FullConfig) == 0 {
 		// Read all templates in $GOGEN_HOME/config/templates
-		fullPath := filepath.Join(configDir, "templates")
+		fullPath := filepath.Join(cc.ConfigDir, "templates")
 		acceptableExtensions := map[string]bool{".yml": true, ".yaml": true, ".json": true}
 		c.walkPath(fullPath, acceptableExtensions, func(innerPath string) error {
 			t := new(Template)
@@ -222,7 +253,7 @@ func NewConfig() *Config {
 		})
 
 		// Read all raters in $GOGEN_HOME/config/raters
-		fullPath = filepath.Join(configDir, "raters")
+		fullPath = filepath.Join(cc.ConfigDir, "raters")
 		acceptableExtensions = map[string]bool{".yml": true, ".yaml": true, ".json": true}
 		c.walkPath(fullPath, acceptableExtensions, func(innerPath string) error {
 			var r RaterConfig
@@ -237,7 +268,7 @@ func NewConfig() *Config {
 		})
 
 		// Read all generators in $GOGEN_HOME/config/generators
-		fullPath = filepath.Join(configDir, "generators")
+		fullPath = filepath.Join(cc.ConfigDir, "generators")
 		acceptableExtensions = map[string]bool{".yml": true, ".yaml": true, ".json": true}
 		c.walkPath(fullPath, acceptableExtensions, func(innerPath string) error {
 			var g GeneratorConfig
@@ -251,7 +282,7 @@ func NewConfig() *Config {
 			return nil
 		})
 
-		c.readSamplesDir(samplesDir)
+		c.readSamplesDir(cc.SamplesDir)
 	}
 
 	// Configuration allows for finding additional samples directories and reading them
@@ -311,7 +342,7 @@ func NewConfig() *Config {
 	// Allow bringing in generator scripts from a file
 	for i := 0; i < len(c.Generators); i++ {
 		if c.Generators[i].FileName != "" && c.Generators[i].Script == "" {
-			err := c.readGenerator(configDir, c.Generators[i])
+			err := c.readGenerator(cc.ConfigDir, c.Generators[i])
 			if err != nil {
 				log.Fatalf("Error reading generator file: %s", err)
 			}
@@ -319,7 +350,7 @@ func NewConfig() *Config {
 	}
 
 	// Due to data structure differences, we append default raters later in the startup process
-	if os.Getenv("GOGEN_EXPORT") != "1" {
+	if !cc.Export {
 		raters := []*RaterConfig{defaultRaterConfig, defaultConfigRaterConfig}
 		for _, r := range raters {
 			c.Raters = append(c.Raters, r)
@@ -340,8 +371,56 @@ func NewConfig() *Config {
 	}
 	c.Samples = samples
 
+	// Add support for the mix statements
+	if !cc.Export {
+		for _, m := range c.Mix {
+			cc := ConfigConfig{FullConfig: m.Sample, Export: false}
+			var nc *Config
+			acceptableExtensions := map[string]bool{".yml": true, ".yaml": true, ".json": true, ".sample": true, ".csv": true}
+			if _, ok := acceptableExtensions[filepath.Ext(m.Sample)]; ok {
+				nc = BuildConfig(cc)
+				c.mergeMixConfig(nc, m)
+			} else {
+				PullFile(m.Sample, ".tmp.yml")
+				cc = ConfigConfig{FullConfig: ".tmp.yml"}
+				nc = BuildConfig(cc)
+				c.mergeMixConfig(nc, m)
+				os.Remove(".tmp.yml")
+			}
+		}
+	}
+
 	c.initialized = true
 	return c
+}
+
+func (c *Config) mergeMixConfig(nc *Config, m *Mix) {
+	for i := range nc.Samples {
+		if m.Count != 0 {
+			nc.Samples[i].Count = m.Count
+		}
+		if m.Interval != 0 {
+			nc.Samples[i].Interval = m.Interval
+		}
+		if m.Begin != "" {
+			nc.Samples[i].Begin = m.Begin
+		}
+		if m.End != "" {
+			nc.Samples[i].End = m.End
+		}
+		if m.EndIntervals != 0 {
+			nc.Samples[i].EndIntervals = m.EndIntervals
+		}
+		ParseBeginEnd(nc.Samples[i])
+		log.Debugf("Adding Sample '%s' from mix", nc.Samples[i].Name)
+		c.Samples = append(c.Samples, nc.Samples[i])
+	}
+	for i := range nc.Generators {
+		c.Generators = append(c.Generators, nc.Generators[i])
+	}
+	for i := range nc.Raters {
+		c.Raters = append(c.Raters, nc.Raters[i])
+	}
 }
 
 func (c *Config) readSamplesDir(samplesDir string) {
@@ -431,6 +510,7 @@ func (c *Config) readSamplesDir(samplesDir string) {
 // string map to the randutil Choice struct
 func (c *Config) validate(s *Sample) {
 	if s.realSample {
+		s.Buf = &c.Buf
 		if s.Generator == "" {
 			s.Generator = defaultGenerator
 		}
@@ -536,7 +616,7 @@ func (c *Config) validate(s *Sample) {
 			}
 		}
 
-		if os.Getenv("GOGEN_EXPORT") != "1" && c.Global.Output.OutputTemplate == "splunkhec" {
+		if !c.cc.Export && c.Global.Output.OutputTemplate == "splunkhec" {
 			// If there's no _time token, add it to make sure we have a timestamp field in every event
 			// This is primarily used for Splunk's HTTP Event Collectot
 			timetoken := false
@@ -880,7 +960,7 @@ func ParseBeginEnd(s *Sample) {
 		}
 		s.Begin = "-" + strconv.Itoa(s.EndIntervals*s.Interval) + "s"
 		s.End = "now"
-		log.Infof("EndIntervals set, setting Begin to '%s' and end to '%s'", s.Begin, s.End)
+		log.Infof("EndIntervals set at %d, setting Begin to '%s' and end to '%s'", s.EndIntervals, s.Begin, s.End)
 	}
 	// Setup Begin & End
 	// If End is not set, then we're intended to always run in realtime

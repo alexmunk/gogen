@@ -1,4 +1,4 @@
-package share
+package internal
 
 import (
 	"bytes"
@@ -7,12 +7,12 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"os"
 
 	log "github.com/coccyx/gogen/logger"
 	"github.com/kr/pretty"
 )
 
+// GogenInfo represents a remote object from our service which stores shared Gogens
 type GogenInfo struct {
 	Gogen       string `json:"gogen"`
 	Owner       string `json:"owner"`
@@ -77,43 +77,42 @@ func listsearch(url string) (ret []GogenList) {
 }
 
 // Get calls /v1/get
-func Get(q string) (g GogenInfo) {
+func Get(q string) (g GogenInfo, err error) {
 	client := &http.Client{}
 	resp, err := client.Get("https://api.gogen.io/v1/get/" + q)
 	if err != nil || resp.StatusCode != 200 {
 		if resp != nil {
 			if resp.StatusCode == 404 {
-				fmt.Printf("Could not find Gogen: %s\n", q)
-				os.Exit(1)
+				return g, fmt.Errorf("Could not find Gogen: %s\n", q)
 			}
 			if resp.StatusCode != 200 {
 				body, _ := ioutil.ReadAll(resp.Body)
-				log.Fatalf("Non 200 response code retrieving Gogen: %s", string(body))
+				return g, fmt.Errorf("Non 200 response code retrieving Gogen: %s", string(body))
 			}
 		} else {
-			log.Fatalf("Error retrieving Gogen %s: %s", q, err)
+			return g, fmt.Errorf("Error retrieving Gogen %s: %s", q, err)
 		}
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatalf("Error reading body from response: %s", err)
+		return g, fmt.Errorf("Error reading body from response: %s", err)
 	}
 	// log.Debugf("Body: %s", body)
 	var gogen map[string]interface{}
 	err = json.Unmarshal(body, &gogen)
 	if err != nil {
-		log.Fatalf("Error unmarshaling body: %s", err)
+		return g, fmt.Errorf("Error unmarshaling body: %s", err)
 	}
 	tmp, err := json.Marshal(gogen["Item"])
 	if err != nil {
-		log.Fatalf("Error converting Item to JSON: %s", err)
+		return g, fmt.Errorf("Error converting Item to JSON: %s", err)
 	}
 	err = json.Unmarshal(tmp, &g)
 	if err != nil {
-		log.Fatalf("Error unmarshaling item: %s", err)
+		return g, fmt.Errorf("Error unmarshaling item: %s", err)
 	}
 	log.Debugf("Gogen: %# v", pretty.Formatter(g))
-	return g
+	return g, nil
 }
 
 // Upsert calls /v1/upsert

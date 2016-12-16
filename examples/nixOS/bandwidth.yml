@@ -1,0 +1,34 @@
+global:
+  samplesDir:
+  - $GOGEN_HOME/examples/nixOS
+generators:
+  - name: bandwidth
+    fileName: $GOGEN_HOME/examples/nixOS/bandwidth.lua
+    options:
+      minKBPS: 1000
+      maxKBPS: 1500
+      numNICs: 2
+samples:
+  - name: bandwidth
+    description: Generate Bandwidth Usage Metrics
+    notes: >
+      Generates bandwidth usage from the Splunk UNIX TA
+    generator: bandwidth
+    interval: 60
+    tokens:
+    - name: host
+      type: fieldChoice
+      srcField: host
+      sample: allhosts.csv
+      disabled: true
+    lines:
+    - index: os
+      sourcetype: bandwidth
+      source: bandwidth
+      host: $host$
+      _raw: Name	rxPackets_PS	txPackets_PS	rxKB_PS	txKB_PS
+    - index: os
+      sourcetype: df
+      source: df
+      host: $host$
+      _raw: $nic$	$rx_p$	$tx_p$	$rx_kb$	$tx_kb$

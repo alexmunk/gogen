@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/coccyx/gogen/internal"
+	config "github.com/coccyx/gogen/internal"
 	"github.com/coccyx/gogen/tests"
 	"github.com/stretchr/testify/assert"
 )

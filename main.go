@@ -8,10 +8,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/coccyx/gogen/internal"
+	config "github.com/coccyx/gogen/internal"
 	log "github.com/coccyx/gogen/logger"
 	"github.com/coccyx/gogen/run"
-	"github.com/coccyx/gogen/share"
 	"github.com/ghodss/yaml"
 	"github.com/olekukonko/tablewriter"
 	"github.com/pkg/profile"
@@ -50,7 +49,7 @@ func Setup(clic *cli.Context) {
 		if cstr[0:4] == "http" || cstr[len(cstr)-3:] == "yml" || cstr[len(cstr)-4:] == "yaml" || cstr[len(cstr)-4:] == "json" {
 			os.Setenv("GOGEN_FULLCONFIG", cstr)
 		} else {
-			share.PullFile(cstr, ".config.yml")
+			config.PullFile(cstr, ".config.yml")
 			config.ResetConfig()
 			os.Setenv("GOGEN_FULLCONFIG", ".config.yml")
 		}
@@ -106,7 +105,7 @@ func Setup(clic *cli.Context) {
 	// log.Debugf("JSON Config: %s\n", j)
 }
 
-func table(l []share.GogenList) {
+func table(l []config.GogenList) {
 	t := tablewriter.NewWriter(os.Stdout)
 	t.SetColWidth(132)
 	t.SetAutoWrapText(false)
@@ -237,10 +236,16 @@ func main() {
 			Usage: "Print config to stdout",
 			Flags: []cli.Flag{
 				cli.StringFlag{Name: "format, f"},
+				cli.BoolFlag{
+					Name:  "noexport, ne",
+					Usage: "Don't set to export",
+				},
 			},
 			Action: func(clic *cli.Context) error {
 				os.Setenv("GOGEN_ALWAYS_REFRESH", "1")
-				os.Setenv("GOGEN_EXPORT", "1")
+				if !clic.Bool("noexport") {
+					os.Setenv("GOGEN_EXPORT", "1")
+				}
 				c = config.NewConfig()
 				var outb []byte
 				var err error
@@ -262,7 +267,7 @@ func main() {
 			Name:  "login",
 			Usage: "Login to GitHub",
 			Action: func(clic *cli.Context) error {
-				_ = share.NewGitHub(true)
+				_ = config.NewGitHub(true)
 				return nil
 			},
 		},
@@ -271,7 +276,7 @@ func main() {
 			Usage: "List all published Gogens",
 			Action: func(clic *cli.Context) error {
 				fmt.Printf("Showing all Gogens:\n\n")
-				l := share.List()
+				l := config.List()
 				table(l)
 				return nil
 			},
@@ -286,7 +291,7 @@ func main() {
 				}
 				q = strings.TrimRight(q, " ")
 				fmt.Printf("Returning results for search: \"%s\"\n\n", q)
-				l := share.Search(q)
+				l := config.Search(q)
 				if len(l) > 0 {
 					table(l)
 				} else {
@@ -304,7 +309,10 @@ func main() {
 					fmt.Println("Error: Must specify a Gogen in owner/name format")
 					os.Exit(1)
 				}
-				g := share.Get(clic.Args()[0])
+				g, err := config.Get(clic.Args()[0])
+				if err != nil {
+					log.WithError(err).Fatalf("Error retrieving gogen")
+				}
 				fmt.Printf("Details for Gogen %s\n", g.Gogen)
 				fmt.Printf("------------------------------------------------------\n")
 				fmt.Printf("%15s : %s\n", "Gogen", g.Gogen)
@@ -319,8 +327,12 @@ func main() {
 				}
 				var event map[string]interface{}
 				var eventbytes []byte
-				_ = json.Unmarshal([]byte(g.SampleEvent), &event)
-				eventbytes, _ = json.MarshalIndent(event, "", "  ")
+				err = json.Unmarshal([]byte(g.SampleEvent), &event)
+				if err != nil {
+					eventbytes = []byte(g.SampleEvent)
+				} else {
+					eventbytes, _ = json.MarshalIndent(event, "", "  ")
+				}
 				fmt.Printf("Sample Event:\n")
 				fmt.Printf("------------------------------------------------------\n")
 				fmt.Printf("%s\n", string(eventbytes))
@@ -332,17 +344,18 @@ func main() {
 			Usage: "Push running config to Gogen sharing service",
 			ArgsUsage: "[name]\n\n" + "This will push your running config to the Gogen sharing API.  This will publish the running config\n" +
 				"in a Git Gist and make an entry in the Gogen API database pointing to the gist with a bit of metadata.\n\n" +
-				"The [name] argument should be the name of the primary sample you are publishing.  The entry in the database\n" +
-				"will get its Name, Description and Notes from the sample referenced by [name]",
+				"The [name] argument will be the name of the config published.  The entry in the database\n" +
+				"will get its Description and Notes from the first sample.  If a mix is specified, it will\n" +
+				"attempt to push all referenced configs in the sample.",
 			Action: func(clic *cli.Context) error {
-				config.ResetConfig()
-				os.Setenv("GOGEN_EXPORT", "1")
-				_ = config.NewConfig()
+				// config.ResetConfig()
+				// _ = config.NewConfig()
 				if len(clic.Args()) == 0 {
 					fmt.Println("Error: Must specify a name to publish this config")
 					os.Exit(1)
 				}
-				owner, id := share.Push(clic.Args().First())
+				var r run.Runner
+				owner, id := config.Push(clic.Args().First(), r)
 				fmt.Printf("Push successful.  Gist: https://gist.github.com/%s/%s\n", owner, id)
 				return nil
 			},
@@ -362,7 +375,7 @@ func main() {
 					fmt.Println("Error: Must specify a directory to place config files")
 					os.Exit(1)
 				}
-				share.Pull(clic.Args()[0], clic.Args()[1], clic.Bool("deconstruct"))
+				config.Pull(clic.Args()[0], clic.Args()[1], clic.Bool("deconstruct"))
 				return nil
 			},
 		},
